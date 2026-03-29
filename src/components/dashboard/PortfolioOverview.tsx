@@ -58,8 +58,8 @@ export function PortfolioOverview() {
             <thead>
               <tr className="text-gray-500 border-b border-gray-800">
                 <th className="text-left pb-2">Asset</th>
-                <th className="text-right pb-2">Qty</th>
-                <th className="text-right pb-2">Avg Cost</th>
+                <th className="text-right pb-2 hidden sm:table-cell">Qty</th>
+                <th className="text-right pb-2 hidden sm:table-cell">Avg Cost</th>
                 <th className="text-right pb-2">Price</th>
                 <th className="text-right pb-2">Value</th>
                 <th className="text-right pb-2">P&amp;L</th>
@@ -87,10 +87,10 @@ export function PortfolioOverview() {
                         <TypeBadge type={holding.assetType} />
                       </Link>
                     </td>
-                    <td className="text-right py-2 text-gray-300 tabular-nums">
+                    <td className="text-right py-2 text-gray-300 tabular-nums hidden sm:table-cell">
                       {holding.quantity.toLocaleString()}
                     </td>
-                    <td className="text-right py-2 text-gray-400 tabular-nums">
+                    <td className="text-right py-2 text-gray-400 tabular-nums hidden sm:table-cell">
                       ${formatPrice(holding.averageCostBasis)}
                     </td>
                     <td className="text-right py-2 text-white tabular-nums">

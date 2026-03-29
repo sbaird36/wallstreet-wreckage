@@ -103,7 +103,7 @@ export function TopNav() {
 
         {/* Tab navigation — only shown when in a game */}
         {state.gameStarted && (
-          <div className="border-t border-gray-800 px-5 flex items-center gap-1 h-12">
+          <div className="border-t border-gray-800 px-2 sm:px-5 flex items-center gap-0 sm:gap-1 h-12">
             {NAV_TABS.map((tab) => {
               const isActive = pathname === tab.href;
               const isBlog = tab.href === "/blog";
@@ -115,8 +115,8 @@ export function TopNav() {
                   key={tab.href}
                   href={tab.href}
                   className={`
-                    relative flex items-center gap-2 px-5 h-full text-sm font-mono tracking-wide
-                    border-b-2 transition-colors
+                    relative flex items-center gap-2 px-3 sm:px-5 h-full text-sm font-mono tracking-wide
+                    border-b-2 transition-colors flex-1 sm:flex-none justify-center sm:justify-start
                     ${isActive
                       ? "border-blue-500 text-white"
                       : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-600"
