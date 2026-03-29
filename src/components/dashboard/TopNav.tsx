@@ -12,6 +12,7 @@ const NAV_TABS = [
   { href: "/dashboard",   label: "Dashboard",    icon: "📊" },
   { href: "/news",        label: "Market News",  icon: "📰" },
   { href: "/blog",        label: "WSB",          icon: "💬" },
+  { href: "/algorithm",   label: "My Algorithm", icon: "🤖" },
   { href: "/hedge-fund",  label: "Hedge Fund",   icon: "🏦" },
 ];
 
