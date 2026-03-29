@@ -7,6 +7,7 @@ import { computeNewPrices } from "@/engine/priceEngine";
 import { advanceIndexes } from "@/engine/indexEngine";
 import { getDayName, isWeekend } from "@/utils/dateUtils";
 import { generateBlogPosts } from "@/engine/blogEngine";
+import { generateContactTips } from "@/engine/contactEngine";
 
 export function AdvanceDayButton() {
   const { state, dispatch } = useGame();
@@ -35,6 +36,7 @@ export function AdvanceDayButton() {
 
     const newIndexes = advanceIndexes(state.indexes, newAssets, state.currentDay + 1);
     const newBlogPosts = generateBlogPosts(state.currentDay + 1, events, state.assets);
+    const newContactTips = generateContactTips(state, state.currentDay + 1);
 
     dispatch({
       type: "ADVANCE_DAY",
@@ -47,6 +49,10 @@ export function AdvanceDayButton() {
         newBlogPosts,
       },
     });
+
+    if (newContactTips.length > 0) {
+      dispatch({ type: "ADD_CONTACT_TIPS", payload: newContactTips });
+    }
 
     setAdvancing(false);
   }

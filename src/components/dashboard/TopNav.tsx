@@ -106,12 +106,16 @@ export function TopNav() {
           <div className="border-t border-gray-800 px-5 flex items-center gap-1 h-12">
             {NAV_TABS.map((tab) => {
               const isActive = pathname === tab.href;
+              const isBlog = tab.href === "/blog";
+              const unreadTips = isBlog
+                ? (state.contactTips ?? []).filter((t) => !t.isRead).length
+                : 0;
               return (
                 <Link
                   key={tab.href}
                   href={tab.href}
                   className={`
-                    flex items-center gap-2 px-5 h-full text-sm font-mono tracking-wide
+                    relative flex items-center gap-2 px-5 h-full text-sm font-mono tracking-wide
                     border-b-2 transition-colors
                     ${isActive
                       ? "border-blue-500 text-white"
@@ -121,6 +125,9 @@ export function TopNav() {
                 >
                   <span className="text-base">{tab.icon}</span>
                   <span className="hidden sm:inline">{tab.label}</span>
+                  {unreadTips > 0 && (
+                    <span className="absolute top-2 right-2 sm:right-1 w-2 h-2 rounded-full bg-blue-500" />
+                  )}
                 </Link>
               );
             })}

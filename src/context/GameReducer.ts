@@ -1,5 +1,6 @@
 import type { GameState, GameAction, Holding } from "@/types";
 import { getNetWorth } from "@/utils/calculations";
+import { getNewlyUnlockedContacts } from "@/engine/contactEngine";
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
@@ -146,6 +147,75 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       });
       return { ...state, blogFeed: updatedFeed };
     }
+
+    case "POST_BLOG_POST": {
+      const post = action.payload;
+      const newCount = (state.playerPostCount ?? 0) + 1;
+
+      // Check if posting this unlocks a new contact
+      const newContactIds: string[] = getNewlyUnlockedContacts(
+        state.contacts ?? [],
+        newCount
+      );
+
+      return {
+        ...state,
+        blogFeed: [...state.blogFeed, post].slice(-720),
+        playerPostCount: newCount,
+        contacts: [...(state.contacts ?? []), ...newContactIds],
+      };
+    }
+
+    case "ADD_CONTACT_TIPS": {
+      const incoming = action.payload;
+      if (!incoming.length) return state;
+      return {
+        ...state,
+        contactTips: [...(state.contactTips ?? []), ...incoming].slice(-200),
+      };
+    }
+
+    case "MARK_TIPS_READ":
+      return {
+        ...state,
+        contactTips: (state.contactTips ?? []).map((t) => ({ ...t, isRead: true })),
+      };
+
+    case "DISMISS_CONTACT_TIP": {
+      const { tipId } = action.payload;
+      return {
+        ...state,
+        contactTips: (state.contactTips ?? []).filter((t) => t.id !== tipId),
+      };
+    }
+
+    case "RESET_GAME":
+      return {
+        currentDay: 1,
+        startDate: "2026-01-05",
+        assets: {},
+        portfolio: {
+          cash: 10_000,
+          holdings: {},
+          transactions: [],
+          netWorthHistory: [],
+        },
+        playerName: "",
+        activeEvents: [],
+        eventHistory: [],
+        recentEventCooldowns: {},
+        volatilityOverrides: {},
+        pendingTrade: null,
+        gameStarted: false,
+        indexes: {},
+        playerHedgeFund: null,
+        blogFeed: [],
+        analystUnlocks: [],
+        analystSubscription: null,
+        contacts: [],
+        contactTips: [],
+        playerPostCount: 0,
+      };
 
     default:
       return state;

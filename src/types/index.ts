@@ -215,6 +215,9 @@ export interface GameState {
   blogFeed: BlogPost[];
   analystUnlocks: string[];                       // individual ticker unlocks ($100 each)
   analystSubscription: AnalystSubscription | null; // weekly all-access ($5,000/week)
+  contacts: string[];          // unlocked contact IDs
+  contactTips: ContactTip[];   // tips received from contacts
+  playerPostCount: number;     // total posts submitted by the player
 }
 
 export interface SaveSlot {
@@ -245,6 +248,23 @@ export interface BlogPost {
   isReal: boolean;
   linkedEventId: string | null;
   linkedTickers: string[];
+  isPlayerPost?: boolean;
+}
+
+// ============================================================
+// Contacts / Tips Types
+// ============================================================
+
+export type ContactTier = 1 | 2 | 3;
+
+export interface ContactTip {
+  id: string;
+  contactId: string;
+  day: number;
+  ticker: string;
+  direction: "bullish" | "bearish";
+  message: string;
+  isRead: boolean;
 }
 
 // ============================================================
@@ -271,4 +291,9 @@ export type GameAction =
   | { type: "CREATE_HEDGE_FUND"; payload: PlayerHedgeFund }
   | { type: "VOTE_BLOG_POST"; payload: { postId: string; vote: "UP" | "DOWN" | null } }
   | { type: "UNLOCK_ANALYST_STOCK"; payload: { ticker: string } }
-  | { type: "BUY_ANALYST_SUBSCRIPTION" };
+  | { type: "BUY_ANALYST_SUBSCRIPTION" }
+  | { type: "POST_BLOG_POST"; payload: BlogPost }
+  | { type: "ADD_CONTACT_TIPS"; payload: ContactTip[] }
+  | { type: "MARK_TIPS_READ" }
+  | { type: "DISMISS_CONTACT_TIP"; payload: { tipId: string } }
+  | { type: "RESET_GAME" };

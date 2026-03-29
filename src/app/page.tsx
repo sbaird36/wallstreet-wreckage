@@ -7,18 +7,17 @@ import { useGame } from "@/context/GameContext";
 import { buildInitialGameState } from "@/engine/seeder";
 
 export default function HomePage() {
-  const { state, dispatch, hasAutoSave, loadAutoSave } = useGame();
+  const { state, dispatch, hasAutoSave, loadAutoSave, saveSlotsLoaded } = useGame();
   const router = useRouter();
   const [playerName, setPlayerName] = useState("");
-  const [showContinue, setShowContinue] = useState(false);
 
   useEffect(() => {
     if (state.gameStarted) {
       router.push("/dashboard");
-      return;
     }
-    setShowContinue(hasAutoSave());
-  }, [state.gameStarted, hasAutoSave, router]);
+  }, [state.gameStarted, router]);
+
+  const showContinue = saveSlotsLoaded && hasAutoSave();
 
   function handleNewGame() {
     if (!playerName.trim()) return;

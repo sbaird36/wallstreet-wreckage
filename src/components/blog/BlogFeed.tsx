@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useGame } from "@/context/GameContext";
 import type { BlogPost, BlogPostFlair } from "@/types";
+import { PostComposer } from "@/components/blog/PostComposer";
 
 const FLAIR_STYLES: Record<BlogPostFlair, string> = {
   DD:         "bg-blue-900/60 text-blue-300 border-blue-700",
@@ -33,7 +34,7 @@ function PostCard({ post }: { post: BlogPost }) {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden hover:border-gray-700 transition-colors">
+    <div className={`rounded-lg overflow-hidden transition-colors ${post.isPlayerPost ? "bg-gray-900 border border-blue-900/60 hover:border-blue-800/80" : "bg-gray-900 border border-gray-800 hover:border-gray-700"}`}>
       <div className="flex gap-0">
         {/* Vote column */}
         <div className="flex flex-col items-center gap-1 px-3 py-3 bg-gray-950/60 border-r border-gray-800 min-w-[48px]">
@@ -77,6 +78,13 @@ function PostCard({ post }: { post: BlogPost }) {
                 </Link>
               );
             })}
+
+            {/* Player post badge */}
+            {post.isPlayerPost && (
+              <span className="text-xs px-1.5 py-0.5 rounded border font-mono bg-blue-900/40 text-blue-400 border-blue-800">
+                ✏ Your Post
+              </span>
+            )}
 
             {/* Verification badge — only shown after 2 days */}
             {status === "VERIFIED" && (
@@ -191,6 +199,9 @@ export function BlogFeed() {
           <span className="text-gray-500 font-mono">✗ UNVERIFIED = FUD</span>
         </div>
       </div>
+
+      {/* Post Composer */}
+      <PostComposer />
 
       {/* Filters */}
       <div className="bg-gray-900 border border-gray-800 rounded-lg p-3 mb-4">

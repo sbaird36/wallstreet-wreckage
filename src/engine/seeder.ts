@@ -103,5 +103,8 @@ export function buildInitialGameState(playerName: string): GameState {
     blogFeed: [],
     analystUnlocks: [],
     analystSubscription: null,
+    contacts: [],
+    contactTips: [],
+    playerPostCount: 0,
   };
 }
