@@ -122,8 +122,8 @@ export function InterestMeter() {
   const snp499 = state.indexes["snp499"];
 
   const score = useMemo(
-    () => computeInterestScore(state.portfolio, netWorth, snp499),
-    [state.portfolio, netWorth, snp499]
+    () => computeInterestScore(state.portfolio, netWorth, snp499, state.currentDay),
+    [state.portfolio, netWorth, snp499, state.currentDay]
   );
 
   const canFound = canFoundHedgeFund(netWorth);
@@ -158,6 +158,25 @@ export function InterestMeter() {
           </div>
         </div>
 
+        {/* Track record progress */}
+        {state.currentDay < 63 && (
+          <div className="bg-gray-800/60 border border-gray-700/60 rounded-lg px-3 py-2.5 mb-4 text-xs text-gray-400 flex items-start gap-2">
+            <span className="mt-0.5 flex-shrink-0">⏳</span>
+            <span>
+              Hedge funds need at least one quarter of track record before they take notice.{" "}
+              <span className="text-gray-300 font-mono">{63 - state.currentDay} trading days</span> to go before your score can build.
+            </span>
+          </div>
+        )}
+        {state.currentDay >= 63 && alpha <= 0 && (
+          <div className="bg-gray-800/60 border border-gray-700/60 rounded-lg px-3 py-2.5 mb-4 text-xs text-gray-400 flex items-start gap-2">
+            <span className="mt-0.5 flex-shrink-0">📉</span>
+            <span>
+              Your portfolio is underperforming the SNP499 market index. You need positive alpha to build interest.
+            </span>
+          </div>
+        )}
+
         {/* Score + gauge */}
         <div className="mb-4">
           <div className="flex items-end justify-between mb-2">
@@ -166,7 +185,14 @@ export function InterestMeter() {
                 {score.toFixed(1)}
                 <span className="text-lg text-gray-500">/100</span>
               </div>
-              <div className="text-xs text-gray-500 mt-0.5">Interest Score</div>
+              <div className="text-xs text-gray-500 mt-0.5">
+                Interest Score
+                {state.currentDay >= 63 && state.currentDay < 504 && (
+                  <span className="ml-2 text-gray-600">
+                    · track record {Math.round(((state.currentDay - 63) / 441) * 100)}% matured
+                  </span>
+                )}
+              </div>
             </div>
             <div className="text-right text-xs">
               <div className="text-gray-500 mb-0.5">Your alpha vs SNP499</div>

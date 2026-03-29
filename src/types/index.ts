@@ -194,6 +194,10 @@ export interface VolatilityOverride {
   expiresOnDay: number;
 }
 
+export interface AnalystSubscription {
+  purchasedDay: number;
+}
+
 export interface GameState {
   currentDay: number;
   startDate: string;
@@ -209,6 +213,8 @@ export interface GameState {
   indexes: Record<string, MarketIndex>;
   playerHedgeFund: PlayerHedgeFund | null;
   blogFeed: BlogPost[];
+  analystUnlocks: string[];                       // individual ticker unlocks ($100 each)
+  analystSubscription: AnalystSubscription | null; // weekly all-access ($5,000/week)
 }
 
 export interface SaveSlot {
@@ -263,4 +269,6 @@ export type GameAction =
   | { type: "NEW_GAME"; payload: { playerName: string; initialState: GameState } }
   | { type: "CANCEL_TRADE" }
   | { type: "CREATE_HEDGE_FUND"; payload: PlayerHedgeFund }
-  | { type: "VOTE_BLOG_POST"; payload: { postId: string; vote: "UP" | "DOWN" | null } };
+  | { type: "VOTE_BLOG_POST"; payload: { postId: string; vote: "UP" | "DOWN" | null } }
+  | { type: "UNLOCK_ANALYST_STOCK"; payload: { ticker: string } }
+  | { type: "BUY_ANALYST_SUBSCRIPTION" };

@@ -280,17 +280,33 @@ export function AlgorithmBuilder() {
     setConfig((c) => ({ ...c, riskProfile: profile }));
   }
 
+  const analystSub = state.analystSubscription;
+  const subActive = analystSub !== null && state.currentDay - analystSub.purchasedDay < 7;
+
+  const fullConfig = useMemo(
+    () => ({
+      ...config,
+      analystUnlocks: state.analystUnlocks,
+      analystSubscriptionDay: analystSub?.purchasedDay ?? null,
+    }),
+    [config, state.analystUnlocks, analystSub]
+  );
+
   const results = useMemo(
     () =>
       runAlgorithm(
         state.assets,
         state.eventHistory,
         state.blogFeed,
-        config,
+        fullConfig,
         state.currentDay
       ),
-    [state.assets, state.eventHistory, state.blogFeed, config, state.currentDay]
+    [state.assets, state.eventHistory, state.blogFeed, fullConfig, state.currentDay]
   );
+
+  const analystCoverageCount = subActive
+    ? Object.keys(state.assets).length
+    : state.analystUnlocks.length;
 
   const totalWeight = Object.values(config.weights).reduce((a, b) => a + b, 0);
   const hasAnyAssetType = config.includeStocks || config.includeCrypto;
@@ -450,6 +466,23 @@ export function AlgorithmBuilder() {
 
         {/* ── Right: Results panel ── */}
         <div className="lg:col-span-3 space-y-3">
+
+          {/* Analyst access notice */}
+          {config.weights.analyst > 0 && (
+            <div className={`rounded-lg border px-3 py-2 text-xs flex items-start gap-2 ${
+              analystCoverageCount > 0
+                ? "bg-blue-900/20 border-blue-800/50 text-blue-300"
+                : "bg-amber-900/20 border-amber-800/50 text-amber-400"
+            }`}>
+              <span className="mt-0.5">{analystCoverageCount > 0 ? "🏛️" : "🔒"}</span>
+              <span>
+                {analystCoverageCount > 0
+                  ? `Analyst data active for ${analystCoverageCount} asset${analystCoverageCount !== 1 ? "s" : ""}${subActive ? " (subscription)" : ""}. Unlocked tickers receive 3-firm consensus scoring.`
+                  : `Analyst weight is set but you have no analyst coverage unlocked. Visit any stock page to unlock for $100, or subscribe for $5,000/week to cover all assets.`
+                }
+              </span>
+            </div>
+          )}
 
           {/* Results header */}
           <div className="bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 flex items-center justify-between gap-4 flex-wrap">

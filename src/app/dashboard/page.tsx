@@ -26,7 +26,7 @@ export default function DashboardPage() {
     }
   }, [state.gameStarted, router]);
 
-  // Show weekly recap when day advances to a Sunday
+  // Show weekly recap when day advances to Monday (weekend just ended)
   useEffect(() => {
     if (!state.gameStarted) return;
     if (prevDayRef.current === null) {
@@ -35,7 +35,7 @@ export default function DashboardPage() {
     }
     if (state.currentDay > prevDayRef.current) {
       const dow = getDayOfWeek(state.startDate, state.currentDay);
-      if (dow === 0) {
+      if (dow === 1) {
         setShowWeeklyRecap(true);
       }
     }

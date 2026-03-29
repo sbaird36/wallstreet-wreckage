@@ -101,5 +101,7 @@ export function buildInitialGameState(playerName: string): GameState {
     indexes,
     playerHedgeFund: null,
     blogFeed: [],
+    analystUnlocks: [],
+    analystSubscription: null,
   };
 }

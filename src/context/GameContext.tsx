@@ -49,6 +49,8 @@ const initialState: GameState = {
   indexes: {},
   playerHedgeFund: null,
   blogFeed: [],
+  analystUnlocks: [],
+  analystSubscription: null,
 };
 
 const GameContext = createContext<GameContextValue | null>(null);

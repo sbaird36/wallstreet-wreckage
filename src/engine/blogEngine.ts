@@ -8,6 +8,10 @@ import {
   FUD_BEARISH_BODIES,
   FUD_NEUTRAL_TITLES,
   FUD_NEUTRAL_BODIES,
+  FUD_YOLO_TITLES,
+  FUD_YOLO_BODIES,
+  FUD_MEME_TITLES,
+  FUD_MEME_BODIES,
   REAL_TITLES,
   REAL_BODIES,
   FLAIR_BY_CATEGORY,
@@ -93,18 +97,26 @@ function generateFudPost(day: number, idx: number, assets: Asset[]): BlogPost {
   let body: string;
   let flair: BlogPostFlair;
 
-  if (roll < 0.35) {
+  if (roll < 0.30) {
     title = fillTemplate(pick(FUD_BULLISH_TITLES), vars);
     body = fillTemplate(pick(FUD_BULLISH_BODIES), vars);
     flair = pick(["DD", "YOLO", "Discussion"] as BlogPostFlair[]);
-  } else if (roll < 0.70) {
+  } else if (roll < 0.60) {
     title = fillTemplate(pick(FUD_BEARISH_TITLES), vars);
     body = fillTemplate(pick(FUD_BEARISH_BODIES), vars);
     flair = pick(["DD", "Discussion", "Shitpost"] as BlogPostFlair[]);
-  } else {
+  } else if (roll < 0.75) {
     title = fillTemplate(pick(FUD_NEUTRAL_TITLES), vars);
     body = fillTemplate(pick(FUD_NEUTRAL_BODIES), vars);
     flair = pick(["Meme", "Shitpost", "Discussion"] as BlogPostFlair[]);
+  } else if (roll < 0.90) {
+    title = fillTemplate(pick(FUD_YOLO_TITLES), vars);
+    body = fillTemplate(pick(FUD_YOLO_BODIES), vars);
+    flair = pick(["YOLO", "Shitpost"] as BlogPostFlair[]);
+  } else {
+    title = fillTemplate(pick(FUD_MEME_TITLES), vars);
+    body = fillTemplate(pick(FUD_MEME_BODIES), vars);
+    flair = pick(["Meme", "Shitpost"] as BlogPostFlair[]);
   }
 
   return {

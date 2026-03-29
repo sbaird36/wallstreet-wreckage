@@ -1,5 +1,6 @@
 import type { Asset, FiredEvent, BlogPost } from "@/types";
 import { rsi, sma } from "@/utils/technicals";
+import { computeAnalystCoverage, hasAnalystAccess } from "@/utils/analystEngine";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -19,6 +20,8 @@ export type AlgorithmConfig = {
   includeStocks: boolean;
   includeCrypto: boolean;
   topN: number;
+  analystUnlocks: string[];
+  analystSubscriptionDay: number | null;
 };
 
 export const DEFAULT_CONFIG: AlgorithmConfig = {
@@ -33,6 +36,8 @@ export const DEFAULT_CONFIG: AlgorithmConfig = {
   includeStocks: true,
   includeCrypto: false,
   topN: 10,
+  analystUnlocks: [],
+  analystSubscriptionDay: null,
 };
 
 // ─── Factor scoring ───────────────────────────────────────────────────────────
@@ -71,19 +76,8 @@ function technicalScore(asset: Asset): number | null {
   return rsiVal !== null ? rsiPart * 0.55 + maPart * 0.45 : maPart;
 }
 
-function analystScore(asset: Asset): number {
-  const closes = asset.priceHistory.map((p) => p.close);
-  const rsiVal = rsi(closes);
-  // Replicate the analystRating logic inline to avoid circular deps
-  // trend > 0 = bullish leaning; combine with RSI for a rating
-  const trend = asset.trend ?? 0;
-  let base = 50 + trend * 2000; // trend ≈ 0.005 maps to ~60
-  if (rsiVal !== null) {
-    if (rsiVal < 30) base += 15;
-    else if (rsiVal > 70) base -= 15;
-  }
-  return Math.max(0, Math.min(100, base));
-}
+// analystScore is not standalone here — it's called per-ticker in runAlgorithm
+// with access check. See usage below.
 
 function momentumScore(asset: Asset, lookbackDays = 5): number {
   const history = asset.priceHistory;
@@ -215,7 +209,14 @@ export function runAlgorithm(
   config: AlgorithmConfig,
   currentDay: number
 ): AssetScore[] {
-  const { weights, riskProfile, includeStocks, includeCrypto, topN } = config;
+  const {
+    weights, riskProfile, includeStocks, includeCrypto, topN,
+    analystUnlocks, analystSubscriptionDay,
+  } = config;
+
+  const analystSub = analystSubscriptionDay !== null
+    ? { purchasedDay: analystSubscriptionDay }
+    : null;
 
   const allWeightsZero = Object.values(weights).every((w) => w === 0);
   if (allWeightsZero || (!includeStocks && !includeCrypto)) return [];
@@ -226,12 +227,23 @@ export function runAlgorithm(
     if (asset.type === "stock" && !includeStocks) continue;
     if (asset.type === "crypto" && !includeCrypto) continue;
 
+    // Analyst: only use if player has paid for this ticker
+    let analystScoreVal: number | null = null;
+    if (weights.analyst > 0) {
+      const access = hasAnalystAccess(asset.ticker, analystUnlocks, analystSub, currentDay);
+      if (access) {
+        const coverage = computeAnalystCoverage(asset, eventHistory, currentDay);
+        analystScoreVal = coverage.consensusScore;
+      }
+      // else: null → this factor is silently excluded from the weighted average
+    }
+
     const factorScores: FactorScores = {
-      technical:     weights.technical     > 0 ? technicalScore(asset)                                      : null,
-      analyst:       weights.analyst       > 0 ? analystScore(asset)                                        : null,
-      blogSentiment: weights.blogSentiment > 0 ? blogSentimentScore(asset.ticker, blogFeed, currentDay)     : null,
-      momentum:      weights.momentum      > 0 ? momentumScore(asset)                                       : null,
-      events:        weights.events        > 0 ? eventScore(asset.ticker, eventHistory, currentDay)         : null,
+      technical:     weights.technical     > 0 ? technicalScore(asset)                                  : null,
+      analyst:       analystScoreVal,
+      blogSentiment: weights.blogSentiment > 0 ? blogSentimentScore(asset.ticker, blogFeed, currentDay) : null,
+      momentum:      weights.momentum      > 0 ? momentumScore(asset)                                   : null,
+      events:        weights.events        > 0 ? eventScore(asset.ticker, eventHistory, currentDay)     : null,
     };
 
     // Weighted average — only count factors that have data

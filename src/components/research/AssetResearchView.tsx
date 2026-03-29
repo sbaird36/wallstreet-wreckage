@@ -26,10 +26,16 @@ import {
   highLow52Week,
   avgVolume,
   beta,
-  analystRating,
-  priceTarget,
-  type AnalystRating,
 } from "@/utils/technicals";
+import {
+  computeAnalystCoverage,
+  hasAnalystAccess,
+  ANALYST_FIRMS,
+  ANALYST_SINGLE_COST,
+  ANALYST_SUB_COST,
+  ANALYST_SUB_DAYS,
+  type AnalystRating,
+} from "@/utils/analystEngine";
 
 interface Props {
   ticker: string;
@@ -178,9 +184,6 @@ export function AssetResearchView({ ticker }: Props) {
     const atrVal = atr(asset.priceHistory);
     const hl52 = highLow52Week(asset.priceHistory);
     const avgVol = avgVolume(asset.priceHistory);
-    const rating = analystRating(rsiVal, asset.trend);
-    const target = priceTarget(asset.currentPrice, asset.trend);
-
     // Beta vs the broad SNP499 index
     const snpIndex = state.indexes["snp499"];
     let betaVal: number | null = null;
@@ -204,7 +207,7 @@ export function AssetResearchView({ ticker }: Props) {
 
     return {
       rsiVal, sma20, sma50, sma200, atrVal, hl52, avgVol, betaVal,
-      rating, target, maTrend, eps,
+      maTrend, eps,
     };
   }, [asset, state.indexes]);
 
@@ -226,7 +229,25 @@ export function AssetResearchView({ ticker }: Props) {
     e.affectedTickers.includes(ticker)
   );
 
-  const ratingStyle = RATING_STYLES[technicals.rating];
+  // ── Analyst coverage ────────────────────────────────────────
+  const analystUnlocks = state.analystUnlocks ?? [];
+  const analystSubscription = state.analystSubscription ?? null;
+  const analystAccess = hasAnalystAccess(
+    ticker,
+    analystUnlocks,
+    analystSubscription,
+    state.currentDay
+  );
+  const coverage = analystAccess
+    ? computeAnalystCoverage(asset, state.eventHistory, state.currentDay)
+    : null;
+  const subActive =
+    analystSubscription !== null &&
+    state.currentDay - analystSubscription.purchasedDay < ANALYST_SUB_DAYS;
+  const subDaysLeft = subActive
+    ? ANALYST_SUB_DAYS - (state.currentDay - analystSubscription!.purchasedDay)
+    : 0;
+
   const qty = parseFloat(quantity) || 0;
 
   function handleTrade() {
@@ -279,16 +300,18 @@ export function AssetResearchView({ ticker }: Props) {
           <QuickStat label="Market Cap" value={`$${formatLargeNumber(marketCap)}`} />
           <QuickStat
             label="Analyst Rating"
-            value={technicals.rating}
-            valueClass={ratingStyle.text}
+            value={analystAccess ? (coverage?.consensusRating ?? "—") : "🔒 Locked"}
+            valueClass={analystAccess ? (coverage ? RATING_STYLES[coverage.consensusRating].text : "text-gray-400") : "text-amber-500"}
           />
           <QuickStat
-            label="Price Target"
-            value={`$${formatPrice(technicals.target)}`}
+            label="Consensus Target"
+            value={analystAccess && coverage ? `$${formatPrice(coverage.consensusTarget)}` : "🔒 Locked"}
             sub={
-              technicals.target > asset.currentPrice
-                ? `▲ ${formatPercent((technicals.target - asset.currentPrice) / asset.currentPrice)} upside`
-                : `▼ ${formatPercent((asset.currentPrice - technicals.target) / asset.currentPrice)} downside`
+              analystAccess && coverage
+                ? coverage.consensusTarget > asset.currentPrice
+                  ? `▲ ${formatPercent((coverage.consensusTarget - asset.currentPrice) / asset.currentPrice)} upside`
+                  : `▼ ${formatPercent((asset.currentPrice - coverage.consensusTarget) / asset.currentPrice)} downside`
+                : undefined
             }
           />
           <QuickStat
@@ -489,45 +512,101 @@ export function AssetResearchView({ ticker }: Props) {
             </div>
           )}
 
-          {/* Analyst View */}
+          {/* Analyst Coverage */}
           <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-            <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-3">
-              Analyst View
-            </h2>
-            <div
-              className={`${ratingStyle.bg} ${ratingStyle.border} border rounded-lg p-3 text-center mb-3`}
-            >
-              <div className="text-xs text-gray-400 mb-0.5">Consensus Rating</div>
-              <div className={`text-lg font-mono font-bold ${ratingStyle.text}`}>
-                {technicals.rating}
-              </div>
-            </div>
-            <div>
-              <div className="text-xs text-gray-500 mb-1.5">
-                Price Target
-                <span className="ml-2 text-gray-600">(90-day simulated)</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-mono text-white tabular-nums">
-                  ${formatPrice(technicals.target)}
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xs text-gray-400 uppercase tracking-wider">
+                Analyst Coverage
+              </h2>
+              {analystAccess && (
+                <span className="text-xs font-mono text-emerald-400 bg-emerald-900/30 border border-emerald-800/50 px-2 py-0.5 rounded">
+                  {subActive ? `SUB · ${subDaysLeft}d left` : "UNLOCKED"}
                 </span>
-                <span
-                  className={`text-xs font-mono tabular-nums ${
-                    technicals.target > asset.currentPrice
-                      ? "text-emerald-400"
-                      : "text-rose-400"
-                  }`}
-                >
-                  {technicals.target > asset.currentPrice ? "▲" : "▼"}{" "}
-                  {formatPercent(
-                    Math.abs(
-                      (technicals.target - asset.currentPrice) / asset.currentPrice
-                    ),
-                    false
-                  )}
-                </span>
-              </div>
+              )}
             </div>
+
+            {analystAccess && coverage ? (
+              <div className="space-y-3">
+                {/* Consensus summary */}
+                <div className={`${RATING_STYLES[coverage.consensusRating].bg} ${RATING_STYLES[coverage.consensusRating].border} border rounded-lg p-3 text-center`}>
+                  <div className="text-xs text-gray-400 mb-0.5">3-Firm Consensus</div>
+                  <div className={`text-lg font-mono font-bold ${RATING_STYLES[coverage.consensusRating].text}`}>
+                    {coverage.consensusRating}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Target: ${formatPrice(coverage.consensusTarget)}
+                  </div>
+                </div>
+
+                {/* Individual firm views */}
+                {coverage.views.map((view) => {
+                  const firm = ANALYST_FIRMS[view.firmId];
+                  const style = RATING_STYLES[view.rating];
+                  return (
+                    <div key={view.firmId} className="border border-gray-800 rounded-lg p-3">
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm">{firm.icon}</span>
+                            <span className="text-xs font-mono font-bold text-white">{firm.shortName}</span>
+                          </div>
+                          <div className="text-xs text-gray-600 mt-0.5">{firm.focus}</div>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <span className={`text-xs font-mono px-1.5 py-0.5 rounded border ${style.bg} ${style.text} ${style.border}`}>
+                            {view.rating}
+                          </span>
+                          <div className="text-xs font-mono text-gray-500 mt-1">
+                            ${formatPrice(view.priceTarget)}
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-400 leading-relaxed">{view.rationale}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              /* Paywall */
+              <div>
+                <div className="text-center py-4 mb-3">
+                  <div className="text-3xl mb-2">🔒</div>
+                  <div className="text-sm font-mono text-gray-300 mb-1">3 Analyst Firms Available</div>
+                  <div className="text-xs text-gray-500 mb-3">
+                    Get independent ratings from Apex Research, Momentum Capital Analytics, and Sentinel Risk Partners — each with their own methodology and price targets.
+                  </div>
+                  <div className="space-y-2 text-left text-xs text-gray-500 mb-4">
+                    {Object.values(ANALYST_FIRMS).map((f) => (
+                      <div key={f.id} className="flex items-center gap-2">
+                        <span>{f.icon}</span>
+                        <span className="text-gray-400 font-mono">{f.name}</span>
+                        <span className="text-gray-600">· {f.focus}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <button
+                    onClick={() => dispatch({ type: "UNLOCK_ANALYST_STOCK", payload: { ticker } })}
+                    disabled={state.portfolio.cash < ANALYST_SINGLE_COST}
+                    className="w-full py-2.5 text-sm font-mono font-bold rounded-lg border transition-colors bg-blue-900 hover:bg-blue-800 border-blue-700 text-blue-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Unlock This Stock — ${ANALYST_SINGLE_COST.toLocaleString()}
+                  </button>
+                  <button
+                    onClick={() => dispatch({ type: "BUY_ANALYST_SUBSCRIPTION" })}
+                    disabled={state.portfolio.cash < ANALYST_SUB_COST}
+                    className="w-full py-2.5 text-sm font-mono font-bold rounded-lg border transition-colors bg-yellow-900/60 hover:bg-yellow-900 border-yellow-700 text-yellow-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Subscribe All — ${ANALYST_SUB_COST.toLocaleString()}/week
+                  </button>
+                  <div className="text-center text-xs text-gray-600">
+                    Subscription covers all {Object.keys(state.assets).length} assets for {ANALYST_SUB_DAYS} days
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Technical Indicators */}

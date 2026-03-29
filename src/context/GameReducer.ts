@@ -109,6 +109,26 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case "CREATE_HEDGE_FUND":
       return { ...state, playerHedgeFund: action.payload };
 
+    case "UNLOCK_ANALYST_STOCK": {
+      const { ticker } = action.payload;
+      if (state.analystUnlocks.includes(ticker)) return state;
+      if (state.portfolio.cash < 100) return state;
+      return {
+        ...state,
+        analystUnlocks: [...state.analystUnlocks, ticker],
+        portfolio: { ...state.portfolio, cash: state.portfolio.cash - 100 },
+      };
+    }
+
+    case "BUY_ANALYST_SUBSCRIPTION": {
+      if (state.portfolio.cash < 5_000) return state;
+      return {
+        ...state,
+        analystSubscription: { purchasedDay: state.currentDay },
+        portfolio: { ...state.portfolio, cash: state.portfolio.cash - 5_000 },
+      };
+    }
+
     case "VOTE_BLOG_POST": {
       const { postId, vote } = action.payload;
       const updatedFeed = state.blogFeed.map((post) => {

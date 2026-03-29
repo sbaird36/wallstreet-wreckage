@@ -7,16 +7,26 @@ const HEDGE_FUND_THRESHOLD = 50_000_000;
  * Computes an "interest score" from 0–100 representing how much the
  * hedge fund community cares about your track record.
  *
+ * Deliberately slow — designed so the first quarter of trading generates
+ * zero interest, and meaningful scores only emerge after sustained
+ * outperformance over many months.
+ *
  * Factors:
- *  - Alpha vs the SNP499 broad market (up to 70 pts)
- *  - Portfolio size — bigger AUM = more credibility (up to 30 pts)
+ *  - Hard gate: no score before day 63 (one trading quarter)
+ *  - Positive alpha vs SNP499 required to build any score (up to 70 pts)
+ *  - Track record multiplier: ramps from 0 (day 63) to 1.0 (day 504 ≈ 2 years)
+ *  - Portfolio size — bigger AUM adds credibility (up to 30 pts, also gated)
  */
 export function computeInterestScore(
   portfolio: Portfolio,
   netWorth: number,
-  snp499: MarketIndex | undefined
+  snp499: MarketIndex | undefined,
+  currentDay: number
 ): number {
-  // Portfolio total return
+  // Hard gate: zero interest for the first quarter of trading
+  if (currentDay < 63) return 0;
+
+  // Portfolio total return since game start
   const portfolioReturn = (netWorth - STARTING_CAPITAL) / STARTING_CAPITAL;
 
   // Market return since game start
@@ -25,13 +35,21 @@ export function computeInterestScore(
     marketReturn = (snp499.currentValue - snp499.startingValue) / snp499.startingValue;
   }
 
-  // Alpha (outperformance over market)
+  // Alpha (outperformance over market) — must be positive to build any score
   const alpha = portfolioReturn - marketReturn;
+  if (alpha <= 0) return 0;
 
-  // Alpha contribution: 100% alpha = 70 pts (capped)
-  const alphaScore = Math.min(Math.max(alpha * 100, 0), 70);
+  // Track record multiplier: 0 at day 63, reaches 1.0 at day 504 (≈ 2 years).
+  // This means even perfect alpha is heavily discounted until you have real history.
+  const trackRecord = Math.min((currentDay - 63) / 441, 1.0);
 
-  // Size contribution: log scale from $10k (0) → $50M (30)
+  // Alpha contribution (up to 70 pts):
+  // Requires substantial sustained alpha — 87.5% alpha fully maxes this out.
+  // At 10% alpha you get 8 raw pts; at 25% you get 20 raw pts.
+  const alphaScore = Math.min(alpha * 80, 70);
+
+  // Size contribution (up to 30 pts): log scale, same as before.
+  // Only starts to matter once you have meaningful AUM.
   const sizeScore =
     netWorth > STARTING_CAPITAL
       ? Math.min(
@@ -42,7 +60,7 @@ export function computeInterestScore(
         )
       : 0;
 
-  return Math.min(Math.max(alphaScore + sizeScore, 0), 100);
+  return Math.min(Math.max((alphaScore + sizeScore) * trackRecord, 0), 100);
 }
 
 export function canFoundHedgeFund(netWorth: number): boolean {
