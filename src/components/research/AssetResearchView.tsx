@@ -259,7 +259,12 @@ export function AssetResearchView({ ticker }: Props) {
   }
 
   // 52-week position (0 = at 52w low, 1 = at 52w high)
-  const hl = technicals.hl52;
+  // Extend the range to always include the current price so the dot never leaves the bar
+  const hl52 = technicals.hl52;
+  const hl = {
+    low: Math.min(hl52.low, asset.currentPrice),
+    high: Math.max(hl52.high, asset.currentPrice),
+  };
   const hlRange = hl.high - hl.low || 1;
   const hlPosition = (asset.currentPrice - hl.low) / hlRange;
 
