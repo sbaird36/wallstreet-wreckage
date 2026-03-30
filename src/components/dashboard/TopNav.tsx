@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useGame } from "@/context/GameContext";
 import { getNetWorth } from "@/utils/calculations";
@@ -33,11 +34,15 @@ export function TopNav() {
           <div className="flex items-center h-full gap-0 flex-shrink-0">
             <Link
               href="/dashboard"
-              className="flex items-center gap-3 pr-5 border-r border-gray-800 h-full"
+              className="flex items-center gap-2 pr-5 border-r border-gray-800 h-full"
             >
-              <span className="bg-blue-600 text-white font-mono font-bold text-xs px-1.5 py-0.5 rounded tracking-wide">
-                WWX
-              </span>
+              <Image
+                src="/logo.png"
+                alt="WallStreet Wreckage"
+                width={72}
+                height={44}
+                className="h-9 w-auto object-contain flex-shrink-0"
+              />
               <span className="hidden sm:block font-bold text-sm text-white tracking-wide">
                 Wall<span className="text-blue-400">Street</span>{" "}
                 <span className="text-gray-400 font-normal">Wreckage</span>

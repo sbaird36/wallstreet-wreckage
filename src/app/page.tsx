@@ -53,25 +53,6 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Feature blurbs */}
-        <div className="grid grid-cols-2 gap-3 mb-8 text-xs">
-          {[
-            { icon: "🏢", label: "59 fake companies", sub: "34 blue chips + 25 penny stocks" },
-            { icon: "💰", label: "6 fake cryptos", sub: "including a cat on the moon" },
-            { icon: "📰", label: "60+ market events", sub: "all extremely plausible" },
-            { icon: "💾", label: "Save/load progress", sub: "3 manual slots + auto-save" },
-          ].map((f) => (
-            <div
-              key={f.label}
-              className="bg-gray-900 border border-gray-800 rounded-lg p-3"
-            >
-              <div className="text-xl mb-1">{f.icon}</div>
-              <div className="text-white font-bold">{f.label}</div>
-              <div className="text-gray-500">{f.sub}</div>
-            </div>
-          ))}
-        </div>
-
         {/* New game form */}
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 mb-4">
           <h2 className="text-sm font-bold text-gray-300 mb-4 uppercase tracking-wider">

@@ -42,12 +42,22 @@ export default function BlogPage() {
                   Network Progress
                 </div>
                 <div className="text-sm font-mono font-bold text-white">
-                  {(state.contacts ?? []).length}
-                  <span className="text-gray-500 font-normal text-xs ml-1">contacts unlocked</span>
+                  {(state.playerFollowerCount ?? 0).toLocaleString()}
+                  <span className="text-gray-500 font-normal text-xs ml-1">followers</span>
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
-                  {state.playerPostCount ?? 0} post{(state.playerPostCount ?? 0) !== 1 ? "s" : ""} made
+                  {(state.contacts ?? []).length} contacts · {state.playerPostCount ?? 0} post{(state.playerPostCount ?? 0) !== 1 ? "s" : ""}
                 </div>
+                {(state.playerFollowerCount ?? 0) >= 50 && (
+                  <div className="mt-2 text-xs text-emerald-400 font-mono">
+                    📈 Posts now influence prices
+                  </div>
+                )}
+                {(state.playerFollowerCount ?? 0) < 50 && (state.playerFollowerCount ?? 0) > 0 && (
+                  <div className="mt-2 text-xs text-gray-600">
+                    {50 - (state.playerFollowerCount ?? 0)} more followers until posts move prices
+                  </div>
+                )}
                 {unreadTips > 0 && (
                   <div className="mt-2 text-xs text-blue-400">
                     {unreadTips} unread tip{unreadTips !== 1 ? "s" : ""} in inbox

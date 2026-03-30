@@ -218,6 +218,7 @@ export interface GameState {
   contacts: string[];          // unlocked contact IDs
   contactTips: ContactTip[];   // tips received from contacts
   playerPostCount: number;     // total posts submitted by the player
+  playerFollowerCount: number; // NPC followers accumulated from blog posts
 }
 
 export interface SaveSlot {
@@ -281,6 +282,8 @@ export type GameAction =
         newCooldowns: Record<string, number>;
         newIndexes: Record<string, MarketIndex>;
         newBlogPosts: BlogPost[];
+        newFollowerCount: number;
+        npcVotesOnPlayerPosts: { postId: string; votes: number }[];
       };
     }
   | { type: "EXECUTE_TRADE"; payload: Transaction }
@@ -296,4 +299,20 @@ export type GameAction =
   | { type: "ADD_CONTACT_TIPS"; payload: ContactTip[] }
   | { type: "MARK_TIPS_READ" }
   | { type: "DISMISS_CONTACT_TIP"; payload: { tipId: string } }
-  | { type: "RESET_GAME" };
+  | { type: "RESET_GAME" }
+  | {
+      type: "ADVANCE_MULTIPLE_DAYS";
+      payload: {
+        days: Array<{
+          newAssets: Record<string, Asset>;
+          events: FiredEvent[];
+          volatilityOverrides: Record<string, VolatilityOverride>;
+          newCooldowns: Record<string, number>;
+          newIndexes: Record<string, MarketIndex>;
+          newBlogPosts: BlogPost[];
+          contactTips: ContactTip[];
+          newFollowerCount: number;
+          npcVotesOnPlayerPosts: { postId: string; votes: number }[];
+        }>;
+      };
+    };

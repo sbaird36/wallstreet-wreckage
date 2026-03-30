@@ -50,7 +50,7 @@ export default function DashboardPage() {
 
       <main className="flex-1 p-4 max-w-7xl mx-auto w-full">
         {/* Trading command bar */}
-        <div className="flex items-center justify-between mb-5 bg-gray-900 border border-gray-800 rounded-lg px-3 sm:px-5 py-3">
+        <div className="flex items-start justify-between mb-5 bg-gray-900 border border-gray-800 rounded-lg px-3 sm:px-5 py-3 gap-3">
           <AdvanceDayButton />
           <div className="hidden sm:flex items-center gap-2 text-right border-l border-gray-800 pl-5">
             <div>

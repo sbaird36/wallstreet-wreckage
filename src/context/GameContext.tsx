@@ -85,6 +85,7 @@ const initialState: GameState = {
   contacts: [],
   contactTips: [],
   playerPostCount: 0,
+  playerFollowerCount: 0,
 };
 
 const GameContext = createContext<GameContextValue | null>(null);

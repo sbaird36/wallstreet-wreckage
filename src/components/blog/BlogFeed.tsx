@@ -86,6 +86,15 @@ function PostCard({ post }: { post: BlogPost }) {
               </span>
             )}
 
+            {/* Price influence indicator */}
+            {post.isPlayerPost &&
+              post.linkedTickers.length > 0 &&
+              (state.playerFollowerCount ?? 0) >= 50 && (
+                <span className="text-xs px-1.5 py-0.5 rounded border font-mono bg-emerald-900/40 text-emerald-400 border-emerald-800">
+                  📈 Moving market
+                </span>
+              )}
+
             {/* Verification badge — only shown after 2 days */}
             {status === "VERIFIED" && (
               <span className="text-xs px-1.5 py-0.5 rounded border font-mono bg-emerald-900/50 text-emerald-400 border-emerald-700">
@@ -189,6 +198,12 @@ export function BlogFeed() {
           <div className="text-right text-xs text-gray-600">
             <div className="font-mono text-gray-400">{blogFeed.length.toLocaleString()}</div>
             <div>total posts</div>
+            {(state.playerFollowerCount ?? 0) > 0 && (
+              <div className="mt-1">
+                <span className="font-mono text-blue-400">{(state.playerFollowerCount ?? 0).toLocaleString()}</span>
+                <span className="ml-1">followers</span>
+              </div>
+            )}
           </div>
         </div>
 

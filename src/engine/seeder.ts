@@ -106,5 +106,6 @@ export function buildInitialGameState(playerName: string): GameState {
     contacts: [],
     contactTips: [],
     playerPostCount: 0,
+    playerFollowerCount: 0,
   };
 }

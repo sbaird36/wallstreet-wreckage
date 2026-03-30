@@ -5,7 +5,10 @@ import { getNewlyUnlockedContacts } from "@/engine/contactEngine";
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "ADVANCE_DAY": {
-      const { newAssets, events, volatilityOverrides, newCooldowns, newIndexes, newBlogPosts } = action.payload;
+      const {
+        newAssets, events, volatilityOverrides, newCooldowns, newIndexes,
+        newBlogPosts, newFollowerCount, npcVotesOnPlayerPosts,
+      } = action.payload;
       const newDay = state.currentDay + 1;
       const newHistory = [...state.eventHistory, ...events];
 
@@ -17,8 +20,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ],
       };
 
-      // Keep rolling blog feed (last 60 days max to avoid unbounded growth)
-      const updatedFeed = [...state.blogFeed, ...newBlogPosts].slice(-720);
+      // Apply NPC votes to player posts in the feed
+      const voteMap: Record<string, number> = {};
+      for (const { postId, votes } of npcVotesOnPlayerPosts) {
+        voteMap[postId] = (voteMap[postId] ?? 0) + votes;
+      }
+      const feedWithVotes = [...state.blogFeed, ...newBlogPosts]
+        .map((p) => voteMap[p.id] ? { ...p, upvotes: p.upvotes + voteMap[p.id] } : p)
+        .slice(-720);
 
       return {
         ...state,
@@ -30,7 +39,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         volatilityOverrides,
         recentEventCooldowns: newCooldowns,
         indexes: newIndexes,
-        blogFeed: updatedFeed,
+        blogFeed: feedWithVotes,
+        playerFollowerCount: newFollowerCount,
       };
     }
 
@@ -189,6 +199,49 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    case "ADVANCE_MULTIPLE_DAYS": {
+      let s = state;
+      for (const day of action.payload.days) {
+        const newDay = s.currentDay + 1;
+        const newPortfolio = {
+          ...s.portfolio,
+          netWorthHistory: [
+            ...s.portfolio.netWorthHistory,
+            { day: newDay, netWorth: getNetWorth(s.portfolio, day.newAssets) },
+          ],
+        };
+        const updatedTips =
+          day.contactTips.length > 0
+            ? [...(s.contactTips ?? []), ...day.contactTips].slice(-200)
+            : s.contactTips ?? [];
+
+        // Apply NPC votes to player posts
+        const voteMap: Record<string, number> = {};
+        for (const { postId, votes } of day.npcVotesOnPlayerPosts) {
+          voteMap[postId] = (voteMap[postId] ?? 0) + votes;
+        }
+        const updatedFeed = [...s.blogFeed, ...day.newBlogPosts]
+          .map((p) => voteMap[p.id] ? { ...p, upvotes: p.upvotes + voteMap[p.id] } : p)
+          .slice(-720);
+
+        s = {
+          ...s,
+          currentDay: newDay,
+          assets: day.newAssets,
+          activeEvents: day.events,
+          eventHistory: [...s.eventHistory, ...day.events],
+          portfolio: newPortfolio,
+          volatilityOverrides: day.volatilityOverrides,
+          recentEventCooldowns: day.newCooldowns,
+          indexes: day.newIndexes,
+          blogFeed: updatedFeed,
+          contactTips: updatedTips,
+          playerFollowerCount: day.newFollowerCount,
+        };
+      }
+      return s;
+    }
+
     case "RESET_GAME":
       return {
         currentDay: 1,
@@ -215,6 +268,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         contacts: [],
         contactTips: [],
         playerPostCount: 0,
+        playerFollowerCount: 0,
       };
 
     default:
