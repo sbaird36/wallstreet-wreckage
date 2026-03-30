@@ -15,6 +15,7 @@ const NAV_TABS = [
   { href: "/blog",        label: "WSB",          icon: "💬" },
   { href: "/algorithm",   label: "My Algorithm", icon: "🤖" },
   { href: "/hedge-fund",  label: "Hedge Fund",   icon: "🏦" },
+  { href: "/stats",       label: "Stats",        icon: "🏆" },
 ];
 
 export function TopNav() {
