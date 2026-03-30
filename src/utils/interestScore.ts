@@ -21,7 +21,9 @@ export function computeInterestScore(
   portfolio: Portfolio,
   netWorth: number,
   snp499: MarketIndex | undefined,
-  currentDay: number
+  currentDay: number,
+  verifiedPosts: number = 0,
+  wrongPosts: number = 0
 ): number {
   // Hard gate: zero interest for the first quarter of trading
   if (currentDay < 63) return 0;
@@ -60,7 +62,13 @@ export function computeInterestScore(
         )
       : 0;
 
-  return Math.min(Math.max((alphaScore + sizeScore) * trackRecord, 0), 100);
+  // Prediction accuracy modifier:
+  //   Verified (correct): +0.5 pts each, capped at +5 pts
+  //   Wrong: -0.25 pts each, capped at -3 pts (penalty is half the reward rate)
+  const verifiedScore = Math.min(verifiedPosts * 0.5, 5);
+  const wrongPenalty = Math.min(wrongPosts * 0.25, 3);
+
+  return Math.min(Math.max((alphaScore + sizeScore + verifiedScore - wrongPenalty) * trackRecord, 0), 100);
 }
 
 export function canFoundHedgeFund(netWorth: number): boolean {

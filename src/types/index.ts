@@ -217,8 +217,10 @@ export interface GameState {
   analystSubscription: AnalystSubscription | null; // weekly all-access ($5,000/week)
   contacts: string[];          // unlocked contact IDs
   contactTips: ContactTip[];   // tips received from contacts
-  playerPostCount: number;     // total posts submitted by the player
-  playerFollowerCount: number; // NPC followers accumulated from blog posts
+  playerPostCount: number;          // total posts submitted by the player
+  playerFollowerCount: number;      // NPC followers earned from trading performance
+  playerVerifiedPostCount: number;  // player posts whose ticker prediction came true
+  playerWrongPostCount: number;     // player posts whose ticker prediction was wrong
 }
 
 export interface SaveSlot {
@@ -250,6 +252,7 @@ export interface BlogPost {
   linkedEventId: string | null;
   linkedTickers: string[];
   isPlayerPost?: boolean;
+  isPredictionWrong?: boolean;  // player post whose ticker went the wrong direction
 }
 
 // ============================================================

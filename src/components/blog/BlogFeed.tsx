@@ -101,9 +101,14 @@ function PostCard({ post }: { post: BlogPost }) {
                 ✓ VERIFIED
               </span>
             )}
-            {status === "UNVERIFIED" && (
+            {status === "UNVERIFIED" && !post.isPredictionWrong && (
               <span className="text-xs px-1.5 py-0.5 rounded border font-mono bg-gray-800 text-gray-500 border-gray-700">
                 ✗ UNVERIFIED
+              </span>
+            )}
+            {post.isPredictionWrong && (
+              <span className="text-xs px-1.5 py-0.5 rounded border font-mono bg-red-900/50 text-red-400 border-red-800">
+                ✗ WRONG CALL
               </span>
             )}
           </div>

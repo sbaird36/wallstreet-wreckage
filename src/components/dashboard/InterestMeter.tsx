@@ -122,8 +122,8 @@ export function InterestMeter() {
   const snp499 = state.indexes["snp499"];
 
   const score = useMemo(
-    () => computeInterestScore(state.portfolio, netWorth, snp499, state.currentDay),
-    [state.portfolio, netWorth, snp499, state.currentDay]
+    () => computeInterestScore(state.portfolio, netWorth, snp499, state.currentDay, state.playerVerifiedPostCount ?? 0, state.playerWrongPostCount ?? 0),
+    [state.portfolio, netWorth, snp499, state.currentDay, state.playerVerifiedPostCount, state.playerWrongPostCount]
   );
 
   const canFound = canFoundHedgeFund(netWorth);

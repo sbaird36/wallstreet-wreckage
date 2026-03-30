@@ -70,7 +70,7 @@ export function AdvanceDayButton() {
     const newContactTips = generateContactTips(state, targetDay);
     const snp499 = newIndexes["snp499"];
     const netWorth = getNetWorth(state.portfolio, newAssets);
-    const newFollowerCount = computeFollowerCount(state.portfolio, netWorth, snp499, targetDay);
+    const newFollowerCount = computeFollowerCount(state.portfolio, netWorth, snp499, targetDay, state.playerVerifiedPostCount ?? 0, state.playerWrongPostCount ?? 0);
     const npcVotesOnPlayerPosts = computeNpcVotesOnPlayerPosts(state, targetDay);
 
     dispatch({
@@ -127,7 +127,7 @@ export function AdvanceDayButton() {
       const contactTips = generateContactTips(threaded, targetDay);
       const snp499 = newIndexes["snp499"];
       const netWorth = getNetWorth(threaded.portfolio, newAssets);
-      const newFollowerCount = computeFollowerCount(threaded.portfolio, netWorth, snp499, targetDay);
+      const newFollowerCount = computeFollowerCount(threaded.portfolio, netWorth, snp499, targetDay, threaded.playerVerifiedPostCount ?? 0, threaded.playerWrongPostCount ?? 0);
       const npcVotesOnPlayerPosts = computeNpcVotesOnPlayerPosts(threaded, targetDay);
 
       days.push({

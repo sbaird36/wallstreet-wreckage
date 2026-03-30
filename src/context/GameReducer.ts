@@ -25,9 +25,29 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       for (const { postId, votes } of npcVotesOnPlayerPosts) {
         voteMap[postId] = (voteMap[postId] ?? 0) + votes;
       }
+      // Build feed with NPC votes applied
       const feedWithVotes = [...state.blogFeed, ...newBlogPosts]
         .map((p) => voteMap[p.id] ? { ...p, upvotes: p.upvotes + voteMap[p.id] } : p)
         .slice(-720);
+
+      // Verify player posts that are exactly 2 days old and have a linked ticker
+      let newVerifications = 0;
+      let newWrongPredictions = 0;
+      const verifiedFeed = feedWithVotes.map((post) => {
+        if (!post.isPlayerPost || post.isReal || post.isPredictionWrong || newDay - post.day !== 2 || post.linkedTickers.length === 0) return post;
+        const ticker = post.linkedTickers[0];
+        const asset = newAssets[ticker];
+        if (!asset) return post;
+        const priceAtPost = asset.priceHistory.find((p) => p.day === post.day)?.close;
+        if (priceAtPost === undefined) return post;
+        if (asset.currentPrice > priceAtPost) {
+          newVerifications++;
+          return { ...post, isReal: true };
+        } else {
+          newWrongPredictions++;
+          return { ...post, isPredictionWrong: true };
+        }
+      });
 
       return {
         ...state,
@@ -39,8 +59,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         volatilityOverrides,
         recentEventCooldowns: newCooldowns,
         indexes: newIndexes,
-        blogFeed: feedWithVotes,
+        blogFeed: verifiedFeed,
         playerFollowerCount: newFollowerCount,
+        playerVerifiedPostCount: (state.playerVerifiedPostCount ?? 0) + newVerifications,
+        playerWrongPostCount: (state.playerWrongPostCount ?? 0) + newWrongPredictions,
       };
     }
 
@@ -132,11 +154,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case "BUY_ANALYST_SUBSCRIPTION": {
-      if (state.portfolio.cash < 5_000) return state;
+      if (state.portfolio.cash < 10_000) return state;
       return {
         ...state,
         analystSubscription: { purchasedDay: state.currentDay },
-        portfolio: { ...state.portfolio, cash: state.portfolio.cash - 5_000 },
+        portfolio: { ...state.portfolio, cash: state.portfolio.cash - 10_000 },
       };
     }
 
@@ -220,9 +242,28 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         for (const { postId, votes } of day.npcVotesOnPlayerPosts) {
           voteMap[postId] = (voteMap[postId] ?? 0) + votes;
         }
-        const updatedFeed = [...s.blogFeed, ...day.newBlogPosts]
+        const feedWithVotes = [...s.blogFeed, ...day.newBlogPosts]
           .map((p) => voteMap[p.id] ? { ...p, upvotes: p.upvotes + voteMap[p.id] } : p)
           .slice(-720);
+
+        // Verify player posts that are exactly 2 days old and have a linked ticker
+        let newVerifications = 0;
+        let newWrongPredictions = 0;
+        const updatedFeed = feedWithVotes.map((post) => {
+          if (!post.isPlayerPost || post.isReal || post.isPredictionWrong || newDay - post.day !== 2 || post.linkedTickers.length === 0) return post;
+          const ticker = post.linkedTickers[0];
+          const asset = day.newAssets[ticker];
+          if (!asset) return post;
+          const priceAtPost = asset.priceHistory.find((p) => p.day === post.day)?.close;
+          if (priceAtPost === undefined) return post;
+          if (asset.currentPrice > priceAtPost) {
+            newVerifications++;
+            return { ...post, isReal: true };
+          } else {
+            newWrongPredictions++;
+            return { ...post, isPredictionWrong: true };
+          }
+        });
 
         s = {
           ...s,
@@ -237,6 +278,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           blogFeed: updatedFeed,
           contactTips: updatedTips,
           playerFollowerCount: day.newFollowerCount,
+          playerVerifiedPostCount: (s.playerVerifiedPostCount ?? 0) + newVerifications,
+          playerWrongPostCount: (s.playerWrongPostCount ?? 0) + newWrongPredictions,
         };
       }
       return s;
@@ -269,6 +312,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         contactTips: [],
         playerPostCount: 0,
         playerFollowerCount: 0,
+        playerVerifiedPostCount: 0,
+        playerWrongPostCount: 0,
       };
 
     default:

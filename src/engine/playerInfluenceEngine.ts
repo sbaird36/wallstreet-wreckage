@@ -31,7 +31,9 @@ export function computeFollowerCount(
   portfolio: Portfolio,
   netWorth: number,
   snp499: MarketIndex | undefined,
-  currentDay: number
+  currentDay: number,
+  verifiedPosts: number = 0,
+  wrongPosts: number = 0
 ): number {
   if (currentDay < 63) return 0;
 
@@ -55,7 +57,16 @@ export function computeFollowerCount(
   if (score <= 0) return 0;
 
   // Exponential conversion: score/20 + 1 as the exponent
-  return Math.round(Math.pow(10, score / 20 + 1.0));
+  const baseCount = Math.pow(10, score / 20 + 1.0);
+
+  // Prediction accuracy modifier on followers:
+  //   Correct: +5% each, capped at +50%
+  //   Wrong: -3% each, capped at -30% (penalty is softer than the reward)
+  const verifiedBonus = Math.min(verifiedPosts * 0.05, 0.5);
+  const wrongPenalty = Math.min(wrongPosts * 0.03, 0.3);
+  const accuracyMultiplier = Math.max(0.7, 1 + verifiedBonus - wrongPenalty);
+
+  return Math.round(baseCount * accuracyMultiplier);
 }
 
 // ─── NPC upvotes on player posts ─────────────────────────────────────────────

@@ -365,5 +365,5 @@ export function hasAnalystAccess(
 }
 
 export const ANALYST_SINGLE_COST = 100;
-export const ANALYST_SUB_COST = 5_000;
+export const ANALYST_SUB_COST = 10_000;
 export const ANALYST_SUB_DAYS = 7;
