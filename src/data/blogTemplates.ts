@@ -479,3 +479,144 @@ export const FLAIR_BY_CATEGORY: Record<string, BlogPostFlair[]> = {
   CRYPTO: ["DD", "News", "YOLO"],
   MEME: ["Meme", "YOLO", "Discussion"],
 };
+
+// ── Premium Blog (WealthWatch Insider) — professional analyst tone ─────────────
+
+export const PREMIUM_USERNAMES = [
+  "JohnRothstein_CFA",
+  "AnalystAlpha_HQ",
+  "ResearchDeskPro",
+  "MarketStructure_Mike",
+  "CapitalAllocationQ",
+  "TierOneResearch",
+  "ConsensusBuster",
+  "FundamentalEdge",
+  "InstitutionalView",
+  "QuantResearchGrp",
+  "SectorDivergence",
+  "EstimateRevisionPro",
+  "CatalystTrackerHQ",
+  "RiskAdjustedReturn",
+  "AlphaGenerationLtd",
+  "MacroThesisDesk",
+  "EarningsModeler99",
+  "ValuationFramework",
+  "PositionMonitor_HQ",
+  "CapitalMarketsView",
+];
+
+export const PREMIUM_FUD_TITLES = [
+  "Initiating coverage on {ticker} with a cautious outlook — price target {price_low}",
+  "Valuation analysis: {ticker} appears materially overextended at current levels",
+  "Channel checks on {company} suggest sequential deterioration in core metrics",
+  "Revisiting our {ticker} model: consensus estimates appear optimistic",
+  "Risk-adjusted analysis: {ticker} offers unfavorable reward relative to downside",
+  "Sentiment divergence on {ticker}: institutional positioning vs. retail narrative",
+  "Earnings quality review: {company} revenue recognition warrants scrutiny",
+  "Updating {ticker} price target to {price_low} on deteriorating fundamentals",
+  "Proprietary survey data signals weakening demand trends at {company}",
+  "Structural headwinds for {ticker}: a framework for the next 12 months",
+  "Forensic accounting review of {company}: three items investors should examine",
+  "Compressing multiples: why {ticker} is vulnerable to a re-rating lower",
+  "Insider activity at {company} and what the pattern historically implies",
+  "Market share data for {company} shows sequential deterioration — analysis inside",
+  "Consensus is wrong on {ticker}: here is the bear case the street is missing",
+];
+
+export const PREMIUM_FUD_BODIES = [
+  "Our analysis of {company}'s most recent filing reveals a pattern in accounts receivable that has historically preceded earnings misses. Specifically, DSO has expanded 14 days quarter-over-quarter — a metric that tends to lead revenue shortfalls by 1-2 quarters. We are revising our revenue estimate 8% below consensus. Price target: {price_low}. Risk: earlier-than-expected stabilization in demand.",
+
+  "Following channel checks with three industry participants, we believe consensus estimates for {company} embed an optimistic recovery timeline. Our analysis suggests demand normalization is progressing at roughly half the pace the street models. This is not a call on management quality — {company} is well-run — but on the pace of the end-market cycle. We remain underweight relative to benchmark.",
+
+  "The valuation on {ticker} now incorporates a multiple expansion that we believe is not supported by the underlying earnings trajectory. At current levels, the stock prices in 18 months of execution flawlessly. Our base case is that execution will be adequate, not flawless. The difference between flawless and adequate, when priced into a high-multiple growth stock, is material. We are cautious.",
+
+  "Updated model for {company} following last week's data points: (1) gross margin pressure appears more persistent than guided, (2) capex trajectory suggests capacity additions are being delayed, (3) management commentary on the call contained subtle but notable language shifts. None of these are individually conclusive. Together they warrant reducing exposure ahead of the next reporting cycle.",
+
+  "Our proprietary tracking of job postings at {company} shows a 31% reduction in engineering roles over the past 90 days. Historically, this precedes an R&D headcount adjustment that typically accompanies a product cycle pause. We are not alarmed but we are cautious. The current price implies a product cycle acceleration that our leading indicators do not yet support.",
+];
+
+export const PREMIUM_REAL_TITLES = [
+  "Confirmed catalyst at {company}: price target raised to {price_high} — full analysis",
+  "Breaking institutional development at {ticker}: what the data shows",
+  "Upgrading {ticker} to Overweight: verified catalysts align with our thesis",
+  "Proprietary channel check confirms {company} beat expectations — upgrading",
+  "Institutional flow data and confirmed news support {ticker} at current levels",
+  "Event-driven analysis: {company} development supports higher valuation",
+  "Coverage update: {ticker} — confirmed catalyst warrants model revision",
+  "Sector signal confirmed: {ticker} is the preferred name in the space today",
+];
+
+export const PREMIUM_REAL_BODIES = [
+  "Following confirmation of today's {company} development, we are revising our model upward. Our updated price target of {price_high} reflects a 12-month horizon and incorporates the full run-rate benefit of the announced catalyst. We have spoken with two industry contacts who corroborate the magnitude of the impact. Our conviction is high. We are upgrading to Overweight.",
+
+  "This morning's confirmed news on {ticker} aligns precisely with the catalyst scenario we outlined in our prior note. The market's initial reaction appears to underestimate the duration of the tailwind. Our DCF analysis suggests the current price does not fully incorporate the medium-term benefit. We are adding to our model position and raising our price target.",
+];
+
+// ── ApeStation (Wildcat Blog) — 95% fake, 5% real (huge pumps) ───────────────
+
+export const WILDCAT_USERNAMES = [
+  "MOON_OR_RUIN_69",
+  "FullSendFinance",
+  "NeverSelling4Real",
+  "DiamondSpine420",
+  "RocketFuelOnly",
+  "ApeNotLeave",
+  "LiquidateMePlease",
+  "10xOrCrying",
+  "BetTheFarm2024",
+  "GainsPornDirector",
+  "NotYourFinAdvisor",
+  "CallsOnEverything",
+  "MarginMaximalist",
+  "SirHoldsALot",
+  "GreenDayOrGrief",
+  "100xOrBust_Real",
+  "FOMOIndustriesLLC",
+  "BuyTheRumourSell",
+  "StillHoldingStill",
+  "GoingToTheMOON",
+];
+
+export const WILDCAT_TITLES = [
+  "🚀🚀 {ticker} IS GOING TO OBLITERATE YOUR ENTIRE CONCEPT OF WEALTH 🚀🚀",
+  "I SOLD EVERYTHING AND BOUGHT {ticker} AND I HAVE NEVER FELT MORE ALIVE",
+  "{ticker} shorts are going to get DESTROYED and I want to be there when it happens 💀",
+  "CALLING IT NOW: {ticker} 10x in 30 days. screenshot this. SCREENSHOT THIS.",
+  "Not financial advice but {ticker} is literally printing money and you are sleeping 😤",
+  "The establishment DOESN'T WANT YOU buying {ticker} right now. That's how you know.",
+  "{ticker} is setting up the most beautiful squeeze I have seen in 3 years of losing money",
+  "I WENT ALL IN ON {ticker} CALLS. My hands are PURE DIAMOND. My brain is SMOOTH.",
+  "If you're not holding {ticker} right now you are CHOOSING to stay poor. I said it.",
+  "The {ticker} short thesis is: I am afraid. The long thesis is: 🚀🚀🚀🚀🚀",
+  "{ticker} dip buyers are going to be eating tendies while shorts cry. Trust the process.",
+  "MAXIMUM YOLO: {ticker}. Strike: aggressive. Expiry: soon. Conviction: infinite.",
+  "Something is BREWING with {ticker} and I can feel it in my BONES. Bones have never lied.",
+  "{ticker} chart literally looks like a rocket ship with rocket emojis around it. SENDING IT.",
+  "I showed my {ticker} thesis to three people. Two laughed. One put in more than me. We're winning.",
+];
+
+export const WILDCAT_BODIES = [
+  "LOOK I don't have a spreadsheet. I don't have a DCF. I have VIBES and 14 years of LOSING MONEY that has taught me to recognize when something is about to go absolutely VERTICAL. {ticker} is that thing right now. The chart is clean. The shorts are sweating. I am ALL IN. If I am wrong I will post my loss porn without complaint. If I am right I will post from my yacht.",
+
+  "Listen to me very carefully: {ticker} is the trade of the year and everyone is sleeping on it because they're too busy doing 'analysis' and 'research' and 'not gambling with money they need.' I have none of those constraints. I have calls. I have conviction. I have a support group chat called 'Please Do Not Do This' that I have muted. SENDING IT. 🚀",
+
+  "The {ticker} short interest is INSANE. These people are going to get VAPORIZED and I am going to watch it happen with popcorn and a very large position. Have I done research? Define research. Have I read the ticker name correctly multiple times? Yes. Am I going to cry if this goes wrong? Possibly. Am I doing it anyway? ABSOLUTELY. All in.",
+
+  "OKAY SO: I know I said {ticker} was going to 5x last week and it went down 8% instead. I know that. I remember. What I want you to focus on is not that, but on the NEW setup which is even better than the old setup which I was wrong about. The new setup is different because of vibes. New price target: very high. New conviction: maximum. I have learned nothing.",
+
+  "If {ticker} doesn't absolutely MOON from here I will personally apologize to every bear I have called a clown. That's my commitment. That's the bet. My position is larger than my therapist would recommend. My therapist doesn't know about my position. My position is GOING UP. Let's go. 🚀🚀🚀",
+];
+
+export const WILDCAT_REAL_TITLES = [
+  "🚨🚨 {ticker} JUST GOT HIT WITH THE MOST REAL NEWS I HAVE EVER SEEN 🚨🚨",
+  "NOT CLICKBAIT: {ticker} catalyst is CONFIRMED and it is MASSIVE 🚀🚀🚀",
+  "THE {ticker} NEWS IS REAL. I VERIFIED IT. LOAD UP BEFORE THE NORMIES SEE IT.",
+  "BREAKING AND CONFIRMED: {ticker} is about to SEND IT based on REAL events 🔥🔥",
+  "This is NOT a drill — {ticker} has a VERIFIED catalyst and the price hasn't moved YET",
+];
+
+export const WILDCAT_REAL_BODIES = [
+  "I KNOW I post a lot of garbage but THIS ONE IS REAL. I checked. Multiple times. The {ticker} news that dropped today is CONFIRMED and the market has NOT priced it in yet. I have never been more certain of anything in my degenerate trading career. This is the one. LOAD UP before the institutions see this. I am telling everyone I know. I am sending this to my mother. SHE IS BUYING {ticker}. 🚀🚀🚀",
+
+  "Not gonna lie I thought this was FUD at first too. But I actually checked this time. The {ticker} development is CONFIRMED REAL. Every source I have (I have two sources, they are reliable) says this is legit. The stock hasn't moved yet because the mainstream hasn't caught on. This is the window. I have maximized my position. If you trust me even 10% you should at minimum look at this. THIS IS THE ONE.",
+];

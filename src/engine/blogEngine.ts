@@ -1,7 +1,6 @@
 import type { BlogPost, BlogPostFlair, FiredEvent, Asset } from "@/types";
 import {
   WSB_USERNAMES,
-  AUTHOR_FLAIRS,
   FUD_BULLISH_TITLES,
   FUD_BULLISH_BODIES,
   FUD_BEARISH_TITLES,
@@ -15,6 +14,16 @@ import {
   REAL_TITLES,
   REAL_BODIES,
   FLAIR_BY_CATEGORY,
+  PREMIUM_USERNAMES,
+  PREMIUM_FUD_TITLES,
+  PREMIUM_FUD_BODIES,
+  PREMIUM_REAL_TITLES,
+  PREMIUM_REAL_BODIES,
+  WILDCAT_USERNAMES,
+  WILDCAT_TITLES,
+  WILDCAT_BODIES,
+  WILDCAT_REAL_TITLES,
+  WILDCAT_REAL_BODIES,
 } from "@/data/blogTemplates";
 
 function pick<T>(arr: T[]): T {
@@ -34,15 +43,40 @@ function fillTemplate(template: string, vars: Record<string, string>): string {
   return template.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? `{${key}}`);
 }
 
-function fakeVotes(): { upvotes: number; downvotes: number } {
+function wsbVotes(): { upvotes: number; downvotes: number } {
   const roll = Math.random();
   if (roll < 0.1) {
-    // viral post
     return { upvotes: 2000 + Math.floor(Math.random() * 8000), downvotes: Math.floor(Math.random() * 200) };
   } else if (roll < 0.3) {
     return { upvotes: 500 + Math.floor(Math.random() * 1500), downvotes: Math.floor(Math.random() * 100) };
   } else {
     return { upvotes: 5 + Math.floor(Math.random() * 200), downvotes: Math.floor(Math.random() * 30) };
+  }
+}
+
+function premiumVotes(): { upvotes: number; downvotes: number } {
+  // Professional tone — higher baselines, lower viral ceiling
+  const roll = Math.random();
+  if (roll < 0.05) {
+    return { upvotes: 3000 + Math.floor(Math.random() * 5000), downvotes: Math.floor(Math.random() * 100) };
+  } else if (roll < 0.25) {
+    return { upvotes: 800 + Math.floor(Math.random() * 2000), downvotes: Math.floor(Math.random() * 80) };
+  } else {
+    return { upvotes: 100 + Math.floor(Math.random() * 700), downvotes: Math.floor(Math.random() * 50) };
+  }
+}
+
+function wildcatVotes(): { upvotes: number; downvotes: number } {
+  // Wild viral ceiling — some posts can hit 20k-50k
+  const roll = Math.random();
+  if (roll < 0.05) {
+    return { upvotes: 20000 + Math.floor(Math.random() * 30000), downvotes: Math.floor(Math.random() * 2000) };
+  } else if (roll < 0.15) {
+    return { upvotes: 5000 + Math.floor(Math.random() * 10000), downvotes: Math.floor(Math.random() * 500) };
+  } else if (roll < 0.35) {
+    return { upvotes: 500 + Math.floor(Math.random() * 3000), downvotes: Math.floor(Math.random() * 200) };
+  } else {
+    return { upvotes: 10 + Math.floor(Math.random() * 300), downvotes: Math.floor(Math.random() * 50) };
   }
 }
 
@@ -71,11 +105,12 @@ function generateRealPost(fired: FiredEvent, day: number, idx: number): BlogPost
     title,
     body,
     author: pick(WSB_USERNAMES),
-    ...fakeVotes(),
+    ...wsbVotes(),
     playerVote: null,
     isReal: true,
     linkedEventId: fired.event.id,
     linkedTickers: tickers.slice(0, 4),
+    source: "wsb",
   };
 }
 
@@ -126,34 +161,180 @@ function generateFudPost(day: number, idx: number, assets: Asset[]): BlogPost {
     title,
     body,
     author: pick(WSB_USERNAMES),
-    ...fakeVotes(),
+    ...wsbVotes(),
     playerVote: null,
     isReal: false,
     linkedEventId: null,
     linkedTickers: [ticker],
+    source: "wsb",
+  };
+}
+
+function generatePremiumFudPost(day: number, idx: number, assets: Asset[]): BlogPost {
+  const stockAssets = assets.filter((a) => a.type === "stock");
+  const asset = pick(stockAssets.length > 0 ? stockAssets : assets);
+  const ticker = asset.ticker;
+  const company = asset.name;
+  const price = asset.currentPrice;
+  const priceHigh = (price * (1.2 + Math.random() * 0.5)).toFixed(2);
+  const priceLow = (price * (0.5 + Math.random() * 0.25)).toFixed(2);
+
+  const vars = { ticker, company, price: price.toFixed(2), price_high: priceHigh, price_low: priceLow };
+  const title = fillTemplate(pick(PREMIUM_FUD_TITLES), vars);
+  const body = fillTemplate(pick(PREMIUM_FUD_BODIES), vars);
+  const flair: BlogPostFlair = pick(["DD", "News", "Discussion"] as BlogPostFlair[]);
+
+  return {
+    id: `day${day}_premium_fud_${idx}`,
+    day,
+    flair,
+    title,
+    body,
+    author: pick(PREMIUM_USERNAMES),
+    ...premiumVotes(),
+    playerVote: null,
+    isReal: false,
+    linkedEventId: null,
+    linkedTickers: [ticker],
+    source: "premium",
+  };
+}
+
+function generatePremiumRealPost(fired: FiredEvent, day: number, idx: number): BlogPost {
+  const tickers = fired.affectedTickers;
+  const ticker = tickers[0] ?? "MKTX";
+  const asset = { name: ticker, currentPrice: 100 };
+  const priceHigh = (asset.currentPrice * (1.15 + Math.random() * 0.35)).toFixed(2);
+
+  const vars = {
+    ticker,
+    company: ticker,
+    price_high: priceHigh,
+    sector: fired.event.effect.targetSectors?.[0] ?? "this sector",
+  };
+
+  const title = fillTemplate(pick(PREMIUM_REAL_TITLES), vars);
+  const body = fillTemplate(pick(PREMIUM_REAL_BODIES), vars);
+  const flair: BlogPostFlair = pick(["DD", "News"] as BlogPostFlair[]);
+
+  return {
+    id: `day${day}_premium_real_${idx}`,
+    day,
+    flair,
+    title,
+    body,
+    author: pick(PREMIUM_USERNAMES),
+    ...premiumVotes(),
+    playerVote: null,
+    isReal: true,
+    linkedEventId: fired.event.id,
+    linkedTickers: tickers.slice(0, 4),
+    source: "premium",
+  };
+}
+
+function generateWildcatFudPost(day: number, idx: number, assets: Asset[]): BlogPost {
+  const asset = pick(assets);
+  const ticker = asset.ticker;
+  const vars = { ticker, company: asset.name };
+  const title = fillTemplate(pick(WILDCAT_TITLES), vars);
+  const body = fillTemplate(pick(WILDCAT_BODIES), vars);
+  const flair: BlogPostFlair = pick(["YOLO", "Shitpost", "Meme"] as BlogPostFlair[]);
+
+  return {
+    id: `day${day}_wildcat_fud_${idx}`,
+    day,
+    flair,
+    title,
+    body,
+    author: pick(WILDCAT_USERNAMES),
+    ...wildcatVotes(),
+    playerVote: null,
+    isReal: false,
+    linkedEventId: null,
+    linkedTickers: [ticker],
+    source: "wildcat",
+  };
+}
+
+function generateWildcatRealPost(fired: FiredEvent, day: number, idx: number): BlogPost {
+  const tickers = fired.affectedTickers;
+  const ticker = tickers[0] ?? "MKTX";
+  const vars = { ticker, company: ticker };
+  const title = fillTemplate(pick(WILDCAT_REAL_TITLES), vars);
+  const body = fillTemplate(pick(WILDCAT_REAL_BODIES), vars);
+  const flair: BlogPostFlair = pick(["YOLO", "DD", "News"] as BlogPostFlair[]);
+
+  return {
+    id: `day${day}_wildcat_real_${idx}`,
+    day,
+    flair,
+    title,
+    body,
+    author: pick(WILDCAT_USERNAMES),
+    ...wildcatVotes(),
+    playerVote: null,
+    isReal: true,
+    isWildBoosted: true,
+    linkedEventId: fired.event.id,
+    linkedTickers: tickers.slice(0, 4),
+    source: "wildcat",
   };
 }
 
 export function generateBlogPosts(
   day: number,
   firedEvents: FiredEvent[],
-  assets: Record<string, Asset>
+  assets: Record<string, Asset>,
+  hasPremiumBlog = false
 ): BlogPost[] {
   const assetList = Object.values(assets);
-  const posts: BlogPost[] = [];
+  const wsbPosts: BlogPost[] = [];
+  const premiumPosts: BlogPost[] = [];
+  const wildcatPosts: BlogPost[] = [];
 
-  // One real post per fired event (capped at 3 to avoid flooding)
+  // ── WSB posts ────────────────────────────────────────────────
+  // One real post per fired event (capped at 3)
   const eventsToPost = firedEvents.slice(0, 3);
   for (let i = 0; i < eventsToPost.length; i++) {
-    posts.push(generateRealPost(eventsToPost[i], day, i));
+    wsbPosts.push(generateRealPost(eventsToPost[i], day, i));
   }
-
   // Fill to 9–13 total with FUD
-  const target = 9 + Math.floor(Math.random() * 5);
-  const fudCount = Math.max(0, target - posts.length);
-  for (let i = 0; i < fudCount; i++) {
-    posts.push(generateFudPost(day, i, assetList));
+  const wsbTarget = 9 + Math.floor(Math.random() * 5);
+  const wsbFudCount = Math.max(0, wsbTarget - wsbPosts.length);
+  for (let i = 0; i < wsbFudCount; i++) {
+    wsbPosts.push(generateFudPost(day, i, assetList));
   }
 
-  return shuffle(posts);
+  // ── Premium posts (only when subscribed) ────────────────────
+  if (hasPremiumBlog) {
+    const premiumTarget = 3 + Math.floor(Math.random() * 3); // 3-5 posts
+    // 40% of premium posts are real (tied to events), 60% are fake
+    let premiumRealUsed = 0;
+    for (let i = 0; i < premiumTarget; i++) {
+      const isReal = Math.random() < 0.4 && premiumRealUsed < firedEvents.length;
+      if (isReal) {
+        premiumPosts.push(generatePremiumRealPost(firedEvents[premiumRealUsed], day, i));
+        premiumRealUsed++;
+      } else {
+        premiumPosts.push(generatePremiumFudPost(day, i, assetList));
+      }
+    }
+  }
+
+  // ── Wildcat posts (always generated) ─────────────────────────
+  const wildcatTarget = 10 + Math.floor(Math.random() * 6); // 10-15 posts
+  // 5% of wildcat posts are real with wild boost; rest are fake
+  let wildcatRealUsed = 0;
+  for (let i = 0; i < wildcatTarget; i++) {
+    const isReal = Math.random() < 0.05 && wildcatRealUsed < firedEvents.length;
+    if (isReal) {
+      wildcatPosts.push(generateWildcatRealPost(firedEvents[wildcatRealUsed], day, i));
+      wildcatRealUsed++;
+    } else {
+      wildcatPosts.push(generateWildcatFudPost(day, i, assetList));
+    }
+  }
+
+  return [...shuffle(wsbPosts), ...shuffle(premiumPosts), ...shuffle(wildcatPosts)];
 }

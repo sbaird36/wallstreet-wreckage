@@ -77,6 +77,7 @@ export function PostComposer({ onPosted }: Props) {
       linkedEventId: null,
       linkedTickers,
       isPlayerPost: true,
+      source: "wsb",
     };
 
     // Add to game state immediately (optimistic)

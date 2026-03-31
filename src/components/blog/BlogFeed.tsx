@@ -15,16 +15,50 @@ const FLAIR_STYLES: Record<BlogPostFlair, string> = {
   Shitpost:   "bg-rose-900/60 text-rose-300 border-rose-700",
 };
 
-function verificationStatus(post: BlogPost, currentDay: number) {
-  if (currentDay - post.day < 2) return null; // too recent to know
+// Credibility heuristic scores per flair (observable signal, not isReal)
+const FLAIR_CRED: Record<BlogPostFlair, number> = {
+  DD: 3, News: 3, Discussion: 1, YOLO: 0, Meme: -1, Shitpost: -2,
+};
+
+function getCredibilityGrade(post: BlogPost, grades: 3 | 5): { label: string; color: string } {
+  const netVotes = post.upvotes - post.downvotes;
+  const voteScore = netVotes > 500 ? 2 : netVotes > 100 ? 1 : netVotes >= 0 ? 0 : netVotes > -100 ? -1 : -2;
+  const total = FLAIR_CRED[post.flair] + voteScore;
+
+  if (grades === 3) {
+    if (total >= 3) return { label: "Credibility: High", color: "text-emerald-500 border-emerald-800 bg-emerald-900/20" };
+    if (total >= 1) return { label: "Credibility: Medium", color: "text-yellow-500 border-yellow-800 bg-yellow-900/20" };
+    return { label: "Credibility: Low", color: "text-red-500 border-red-800 bg-red-900/20" };
+  } else {
+    if (total >= 4) return { label: "Credibility: Very High", color: "text-emerald-400 border-emerald-700 bg-emerald-900/30" };
+    if (total >= 2) return { label: "Credibility: High", color: "text-emerald-600 border-emerald-800 bg-emerald-900/20" };
+    if (total >= 0) return { label: "Credibility: Medium", color: "text-yellow-500 border-yellow-800 bg-yellow-900/20" };
+    if (total >= -2) return { label: "Credibility: Low", color: "text-orange-500 border-orange-800 bg-orange-900/20" };
+    return { label: "Credibility: Very Low", color: "text-red-400 border-red-700 bg-red-900/30" };
+  }
+}
+
+function verificationStatus(post: BlogPost, currentDay: number, literacy: number): "VERIFIED" | "UNVERIFIED" | null {
+  // L5: immediate reveal
+  if (literacy >= 5) return post.isReal ? "VERIFIED" : "UNVERIFIED";
+  // L3+: reveal after 1 day instead of 2
+  const revealDelay = literacy >= 3 ? 1 : 2;
+  if (currentDay - post.day < revealDelay) return null;
   return post.isReal ? "VERIFIED" : "UNVERIFIED";
 }
 
-function PostCard({ post }: { post: BlogPost }) {
+function PostCard({ post, literacy }: { post: BlogPost; literacy: number }) {
   const { state, dispatch } = useGame();
   const [expanded, setExpanded] = useState(false);
-  const status = verificationStatus(post, state.currentDay);
+  const status = verificationStatus(post, state.currentDay, literacy);
   const netScore = post.upvotes - post.downvotes;
+
+  // Blog Literacy credibility heuristic (shown on all posts at L1+)
+  const credGrade = literacy >= 1 ? getCredibilityGrade(post, literacy >= 2 ? 5 : 3) : null;
+
+  // L4+: warn about likely-fake posts before normal reveal window
+  // Only applies when status isn't already revealed
+  const showLikelyFakeWarning = literacy >= 4 && status === null && !post.isReal && !post.isPredictionWrong;
 
   function vote(v: "UP" | "DOWN") {
     dispatch({
@@ -95,7 +129,28 @@ function PostCard({ post }: { post: BlogPost }) {
                 </span>
               )}
 
-            {/* Verification badge — only shown after 2 days */}
+            {/* Wild boost badge */}
+            {post.isWildBoosted && (
+              <span className="text-xs px-1.5 py-0.5 rounded border font-mono bg-orange-900/50 text-orange-300 border-orange-700">
+                🔥 WILD BOOST
+              </span>
+            )}
+
+            {/* Blog Literacy L1+: credibility heuristic */}
+            {credGrade && (
+              <span className={`text-xs px-1.5 py-0.5 rounded border font-mono ${credGrade.color}`}>
+                {credGrade.label}
+              </span>
+            )}
+
+            {/* Blog Literacy L4+: likely-fake warning before reveal window */}
+            {showLikelyFakeWarning && (
+              <span className="text-xs px-1.5 py-0.5 rounded border font-mono bg-orange-900/50 text-orange-400 border-orange-700">
+                ⚠ LIKELY FAKE
+              </span>
+            )}
+
+            {/* Verification badge — timing depends on Blog Literacy level */}
             {status === "VERIFIED" && (
               <span className="text-xs px-1.5 py-0.5 rounded border font-mono bg-emerald-900/50 text-emerald-400 border-emerald-700">
                 ✓ VERIFIED
@@ -150,30 +205,40 @@ function PostCard({ post }: { post: BlogPost }) {
 
 // ─── Main BlogFeed ────────────────────────────────────────────────────────────
 
+type BlogSource = "wsb" | "premium" | "wildcat";
+
 export function BlogFeed() {
-  const { state } = useGame();
+  const { state, dispatch } = useGame();
   const { blogFeed, currentDay } = state;
+  const literacy = state.traderSkills?.blogLiteracy ?? 0;
   const [tickerFilter, setTickerFilter] = useState<string | null>(null);
   const [flairFilter, setFlairFilter] = useState<BlogPostFlair | null>(null);
   const [daysShown, setDaysShown] = useState(5);
+  const [activeBlogSource, setActiveBlogSource] = useState<BlogSource>("wsb");
 
-  // Unique tickers mentioned across all posts
+  const hasPremiumBlog = state.premiumBlogSubscription !== null &&
+    state.currentDay - (state.premiumBlogSubscription?.purchasedDay ?? 0) < 7;
+
+  // Unique tickers mentioned across all posts in active source
   const mentionedTickers = useMemo(() => {
     const t = new Set<string>();
-    blogFeed.forEach((p) => p.linkedTickers.forEach((tk) => t.add(tk)));
+    blogFeed
+      .filter((p) => (p.source ?? "wsb") === activeBlogSource)
+      .forEach((p) => p.linkedTickers.forEach((tk) => t.add(tk)));
     return Array.from(t).sort();
-  }, [blogFeed]);
+  }, [blogFeed, activeBlogSource]);
 
   const filtered = useMemo(() => {
     return [...blogFeed]
       .filter((p) => {
+        if ((p.source ?? "wsb") !== activeBlogSource) return false;
         if (tickerFilter && !p.linkedTickers.includes(tickerFilter)) return false;
         if (flairFilter && p.flair !== flairFilter) return false;
         if (currentDay - p.day >= daysShown) return false;
         return true;
       })
       .sort((a, b) => b.day - a.day || b.upvotes - a.upvotes);
-  }, [blogFeed, tickerFilter, flairFilter, daysShown, currentDay]);
+  }, [blogFeed, tickerFilter, flairFilter, daysShown, currentDay, activeBlogSource]);
 
   // Group by day
   const byDay = useMemo(() => {
@@ -188,86 +253,234 @@ export function BlogFeed() {
 
   const allFlairs: BlogPostFlair[] = ["DD", "News", "Discussion", "Meme", "YOLO", "Shitpost"];
 
+  const wsbCount = blogFeed.filter((p) => (p.source ?? "wsb") === "wsb").length;
+  const premiumCount = blogFeed.filter((p) => p.source === "premium").length;
+  const wildcatCount = blogFeed.filter((p) => p.source === "wildcat").length;
+
+  function handleBuyPremium() {
+    dispatch({ type: "BUY_PREMIUM_BLOG" });
+  }
+
   return (
     <div className="max-w-3xl mx-auto">
-      {/* Header */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 mb-4">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="font-mono font-bold text-white text-lg">r/WallStreetWreckage</h1>
-            <p className="text-xs text-gray-500 mt-1">
-              The internet&apos;s finest financial misinformation, curated daily.
-              <span className="text-yellow-600 ml-2">80% of posts are FUD. You figure out which.</span>
-            </p>
-          </div>
-          <div className="text-right text-xs text-gray-600">
-            <div className="font-mono text-gray-400">{blogFeed.length.toLocaleString()}</div>
-            <div>total posts</div>
-            {(state.playerFollowerCount ?? 0) > 0 && (
-              <div className="mt-1">
-                <span className="font-mono text-blue-400">{(state.playerFollowerCount ?? 0).toLocaleString()}</span>
-                <span className="ml-1">followers</span>
-              </div>
-            )}
-          </div>
-        </div>
+      {/* Source tab navigation — horizontally scrollable on mobile */}
+      <div className="overflow-x-auto mb-4">
+        <div className="flex gap-2 min-w-max pb-1">
+          {/* WSB tab */}
+          <button
+            onClick={() => setActiveBlogSource("wsb")}
+            className={`flex-shrink-0 px-4 py-2 rounded-lg border font-mono text-xs font-bold transition-colors ${
+              activeBlogSource === "wsb"
+                ? "bg-cyan-900/40 border-cyan-700 text-cyan-300"
+                : "bg-gray-900 border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600"
+            }`}
+          >
+            <span className="block">r/WallStreetWreckage</span>
+            <span className="text-xs font-normal opacity-70">Free · 80% FUD</span>
+          </button>
 
-        {/* Verification legend */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 pt-3 border-t border-gray-800 text-xs">
-          <span className="text-gray-500">After 2 days:</span>
-          <span className="text-emerald-400 font-mono">✓ VERIFIED = real news</span>
-          <span className="text-gray-500 font-mono">✗ UNVERIFIED = FUD</span>
+          {/* Premium tab */}
+          <button
+            onClick={() => setActiveBlogSource("premium")}
+            className={`flex-shrink-0 px-4 py-2 rounded-lg border font-mono text-xs font-bold transition-colors ${
+              activeBlogSource === "premium"
+                ? "bg-amber-900/40 border-amber-700 text-amber-300"
+                : "bg-gray-900 border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600"
+            }`}
+          >
+            <span className="block">WealthWatch Insider</span>
+            <span className="text-xs font-normal opacity-70">
+              {hasPremiumBlog ? "Subscribed · 60% FUD" : "$5,000/wk · 60% real"}
+            </span>
+          </button>
+
+          {/* Wildcat tab */}
+          <button
+            onClick={() => setActiveBlogSource("wildcat")}
+            className={`flex-shrink-0 px-4 py-2 rounded-lg border font-mono text-xs font-bold transition-colors ${
+              activeBlogSource === "wildcat"
+                ? "bg-orange-900/40 border-orange-700 text-orange-300"
+                : "bg-gray-900 border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600"
+            }`}
+          >
+            <span className="block">ApeStation</span>
+            <span className="text-xs font-normal opacity-70">Free · 95% chaos</span>
+          </button>
         </div>
       </div>
 
-      {/* Post Composer */}
-      <PostComposer />
+      {/* Header — per source */}
+      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 mb-4">
+        {activeBlogSource === "wsb" && (
+          <>
+            <div className="flex items-start justify-between">
+              <div>
+                <h1 className="font-mono font-bold text-white text-lg">r/WallStreetWreckage</h1>
+                <p className="text-xs text-gray-500 mt-1">
+                  The internet&apos;s finest financial misinformation, curated daily.
+                  <span className="text-yellow-600 ml-2">80% of posts are FUD. You figure out which.</span>
+                </p>
+              </div>
+              <div className="text-right text-xs text-gray-600">
+                <div className="font-mono text-gray-400">{wsbCount.toLocaleString()}</div>
+                <div>posts</div>
+                {(state.playerFollowerCount ?? 0) > 0 && (
+                  <div className="mt-1">
+                    <span className="font-mono text-blue-400">{(state.playerFollowerCount ?? 0).toLocaleString()}</span>
+                    <span className="ml-1">followers</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* Verification legend */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 pt-3 border-t border-gray-800 text-xs">
+              {literacy >= 5 ? (
+                <span className="text-amber-400 font-mono">⚡ Truth Broker: Real/fake status shown immediately</span>
+              ) : literacy >= 3 ? (
+                <>
+                  <span className="text-gray-500">After 1 day:</span>
+                  <span className="text-emerald-400 font-mono">✓ VERIFIED = real news</span>
+                  <span className="text-gray-500 font-mono">✗ UNVERIFIED = FUD</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-gray-500">After 2 days:</span>
+                  <span className="text-emerald-400 font-mono">✓ VERIFIED = real news</span>
+                  <span className="text-gray-500 font-mono">✗ UNVERIFIED = FUD</span>
+                </>
+              )}
+            </div>
+          </>
+        )}
 
-      {/* Filters */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-3 mb-4">
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-xs text-gray-500 font-mono uppercase tracking-wider mr-1">Flair:</span>
-          <button
-            onClick={() => setFlairFilter(null)}
-            className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${!flairFilter ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
-          >
-            All
-          </button>
-          {allFlairs.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFlairFilter(flairFilter === f ? null : f)}
-              className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${flairFilter === f ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
+        {activeBlogSource === "premium" && (
+          <>
+            <div className="flex items-start justify-between">
+              <div>
+                <h1 className="font-mono font-bold text-amber-300 text-lg">WealthWatch Insider</h1>
+                <p className="text-xs text-gray-500 mt-1">
+                  Professional analyst research.
+                  {hasPremiumBlog
+                    ? <span className="text-amber-500 ml-2">40% of posts reflect real market events.</span>
+                    : <span className="text-gray-600 ml-2">Subscribe for $5,000/week to unlock.</span>
+                  }
+                </p>
+              </div>
+              <div className="text-right text-xs text-gray-600">
+                <div className="font-mono text-amber-400">{premiumCount.toLocaleString()}</div>
+                <div>posts</div>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 pt-3 border-t border-gray-800 text-xs">
+              <span className="text-amber-600 font-mono">40% of posts here reflect real events — higher signal than WSB</span>
+            </div>
+          </>
+        )}
 
-        {mentionedTickers.length > 0 && (
-          <div className="flex flex-wrap gap-2 items-center mt-2 pt-2 border-t border-gray-800">
-            <span className="text-xs text-gray-500 font-mono uppercase tracking-wider mr-1">Ticker:</span>
-            <button
-              onClick={() => setTickerFilter(null)}
-              className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${!tickerFilter ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
-            >
-              All
-            </button>
-            {mentionedTickers.slice(0, 20).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTickerFilter(tickerFilter === t ? null : t)}
-                className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${tickerFilter === t ? "bg-blue-800 border-blue-600 text-white" : "border-gray-700 text-gray-500 hover:text-blue-400"}`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
+        {activeBlogSource === "wildcat" && (
+          <>
+            <div className="flex items-start justify-between">
+              <div>
+                <h1 className="font-mono font-bold text-orange-400 text-lg">ApeStation</h1>
+                <p className="text-xs text-gray-500 mt-1">
+                  Maximum degeneracy. Free entry.
+                  <span className="text-orange-600 ml-2">95% fabricated. The 5% that aren&apos;t move markets.</span>
+                </p>
+              </div>
+              <div className="text-right text-xs text-gray-600">
+                <div className="font-mono text-orange-400">{wildcatCount.toLocaleString()}</div>
+                <div>posts</div>
+              </div>
+            </div>
+            {/* Warning banner */}
+            <div className="mt-3 pt-3 border-t border-gray-800">
+              <div className="bg-orange-950/40 border border-orange-800/60 rounded px-3 py-2 text-xs text-orange-400 font-mono">
+                ⚠ 95% of posts are fabricated. The 5% that aren&apos;t trigger extreme market moves via volatility multipliers.
+              </div>
+            </div>
+          </>
         )}
       </div>
 
+      {/* Premium lock panel */}
+      {activeBlogSource === "premium" && !hasPremiumBlog && (
+        <div className="bg-gray-900 border border-amber-800/50 rounded-lg p-6 mb-4 text-center">
+          <div className="text-3xl mb-3">🔒</div>
+          <h2 className="font-mono font-bold text-amber-300 text-base mb-2">WealthWatch Insider</h2>
+          <p className="text-sm text-gray-400 mb-4 max-w-sm mx-auto">
+            Professional analyst research with 40% real event coverage.
+            Higher signal-to-noise than the free feeds.
+          </p>
+          <div className="text-xs text-gray-500 font-mono mb-4">
+            $5,000 / week · {state.portfolio.cash >= 5000
+              ? <span className="text-emerald-400">You can afford this</span>
+              : <span className="text-red-400">Need ${(5000 - state.portfolio.cash).toLocaleString()} more</span>
+            }
+          </div>
+          <button
+            onClick={handleBuyPremium}
+            disabled={state.portfolio.cash < 5000}
+            className={`px-6 py-2 rounded border font-mono font-bold text-sm transition-colors ${
+              state.portfolio.cash >= 5000
+                ? "bg-amber-900/40 border-amber-700 text-amber-300 hover:bg-amber-800/50 active:scale-95"
+                : "bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed"
+            }`}
+          >
+            Subscribe — $5,000/week
+          </button>
+        </div>
+      )}
+
+      {/* Post Composer — only on WSB tab */}
+      {activeBlogSource === "wsb" && <PostComposer />}
+
+      {/* Filters */}
+      {(activeBlogSource !== "premium" || hasPremiumBlog) && (
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-3 mb-4">
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-xs text-gray-500 font-mono uppercase tracking-wider mr-1">Flair:</span>
+            <button
+              onClick={() => setFlairFilter(null)}
+              className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${!flairFilter ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
+            >
+              All
+            </button>
+            {allFlairs.map((f) => (
+              <button
+                key={f}
+                onClick={() => setFlairFilter(flairFilter === f ? null : f)}
+                className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${flairFilter === f ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+
+          {mentionedTickers.length > 0 && (
+            <div className="flex flex-wrap gap-2 items-center mt-2 pt-2 border-t border-gray-800">
+              <span className="text-xs text-gray-500 font-mono uppercase tracking-wider mr-1">Ticker:</span>
+              <button
+                onClick={() => setTickerFilter(null)}
+                className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${!tickerFilter ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
+              >
+                All
+              </button>
+              {mentionedTickers.slice(0, 20).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTickerFilter(tickerFilter === t ? null : t)}
+                  className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${tickerFilter === t ? "bg-blue-800 border-blue-600 text-white" : "border-gray-700 text-gray-500 hover:text-blue-400"}`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Feed */}
-      {blogFeed.length === 0 ? (
+      {activeBlogSource === "premium" && !hasPremiumBlog ? null : blogFeed.filter((p) => (p.source ?? "wsb") === activeBlogSource).length === 0 ? (
         <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
           <div className="text-3xl mb-3">📭</div>
           <div className="text-gray-400 text-sm">No posts yet.</div>
@@ -288,7 +501,7 @@ export function BlogFeed() {
               </div>
               <div className="space-y-2">
                 {posts.map((post) => (
-                  <PostCard key={post.id} post={post} />
+                  <PostCard key={post.id} post={post} literacy={literacy} />
                 ))}
               </div>
             </div>

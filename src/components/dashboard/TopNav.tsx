@@ -16,6 +16,7 @@ const NAV_TABS = [
   { href: "/algorithm",   label: "My Algorithm", icon: "🤖" },
   { href: "/hedge-fund",  label: "Hedge Fund",   icon: "🏦" },
   { href: "/stats",       label: "Stats",        icon: "🏆" },
+  { href: "/skills",      label: "Skills",       icon: "⚡" },
 ];
 
 export function TopNav() {
@@ -113,9 +114,12 @@ export function TopNav() {
             {NAV_TABS.map((tab) => {
               const isActive = pathname === tab.href;
               const isBlog = tab.href === "/blog";
+              const isSkills = tab.href === "/skills";
               const unreadTips = isBlog
                 ? (state.contactTips ?? []).filter((t) => !t.isRead).length
                 : 0;
+              const unspentPoints = isSkills ? (state.skillPoints ?? 0) : 0;
+              const hasBadge = unreadTips > 0 || unspentPoints > 0;
               return (
                 <Link
                   key={tab.href}
@@ -131,8 +135,13 @@ export function TopNav() {
                 >
                   <span className="text-base">{tab.icon}</span>
                   <span className="hidden sm:inline">{tab.label}</span>
-                  {unreadTips > 0 && (
-                    <span className="absolute top-2 right-2 sm:right-1 w-2 h-2 rounded-full bg-blue-500" />
+                  {isSkills && unspentPoints > 0 && (
+                    <span className="hidden sm:flex items-center justify-center text-[10px] font-mono font-bold min-w-[18px] h-[18px] px-1 rounded-full bg-amber-500 text-gray-900">
+                      {unspentPoints}
+                    </span>
+                  )}
+                  {hasBadge && (
+                    <span className={`absolute top-2 right-2 sm:right-1 w-2 h-2 rounded-full ${isSkills ? "bg-amber-500" : "bg-blue-500"} ${isSkills ? "sm:hidden" : ""}`} />
                   )}
                 </Link>
               );

@@ -109,5 +109,10 @@ export function buildInitialGameState(playerName: string): GameState {
     playerFollowerCount: 0,
     playerVerifiedPostCount: 0,
     playerWrongPostCount: 0,
+    skillPoints: 0,
+    traderSkills: { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 },
+    traderSkillsXP: { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 },
+    playerInfluence: 0,
+    premiumBlogSubscription: null,
   };
 }

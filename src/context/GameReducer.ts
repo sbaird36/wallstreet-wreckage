@@ -1,13 +1,42 @@
-import type { GameState, GameAction, Holding } from "@/types";
+import type { GameState, GameAction, Holding, TraderSkills } from "@/types";
 import { getNetWorth } from "@/utils/calculations";
 import { getNewlyUnlockedContacts } from "@/engine/contactEngine";
+
+// ── Organic skill XP ──────────────────────────────────────────────────────────
+// Accumulate XP through performance; crossing thresholds auto-levels the skill.
+const XP_UP   = 20;  // XP needed to gain 1 organic level (~30–50 qualifying actions)
+const XP_DOWN = -10; // XP needed to lose 1 organic level
+
+const DEFAULT_SKILLS: TraderSkills = { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 };
+
+function applySkillXP(
+  skills: TraderSkills,
+  xp: TraderSkills,
+  deltas: Partial<TraderSkills>
+): { skills: TraderSkills; xp: TraderSkills } {
+  const newXP = { ...xp };
+  const newSkills = { ...skills };
+  for (const k of Object.keys(deltas) as (keyof TraderSkills)[]) {
+    newXP[k] += deltas[k] ?? 0;
+  }
+  for (const k of Object.keys(newSkills) as (keyof TraderSkills)[]) {
+    if (newXP[k] >= XP_UP && newSkills[k] < 5) {
+      newSkills[k] += 1;
+      newXP[k] = 0;
+    } else if (newXP[k] <= XP_DOWN && newSkills[k] > 0) {
+      newSkills[k] -= 1;
+      newXP[k] = 0;
+    }
+  }
+  return { skills: newSkills, xp: newXP };
+}
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "ADVANCE_DAY": {
       const {
         newAssets, events, volatilityOverrides, newCooldowns, newIndexes,
-        newBlogPosts, newFollowerCount, npcVotesOnPlayerPosts,
+        newBlogPosts, newFollowerCount, npcVotesOnPlayerPosts, weeklySkillPoints,
       } = action.payload;
       const newDay = state.currentDay + 1;
       const newHistory = [...state.eventHistory, ...events];
@@ -49,6 +78,35 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         }
       });
 
+      // Organic blogLiteracy XP from post verification
+      const blogXPDelta = newVerifications * 0.4 - newWrongPredictions * 0.2;
+      const { skills: newTraderSkills, xp: newTraderSkillsXP } = applySkillXP(
+        state.traderSkills ?? DEFAULT_SKILLS,
+        state.traderSkillsXP ?? DEFAULT_SKILLS,
+        { blogLiteracy: blogXPDelta }
+      );
+
+      // Wild blog price boost: apply 8x volatility overrides for wild-boosted posts
+      const newVolOverrides = { ...volatilityOverrides };
+      for (const post of newBlogPosts) {
+        if (post.source === "wildcat" && post.isReal && post.isWildBoosted) {
+          for (const ticker of post.linkedTickers) {
+            newVolOverrides[ticker] = { multiplier: 8, expiresOnDay: newDay + 3 };
+          }
+        }
+      }
+
+      // Influence: daily portfolio performance
+      const prevNetWorth = state.portfolio.netWorthHistory.slice(-1)[0]?.netWorth ?? state.portfolio.cash;
+      const curNetWorth = getNetWorth(state.portfolio, newAssets);
+      const dailyReturn = prevNetWorth > 0 ? (curNetWorth - prevNetWorth) / prevNetWorth : 0;
+      const performanceDelta = dailyReturn > 0.005 ? 3 : dailyReturn < -0.005 ? -1.5 : 0;
+
+      // Influence: blog post verification
+      const blogInfluenceDelta = newVerifications * 30 - newWrongPredictions * 12;
+
+      const newInfluence = Math.max(0, (state.playerInfluence ?? 0) + performanceDelta + blogInfluenceDelta);
+
       return {
         ...state,
         currentDay: newDay,
@@ -56,13 +114,17 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         activeEvents: events,
         eventHistory: newHistory,
         portfolio: newPortfolio,
-        volatilityOverrides,
+        volatilityOverrides: newVolOverrides,
         recentEventCooldowns: newCooldowns,
         indexes: newIndexes,
         blogFeed: verifiedFeed,
         playerFollowerCount: newFollowerCount,
         playerVerifiedPostCount: (state.playerVerifiedPostCount ?? 0) + newVerifications,
         playerWrongPostCount: (state.playerWrongPostCount ?? 0) + newWrongPredictions,
+        skillPoints: (state.skillPoints ?? 0) + weeklySkillPoints,
+        traderSkills: newTraderSkills,
+        traderSkillsXP: newTraderSkillsXP,
+        playerInfluence: newInfluence,
       };
     }
 
@@ -70,6 +132,29 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const tx = action.payload;
       const holdings = { ...state.portfolio.holdings };
       let cash = state.portfolio.cash;
+
+      // Organic XP deltas for sells (computed before holdings are mutated)
+      let tradeXPDeltas: Partial<TraderSkills> = {};
+      if (tx.action === "SELL") {
+        const preSellHolding = holdings[tx.ticker];
+        if (preSellHolding) {
+          const returnPct = (tx.pricePerUnit - preSellHolding.averageCostBasis) / preSellHolding.averageCostBasis;
+          const isWin = returnPct >= 0.05;
+          const isLoss = returnPct <= -0.05;
+          if (isWin || isLoss) {
+            const algoDelta = isWin ? 0.3 : -0.15;
+            tradeXPDeltas.algorithmMastery = algoDelta;
+            // analystAcuity if the stock had an analyst unlock or active subscription
+            if (state.analystUnlocks.includes(tx.ticker) || state.analystSubscription) {
+              tradeXPDeltas.analystAcuity = algoDelta;
+            }
+            // eventReading if there are active market events
+            if ((state.activeEvents ?? []).length > 0) {
+              tradeXPDeltas.eventReading = isWin ? 0.15 : -0.08;
+            }
+          }
+        }
+      }
 
       if (tx.action === "BUY") {
         cash -= tx.totalValue;
@@ -115,6 +200,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         }
       }
 
+      const { skills: tradeSkills, xp: tradeXP } = Object.keys(tradeXPDeltas).length > 0
+        ? applySkillXP(state.traderSkills ?? DEFAULT_SKILLS, state.traderSkillsXP ?? DEFAULT_SKILLS, tradeXPDeltas)
+        : { skills: state.traderSkills ?? DEFAULT_SKILLS, xp: state.traderSkillsXP ?? DEFAULT_SKILLS };
+
       return {
         ...state,
         pendingTrade: null,
@@ -124,6 +213,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           holdings,
           transactions: [...state.portfolio.transactions, tx],
         },
+        traderSkills: tradeSkills,
+        traderSkillsXP: tradeXP,
       };
     }
 
@@ -265,6 +356,31 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           }
         });
 
+        const blogXPDelta = newVerifications * 0.4 - newWrongPredictions * 0.2;
+        const { skills: multiSkills, xp: multiXP } = applySkillXP(
+          s.traderSkills ?? DEFAULT_SKILLS,
+          s.traderSkillsXP ?? DEFAULT_SKILLS,
+          { blogLiteracy: blogXPDelta }
+        );
+
+        // Wild blog price boost: apply 8x volatility overrides for wild-boosted posts
+        const multiVolOverrides = { ...day.volatilityOverrides };
+        for (const post of day.newBlogPosts) {
+          if (post.source === "wildcat" && post.isReal && post.isWildBoosted) {
+            for (const ticker of post.linkedTickers) {
+              multiVolOverrides[ticker] = { multiplier: 8, expiresOnDay: newDay + 3 };
+            }
+          }
+        }
+
+        // Influence: daily portfolio performance
+        const prevNW = s.portfolio.netWorthHistory.slice(-1)[0]?.netWorth ?? s.portfolio.cash;
+        const curNW = getNetWorth(s.portfolio, day.newAssets);
+        const dailyRet = prevNW > 0 ? (curNW - prevNW) / prevNW : 0;
+        const perfDelta = dailyRet > 0.005 ? 3 : dailyRet < -0.005 ? -1.5 : 0;
+        const blogInfDelta = newVerifications * 30 - newWrongPredictions * 12;
+        const multiInfluence = Math.max(0, (s.playerInfluence ?? 0) + perfDelta + blogInfDelta);
+
         s = {
           ...s,
           currentDay: newDay,
@@ -272,7 +388,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           activeEvents: day.events,
           eventHistory: [...s.eventHistory, ...day.events],
           portfolio: newPortfolio,
-          volatilityOverrides: day.volatilityOverrides,
+          volatilityOverrides: multiVolOverrides,
           recentEventCooldowns: day.newCooldowns,
           indexes: day.newIndexes,
           blogFeed: updatedFeed,
@@ -280,9 +396,48 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           playerFollowerCount: day.newFollowerCount,
           playerVerifiedPostCount: (s.playerVerifiedPostCount ?? 0) + newVerifications,
           playerWrongPostCount: (s.playerWrongPostCount ?? 0) + newWrongPredictions,
+          skillPoints: (s.skillPoints ?? 0) + day.weeklySkillPoints,
+          traderSkills: multiSkills,
+          traderSkillsXP: multiXP,
+          playerInfluence: multiInfluence,
         };
       }
       return s;
+    }
+
+    case "BUY_PREMIUM_BLOG": {
+      if (state.portfolio.cash < 5000) return state;
+      return {
+        ...state,
+        premiumBlogSubscription: { purchasedDay: state.currentDay },
+        portfolio: { ...state.portfolio, cash: state.portfolio.cash - 5000 },
+      };
+    }
+
+    case "SPEND_POINT_ON_INFLUENCE": {
+      if ((state.skillPoints ?? 0) < 1) return state;
+      return {
+        ...state,
+        skillPoints: (state.skillPoints ?? 0) - 1,
+        playerInfluence: (state.playerInfluence ?? 0) + 15,
+      };
+    }
+
+    case "UPGRADE_SKILL": {
+      const { skill } = action.payload;
+      const UPGRADE_COSTS = [4, 8, 16, 28, 44]; // cost to go from level N to N+1
+      const currentLevel = (state.traderSkills ?? {})[skill] ?? 0;
+      if (currentLevel >= 5) return state;
+      const cost = UPGRADE_COSTS[currentLevel];
+      if ((state.skillPoints ?? 0) < cost) return state;
+      return {
+        ...state,
+        skillPoints: (state.skillPoints ?? 0) - cost,
+        traderSkills: {
+          ...(state.traderSkills ?? { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 }),
+          [skill]: currentLevel + 1,
+        },
+      };
     }
 
     case "RESET_GAME":
@@ -314,6 +469,11 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         playerFollowerCount: 0,
         playerVerifiedPostCount: 0,
         playerWrongPostCount: 0,
+        skillPoints: 0,
+        traderSkills: { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 },
+        traderSkillsXP: { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 },
+        playerInfluence: 0,
+        premiumBlogSubscription: null,
       };
 
     default:

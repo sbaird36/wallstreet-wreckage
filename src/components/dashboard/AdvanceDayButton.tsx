@@ -27,6 +27,7 @@ type WeekDayPayload = {
   contactTips: ContactTip[];
   newFollowerCount: number;
   npcVotesOnPlayerPosts: { postId: string; votes: number }[];
+  weeklySkillPoints: number;
 };
 
 export function AdvanceDayButton() {
@@ -66,12 +67,15 @@ export function AdvanceDayButton() {
     newAssets = applyPlayerInfluenceToAssets(newAssets, playerMultipliers);
 
     const newIndexes = advanceIndexes(state.indexes, newAssets, targetDay);
-    const newBlogPosts = generateBlogPosts(targetDay, events, state.assets);
+    const hasPremiumBlog = state.premiumBlogSubscription !== null &&
+      state.currentDay - state.premiumBlogSubscription.purchasedDay < 7;
+    const newBlogPosts = generateBlogPosts(targetDay, events, state.assets, hasPremiumBlog);
     const newContactTips = generateContactTips(state, targetDay);
     const snp499 = newIndexes["snp499"];
     const netWorth = getNetWorth(state.portfolio, newAssets);
     const newFollowerCount = computeFollowerCount(state.portfolio, netWorth, snp499, targetDay, state.playerVerifiedPostCount ?? 0, state.playerWrongPostCount ?? 0);
     const npcVotesOnPlayerPosts = computeNpcVotesOnPlayerPosts(state, targetDay);
+    const weeklySkillPoints = getDayOfWeek(state.startDate, targetDay) === 1 ? 1 : 0;
 
     dispatch({
       type: "ADVANCE_DAY",
@@ -84,6 +88,7 @@ export function AdvanceDayButton() {
         newBlogPosts,
         newFollowerCount,
         npcVotesOnPlayerPosts,
+        weeklySkillPoints,
       },
     });
 
@@ -123,12 +128,15 @@ export function AdvanceDayButton() {
       newAssets = applyPlayerInfluenceToAssets(newAssets, playerMultipliers);
 
       const newIndexes = advanceIndexes(threaded.indexes, newAssets, targetDay);
-      const newBlogPosts = generateBlogPosts(targetDay, events, threaded.assets);
+      const hasPremiumBlog = threaded.premiumBlogSubscription !== null &&
+        threaded.currentDay - threaded.premiumBlogSubscription.purchasedDay < 7;
+      const newBlogPosts = generateBlogPosts(targetDay, events, threaded.assets, hasPremiumBlog);
       const contactTips = generateContactTips(threaded, targetDay);
       const snp499 = newIndexes["snp499"];
       const netWorth = getNetWorth(threaded.portfolio, newAssets);
       const newFollowerCount = computeFollowerCount(threaded.portfolio, netWorth, snp499, targetDay, threaded.playerVerifiedPostCount ?? 0, threaded.playerWrongPostCount ?? 0);
       const npcVotesOnPlayerPosts = computeNpcVotesOnPlayerPosts(threaded, targetDay);
+      const weeklySkillPoints = getDayOfWeek(state.startDate, targetDay) === 1 ? 1 : 0;
 
       days.push({
         newAssets,
@@ -140,6 +148,7 @@ export function AdvanceDayButton() {
         contactTips,
         newFollowerCount,
         npcVotesOnPlayerPosts,
+        weeklySkillPoints,
       });
 
       // Simulate what the reducer will produce so the next iteration is correct

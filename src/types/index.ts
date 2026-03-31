@@ -198,6 +198,17 @@ export interface AnalystSubscription {
   purchasedDay: number;
 }
 
+// ============================================================
+// Trader Progression
+// ============================================================
+
+export interface TraderSkills {
+  blogLiteracy: number;      // 0-5: identify real vs fake posts
+  analystAcuity: number;     // 0-5: analyst pick insight & accuracy
+  algorithmMastery: number;  // 0-5: stock-picking algorithm upgrades
+  eventReading: number;      // 0-5: world/market event awareness
+}
+
 export interface GameState {
   currentDay: number;
   startDate: string;
@@ -221,6 +232,11 @@ export interface GameState {
   playerFollowerCount: number;      // NPC followers earned from trading performance
   playerVerifiedPostCount: number;  // player posts whose ticker prediction came true
   playerWrongPostCount: number;     // player posts whose ticker prediction was wrong
+  skillPoints: number;              // unspent trader skill points
+  traderSkills: TraderSkills;       // current skill levels (0-5 each)
+  traderSkillsXP: TraderSkills;     // organic XP per skill (float); ±10/-5 auto-levels
+  playerInfluence: number;
+  premiumBlogSubscription: { purchasedDay: number } | null;
 }
 
 export interface SaveSlot {
@@ -253,6 +269,8 @@ export interface BlogPost {
   linkedTickers: string[];
   isPlayerPost?: boolean;
   isPredictionWrong?: boolean;  // player post whose ticker went the wrong direction
+  source: "wsb" | "premium" | "wildcat";
+  isWildBoosted?: boolean;
 }
 
 // ============================================================
@@ -287,6 +305,7 @@ export type GameAction =
         newBlogPosts: BlogPost[];
         newFollowerCount: number;
         npcVotesOnPlayerPosts: { postId: string; votes: number }[];
+        weeklySkillPoints: number;
       };
     }
   | { type: "EXECUTE_TRADE"; payload: Transaction }
@@ -303,6 +322,9 @@ export type GameAction =
   | { type: "MARK_TIPS_READ" }
   | { type: "DISMISS_CONTACT_TIP"; payload: { tipId: string } }
   | { type: "RESET_GAME" }
+  | { type: "UPGRADE_SKILL"; payload: { skill: keyof TraderSkills } }
+  | { type: "BUY_PREMIUM_BLOG" }
+  | { type: "SPEND_POINT_ON_INFLUENCE" }
   | {
       type: "ADVANCE_MULTIPLE_DAYS";
       payload: {
@@ -316,6 +338,7 @@ export type GameAction =
           contactTips: ContactTip[];
           newFollowerCount: number;
           npcVotesOnPlayerPosts: { postId: string; votes: number }[];
+          weeklySkillPoints: number;
         }>;
       };
     };
