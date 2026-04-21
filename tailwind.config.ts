@@ -9,15 +9,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Deep navy terminal palette — replaces default Tailwind grays
+        // Deep navy palette — grays are blue-tinted for the terminal feel
+        // 400/500 are lightened significantly for readable label text
         gray: {
           50:  "#eaf2fb",
           100: "#d5e6f5",
           200: "#b8d0ea",
-          300: "#8fb3d0",
-          400: "#6090b0",
-          500: "#3f6480",
-          600: "#2a4862",
+          300: "#90b8d5",
+          400: "#7aadcc",  // was #6090b0 — main readable secondary text
+          500: "#5088a8",  // was #3f6480 — labels, inactive nav; now legible
+          600: "#2d5068",  // was #2a4862
           700: "#1a3248",
           750: "#142840",
           800: "#0e2038",
@@ -26,14 +27,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "'Segoe UI'",
-          "Roboto",
-          "sans-serif",
-        ],
-        mono: ["'JetBrains Mono'", "'Courier New'", "Courier", "monospace"],
+        sans: ["var(--font-sans)", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "sans-serif"],
+        mono: ["var(--font-mono)", "'Courier New'", "Courier", "monospace"],
       },
       animation: {
         "scroll-left": "scroll-left 40s linear infinite",
