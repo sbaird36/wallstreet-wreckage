@@ -108,9 +108,9 @@ export function TopNav() {
           </div>
         )}
 
-        {/* Tab navigation — only shown when in a game */}
+        {/* Tab navigation — hidden on mobile (BottomNav handles it), shown on sm+ */}
         {state.gameStarted && (
-          <div className="border-t border-gray-800 px-2 sm:px-5 flex items-center gap-0 sm:gap-1 h-12">
+          <div className="border-t border-gray-800 px-2 sm:px-5 hidden sm:flex items-center gap-0 sm:gap-1 h-12">
             {NAV_TABS.map((tab) => {
               const isActive = pathname === tab.href;
               const isBlog = tab.href === "/blog";

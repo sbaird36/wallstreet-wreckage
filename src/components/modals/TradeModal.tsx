@@ -81,6 +81,20 @@ export function TradeModal() {
     }
   }
 
+  function getPresetValue(pct: number): string {
+    if (action === "BUY") {
+      const raw = (portfolio.cash * pct) / asset.currentPrice;
+      return asset.type === "crypto"
+        ? String(Math.floor(raw * 10000) / 10000)
+        : String(Math.floor(raw));
+    } else {
+      const raw = maxSell * pct;
+      return asset.type === "crypto"
+        ? String(Math.floor(raw * 10000) / 10000)
+        : String(Math.floor(raw));
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
@@ -145,7 +159,7 @@ export function TradeModal() {
 
         {/* Quantity */}
         <div className="mb-4">
-          <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center justify-between mb-2">
             <label className="text-xs text-gray-400">
               Quantity ({asset.type === "crypto" ? "coins" : "shares"})
             </label>
@@ -155,6 +169,21 @@ export function TradeModal() {
             >
               Max ({action === "BUY" ? maxBuy : maxSell})
             </button>
+          </div>
+          {/* Quick preset buttons */}
+          <div className="flex gap-1.5 mb-2">
+            {([0.25, 0.5, 0.75, 1] as const).map((pct) => {
+              const label = pct === 1 ? "MAX" : `${pct * 100}%`;
+              return (
+                <button
+                  key={pct}
+                  onClick={() => { setQuantity(getPresetValue(pct)); setError(""); }}
+                  className="flex-1 py-1.5 text-xs font-mono rounded border border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors"
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
           <input
             type="number"

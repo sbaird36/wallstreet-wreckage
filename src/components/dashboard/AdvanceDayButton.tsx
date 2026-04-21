@@ -178,8 +178,9 @@ export function AdvanceDayButton() {
           onClick={handleAdvanceDay}
           disabled={advancing}
           className={`
-            px-4 sm:px-5 py-2 rounded border font-mono font-bold text-xs uppercase tracking-widest
-            transition-all duration-150 flex items-center gap-2
+            flex-1 sm:flex-none
+            px-4 sm:px-5 py-3 sm:py-2 rounded border font-mono font-bold text-sm sm:text-xs uppercase tracking-widest
+            transition-all duration-150 flex items-center justify-center sm:justify-start gap-2
             ${
               advancing
                 ? "bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed"

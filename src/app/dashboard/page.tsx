@@ -79,8 +79,8 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      {/* Bottom ticker */}
-      <div className="sticky bottom-0">
+      {/* Bottom ticker — desktop only (mobile uses BottomNav) */}
+      <div className="sticky bottom-0 hidden sm:block">
         <MarketTicker />
       </div>
 

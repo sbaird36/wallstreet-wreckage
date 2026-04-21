@@ -12,7 +12,7 @@ import type { Asset, Sector } from "@/types";
 type Tab = "stocks" | "crypto";
 type SortKey = "name" | "price" | "change";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 15;
 
 export function MarketTable() {
   const { state, dispatch } = useGame();
@@ -20,6 +20,7 @@ export function MarketTable() {
   const [sort, setSort] = useState<SortKey>("change");
   const [sortDir, setSortDir] = useState<1 | -1>(-1);
   const [sectorFilter, setSectorFilter] = useState<Sector | null>(null);
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
   const allAssets = Object.values(state.assets);
@@ -33,13 +34,18 @@ export function MarketTable() {
   }, [allAssets]);
 
   const sorted = useMemo(() => {
+    const q = search.toLowerCase().trim();
     const filtered = allAssets.filter((a) => {
       if (tab === "stocks") {
         if (a.type !== "stock") return false;
         if (sectorFilter && a.sector !== sectorFilter) return false;
-        return true;
+      } else {
+        if (a.type !== "crypto") return false;
       }
-      return a.type === "crypto";
+      if (q) {
+        return a.ticker.toLowerCase().includes(q) || a.name.toLowerCase().includes(q);
+      }
+      return true;
     });
 
     return [...filtered].sort((a, b) => {
@@ -47,7 +53,7 @@ export function MarketTable() {
       if (sort === "price") return (a.currentPrice - b.currentPrice) * sortDir;
       return (getPriceChangePercent(a) - getPriceChangePercent(b)) * sortDir;
     });
-  }, [allAssets, tab, sectorFilter, sort, sortDir]);
+  }, [allAssets, tab, sectorFilter, sort, sortDir, search]);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -66,6 +72,7 @@ export function MarketTable() {
   function handleTabChange(t: Tab) {
     setTab(t);
     setSectorFilter(null);
+    setSearch("");
     setPage(1);
   }
 
@@ -126,6 +133,17 @@ export function MarketTable() {
             Crypto
           </button>
         </div>
+      </div>
+
+      {/* Search */}
+      <div className="mb-3">
+        <input
+          type="text"
+          placeholder="Search ticker or name…"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 font-mono"
+        />
       </div>
 
       {/* Sector filter pills — stocks only */}
