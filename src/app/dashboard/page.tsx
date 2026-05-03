@@ -10,6 +10,7 @@ import { AdvanceDayButton } from "@/components/dashboard/AdvanceDayButton";
 import { MarketTicker } from "@/components/dashboard/MarketTicker";
 import { ROIChart } from "@/components/dashboard/ROIChart";
 import { IndexWidget } from "@/components/dashboard/IndexWidget";
+import { DayEventsPanel } from "@/components/dashboard/DayEventsPanel";
 import { TradeModal } from "@/components/modals/TradeModal";
 import { WeeklyRecapModal } from "@/components/modals/WeeklyRecapModal";
 import { getDayOfWeek } from "@/utils/dateUtils";
@@ -59,6 +60,9 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Day events / notifications */}
+        <DayEventsPanel />
 
         {/* Market Indexes */}
         <div className="mb-4">

@@ -14,8 +14,16 @@ import {
   computePlayerPostMultipliers,
   applyPlayerInfluenceToAssets,
 } from "@/engine/playerInfluenceEngine";
+import {
+  generateAdvisorPool,
+  generateAdvisorHotTips,
+  generateWeeklyAdvisorEmails,
+  driftAdvisorSkills,
+  calcTotalWeeklyFee,
+  getAdvisorWeekNumber,
+} from "@/engine/advisorEngine";
 import { getNetWorth } from "@/utils/calculations";
-import type { GameState, Asset, FiredEvent, VolatilityOverride, MarketIndex, BlogPost, ContactTip } from "@/types";
+import type { GameState, Asset, FiredEvent, VolatilityOverride, MarketIndex, BlogPost, ContactTip, AdvisorEmail, AdvisorSkills, Advisor } from "@/types";
 
 type WeekDayPayload = {
   newAssets: Record<string, Asset>;
@@ -28,6 +36,11 @@ type WeekDayPayload = {
   newFollowerCount: number;
   npcVotesOnPlayerPosts: { postId: string; votes: number }[];
   weeklySkillPoints: number;
+  advisorHotTips: AdvisorEmail[];
+  advisorWeeklyEmails: AdvisorEmail[];
+  newAdvisorPool: Advisor[] | null;
+  advisorSkillUpdates: Array<{ id: string; skills: AdvisorSkills }>;
+  weeklyAdvisorFee: number;
 };
 
 export function AdvanceDayButton() {
@@ -77,6 +90,18 @@ export function AdvanceDayButton() {
     const npcVotesOnPlayerPosts = computeNpcVotesOnPlayerPosts(state, targetDay);
     const weeklySkillPoints = getDayOfWeek(state.startDate, targetDay) === 1 ? 1 : 0;
 
+    // ── Advisor engine ───────────────────────────────────────────────────
+    const isMonday = getDayOfWeek(state.startDate, targetDay) === 1;
+    const advisorHotTips = generateAdvisorHotTips(state, targetDay);
+    const advisorWeeklyEmails = isMonday ? generateWeeklyAdvisorEmails(state, targetDay) : [];
+    const advisorSkillUpdates = isMonday ? driftAdvisorSkills(state.hiredAdvisors ?? []) : [];
+    const weeklyAdvisorFee = isMonday ? calcTotalWeeklyFee(state.hiredAdvisors ?? []) : 0;
+    const currentWeek = getAdvisorWeekNumber(targetDay);
+    const poolNeedsRefresh = isMonday && currentWeek !== (state.advisorPoolWeek ?? 0);
+    const newAdvisorPool = poolNeedsRefresh
+      ? generateAdvisorPool(currentWeek, (state.hiredAdvisors ?? []).map((h) => h.advisor.id))
+      : null;
+
     dispatch({
       type: "ADVANCE_DAY",
       payload: {
@@ -89,6 +114,11 @@ export function AdvanceDayButton() {
         newFollowerCount,
         npcVotesOnPlayerPosts,
         weeklySkillPoints,
+        advisorHotTips,
+        advisorWeeklyEmails,
+        newAdvisorPool,
+        advisorSkillUpdates,
+        weeklyAdvisorFee,
       },
     });
 
@@ -138,6 +168,18 @@ export function AdvanceDayButton() {
       const npcVotesOnPlayerPosts = computeNpcVotesOnPlayerPosts(threaded, targetDay);
       const weeklySkillPoints = getDayOfWeek(state.startDate, targetDay) === 1 ? 1 : 0;
 
+      // Advisor engine for this day
+      const isMon = getDayOfWeek(state.startDate, targetDay) === 1;
+      const dayAdvisorHotTips = generateAdvisorHotTips(threaded, targetDay);
+      const dayAdvisorWeeklyEmails = isMon ? generateWeeklyAdvisorEmails(threaded, targetDay) : [];
+      const daySkillUpdates = isMon ? driftAdvisorSkills(threaded.hiredAdvisors ?? []) : [];
+      const dayWeeklyFee = isMon ? calcTotalWeeklyFee(threaded.hiredAdvisors ?? []) : 0;
+      const dayWeek = getAdvisorWeekNumber(targetDay);
+      const poolRefresh = isMon && dayWeek !== (threaded.advisorPoolWeek ?? 0);
+      const dayAdvisorPool = poolRefresh
+        ? generateAdvisorPool(dayWeek, (threaded.hiredAdvisors ?? []).map((h) => h.advisor.id))
+        : null;
+
       days.push({
         newAssets,
         events,
@@ -149,6 +191,11 @@ export function AdvanceDayButton() {
         newFollowerCount,
         npcVotesOnPlayerPosts,
         weeklySkillPoints,
+        advisorHotTips: dayAdvisorHotTips,
+        advisorWeeklyEmails: dayAdvisorWeeklyEmails,
+        newAdvisorPool: dayAdvisorPool,
+        advisorSkillUpdates: daySkillUpdates,
+        weeklyAdvisorFee: dayWeeklyFee,
       });
 
       // Simulate what the reducer will produce so the next iteration is correct

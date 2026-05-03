@@ -114,5 +114,9 @@ export function buildInitialGameState(playerName: string): GameState {
     traderSkillsXP: { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 },
     playerInfluence: 0,
     premiumBlogSubscription: null,
+    advisorPool: [],
+    hiredAdvisors: [],
+    advisorEmails: [],
+    advisorPoolWeek: 0,
   };
 }

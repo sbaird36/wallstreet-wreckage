@@ -215,6 +215,7 @@ export function BlogFeed() {
   const [flairFilter, setFlairFilter] = useState<BlogPostFlair | null>(null);
   const [daysShown, setDaysShown] = useState(5);
   const [activeBlogSource, setActiveBlogSource] = useState<BlogSource>("wsb");
+  const [myPostsOnly, setMyPostsOnly] = useState(false);
 
   const hasPremiumBlog = state.premiumBlogSubscription !== null &&
     state.currentDay - (state.premiumBlogSubscription?.purchasedDay ?? 0) < 7;
@@ -232,13 +233,14 @@ export function BlogFeed() {
     return [...blogFeed]
       .filter((p) => {
         if ((p.source ?? "wsb") !== activeBlogSource) return false;
+        if (myPostsOnly && !p.isPlayerPost) return false;
         if (tickerFilter && !p.linkedTickers.includes(tickerFilter)) return false;
         if (flairFilter && p.flair !== flairFilter) return false;
-        if (currentDay - p.day >= daysShown) return false;
+        if (!myPostsOnly && currentDay - p.day >= daysShown) return false;
         return true;
       })
       .sort((a, b) => b.day - a.day || b.upvotes - a.upvotes);
-  }, [blogFeed, tickerFilter, flairFilter, daysShown, currentDay, activeBlogSource]);
+  }, [blogFeed, tickerFilter, flairFilter, daysShown, currentDay, activeBlogSource, myPostsOnly]);
 
   // Group by day
   const byDay = useMemo(() => {
@@ -252,6 +254,7 @@ export function BlogFeed() {
   }, [filtered]);
 
   const allFlairs: BlogPostFlair[] = ["DD", "News", "Discussion", "Meme", "YOLO", "Shitpost"];
+  const myPostCount = blogFeed.filter((p) => p.isPlayerPost && (p.source ?? "wsb") === activeBlogSource).length;
 
   const wsbCount = blogFeed.filter((p) => (p.source ?? "wsb") === "wsb").length;
   const premiumCount = blogFeed.filter((p) => p.source === "premium").length;
@@ -261,6 +264,13 @@ export function BlogFeed() {
     dispatch({ type: "BUY_PREMIUM_BLOG" });
   }
 
+  function handleSourceChange(src: BlogSource) {
+    setActiveBlogSource(src);
+    setMyPostsOnly(false);
+    setTickerFilter(null);
+    setFlairFilter(null);
+  }
+
   return (
     <div className="max-w-3xl mx-auto">
       {/* Source tab navigation — horizontally scrollable on mobile */}
@@ -268,7 +278,7 @@ export function BlogFeed() {
         <div className="flex gap-2 min-w-max pb-1">
           {/* WSB tab */}
           <button
-            onClick={() => setActiveBlogSource("wsb")}
+            onClick={() => handleSourceChange("wsb")}
             className={`flex-shrink-0 px-4 py-2 rounded-lg border font-mono text-xs font-bold transition-colors ${
               activeBlogSource === "wsb"
                 ? "bg-cyan-900/40 border-cyan-700 text-cyan-300"
@@ -281,7 +291,7 @@ export function BlogFeed() {
 
           {/* Premium tab */}
           <button
-            onClick={() => setActiveBlogSource("premium")}
+            onClick={() => handleSourceChange("premium")}
             className={`flex-shrink-0 px-4 py-2 rounded-lg border font-mono text-xs font-bold transition-colors ${
               activeBlogSource === "premium"
                 ? "bg-amber-900/40 border-amber-700 text-amber-300"
@@ -296,7 +306,7 @@ export function BlogFeed() {
 
           {/* Wildcat tab */}
           <button
-            onClick={() => setActiveBlogSource("wildcat")}
+            onClick={() => handleSourceChange("wildcat")}
             className={`flex-shrink-0 px-4 py-2 rounded-lg border font-mono text-xs font-bold transition-colors ${
               activeBlogSource === "wildcat"
                 ? "bg-orange-900/40 border-orange-700 text-orange-300"
@@ -440,20 +450,28 @@ export function BlogFeed() {
           <div className="flex flex-wrap gap-2 items-center">
             <span className="text-xs text-gray-500 font-mono uppercase tracking-wider mr-1">Flair:</span>
             <button
-              onClick={() => setFlairFilter(null)}
-              className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${!flairFilter ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
+              onClick={() => { setFlairFilter(null); setMyPostsOnly(false); }}
+              className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${!flairFilter && !myPostsOnly ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
             >
               All
             </button>
             {allFlairs.map((f) => (
               <button
                 key={f}
-                onClick={() => setFlairFilter(flairFilter === f ? null : f)}
-                className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${flairFilter === f ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
+                onClick={() => { setFlairFilter(flairFilter === f ? null : f); setMyPostsOnly(false); }}
+                className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${flairFilter === f && !myPostsOnly ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
               >
                 {f}
               </button>
             ))}
+            {activeBlogSource === "wsb" && myPostCount > 0 && (
+              <button
+                onClick={() => { setMyPostsOnly((v) => !v); setFlairFilter(null); }}
+                className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${myPostsOnly ? "bg-blue-800 border-blue-600 text-blue-200" : "border-blue-800/50 text-blue-400 hover:border-blue-700 hover:text-blue-300"}`}
+              >
+                ✏ My Posts ({myPostCount})
+              </button>
+            )}
           </div>
 
           {mentionedTickers.length > 0 && (
@@ -485,6 +503,12 @@ export function BlogFeed() {
           <div className="text-3xl mb-3">📭</div>
           <div className="text-gray-400 text-sm">No posts yet.</div>
           <div className="text-gray-600 text-xs mt-1">Advance a day to see the community react to market events.</div>
+        </div>
+      ) : byDay.length === 0 && myPostsOnly ? (
+        <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
+          <div className="text-3xl mb-3">✏️</div>
+          <div className="text-gray-400 text-sm">No posts from you yet.</div>
+          <div className="text-gray-600 text-xs mt-1">Write something above to share your take with the community.</div>
         </div>
       ) : byDay.length === 0 ? (
         <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 text-center text-gray-500 text-sm">

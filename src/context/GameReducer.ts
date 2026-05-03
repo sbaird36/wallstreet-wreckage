@@ -107,13 +107,40 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
       const newInfluence = Math.max(0, (state.playerInfluence ?? 0) + performanceDelta + blogInfluenceDelta);
 
+      // ── Advisor emails + skill drift + fee deduction ───────────────────
+      const {
+        advisorHotTips = [],
+        advisorWeeklyEmails = [],
+        newAdvisorPool,
+        advisorSkillUpdates = [],
+        weeklyAdvisorFee = 0,
+      } = action.payload;
+
+      const incomingAdvisorEmails = [...advisorWeeklyEmails, ...advisorHotTips];
+      const updatedAdvisorEmails = [
+        ...(state.advisorEmails ?? []),
+        ...incomingAdvisorEmails,
+      ].slice(-200);
+
+      // Apply skill drift updates
+      const updatedHired = (state.hiredAdvisors ?? []).map((h) => {
+        const update = advisorSkillUpdates.find((u) => u.id === h.advisor.id);
+        return update ? { ...h, currentSkills: update.skills } : h;
+      });
+
+      // Deduct weekly advisor fees
+      const cashAfterFees = Math.max(0, (newPortfolio.cash ?? 0) - weeklyAdvisorFee);
+      const portfolioAfterFees = weeklyAdvisorFee > 0
+        ? { ...newPortfolio, cash: cashAfterFees }
+        : newPortfolio;
+
       return {
         ...state,
         currentDay: newDay,
         assets: newAssets,
         activeEvents: events,
         eventHistory: newHistory,
-        portfolio: newPortfolio,
+        portfolio: portfolioAfterFees,
         volatilityOverrides: newVolOverrides,
         recentEventCooldowns: newCooldowns,
         indexes: newIndexes,
@@ -125,6 +152,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         traderSkills: newTraderSkills,
         traderSkillsXP: newTraderSkillsXP,
         playerInfluence: newInfluence,
+        advisorEmails: updatedAdvisorEmails,
+        hiredAdvisors: updatedHired,
+        advisorPool: newAdvisorPool ?? (state.advisorPool ?? []),
+        advisorPoolWeek: newAdvisorPool ? Math.ceil(newDay / 7) : (state.advisorPoolWeek ?? 0),
       };
     }
 
@@ -381,13 +412,29 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         const blogInfDelta = newVerifications * 30 - newWrongPredictions * 12;
         const multiInfluence = Math.max(0, (s.playerInfluence ?? 0) + perfDelta + blogInfDelta);
 
+        // Advisor emails + fees + skill drift
+        const multiAdvisorEmails = [
+          ...(s.advisorEmails ?? []),
+          ...(day.advisorWeeklyEmails ?? []),
+          ...(day.advisorHotTips ?? []),
+        ].slice(-200);
+
+        const multiHired = (s.hiredAdvisors ?? []).map((h) => {
+          const update = (day.advisorSkillUpdates ?? []).find((u) => u.id === h.advisor.id);
+          return update ? { ...h, currentSkills: update.skills } : h;
+        });
+
+        const fee = day.weeklyAdvisorFee ?? 0;
+        const multiCash = Math.max(0, newPortfolio.cash - fee);
+        const multiPortfolio = fee > 0 ? { ...newPortfolio, cash: multiCash } : newPortfolio;
+
         s = {
           ...s,
           currentDay: newDay,
           assets: day.newAssets,
           activeEvents: day.events,
           eventHistory: [...s.eventHistory, ...day.events],
-          portfolio: newPortfolio,
+          portfolio: multiPortfolio,
           volatilityOverrides: multiVolOverrides,
           recentEventCooldowns: day.newCooldowns,
           indexes: day.newIndexes,
@@ -400,6 +447,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           traderSkills: multiSkills,
           traderSkillsXP: multiXP,
           playerInfluence: multiInfluence,
+          advisorEmails: multiAdvisorEmails,
+          hiredAdvisors: multiHired,
+          advisorPool: day.newAdvisorPool ?? (s.advisorPool ?? []),
+          advisorPoolWeek: day.newAdvisorPool ? Math.ceil(newDay / 7) : (s.advisorPoolWeek ?? 0),
         };
       }
       return s;
@@ -440,6 +491,53 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    case "REFRESH_ADVISOR_POOL":
+      return {
+        ...state,
+        advisorPool: action.payload.pool,
+        advisorPoolWeek: Math.ceil(state.currentDay / 7),
+      };
+
+    case "HIRE_ADVISOR": {
+      const { advisor } = action.payload;
+      if (state.portfolio.cash < advisor.weeklyFee) return state;
+      // Don't hire duplicates
+      if ((state.hiredAdvisors ?? []).some((h) => h.advisor.id === advisor.id)) return state;
+      const hired = {
+        advisor,
+        hiredOnDay: state.currentDay,
+        currentSkills: { ...advisor.skills },
+      };
+      return {
+        ...state,
+        hiredAdvisors: [...(state.hiredAdvisors ?? []), hired],
+        advisorPool: (state.advisorPool ?? []).filter((a) => a.id !== advisor.id),
+        portfolio: { ...state.portfolio, cash: state.portfolio.cash - advisor.weeklyFee },
+      };
+    }
+
+    case "FIRE_ADVISOR": {
+      const { advisorId } = action.payload;
+      return {
+        ...state,
+        hiredAdvisors: (state.hiredAdvisors ?? []).filter((h) => h.advisor.id !== advisorId),
+      };
+    }
+
+    case "MARK_ADVISOR_EMAILS_READ":
+      return {
+        ...state,
+        advisorEmails: (state.advisorEmails ?? []).map((e) => ({ ...e, isRead: true })),
+      };
+
+    case "DISMISS_ADVISOR_EMAIL": {
+      const { emailId } = action.payload;
+      return {
+        ...state,
+        advisorEmails: (state.advisorEmails ?? []).filter((e) => e.id !== emailId),
+      };
+    }
+
     case "RESET_GAME":
       return {
         currentDay: 1,
@@ -474,6 +572,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         traderSkillsXP: { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 },
         playerInfluence: 0,
         premiumBlogSubscription: null,
+        advisorPool: [],
+        hiredAdvisors: [],
+        advisorEmails: [],
+        advisorPoolWeek: 0,
       };
 
     default:

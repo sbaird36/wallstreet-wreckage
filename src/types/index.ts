@@ -199,6 +199,48 @@ export interface AnalystSubscription {
 }
 
 // ============================================================
+// Advisor Types
+// ============================================================
+
+export interface AdvisorSkills {
+  stockPicking: number;    // 0-10: accuracy on stock direction tips
+  cryptoKnowledge: number; // 0-10: accuracy on crypto tips
+  riskManagement: number;  // 0-10: quality of bearish / downside warnings
+  marketTiming: number;    // 0-10: frequency + quality of hot tips
+}
+
+export interface Advisor {
+  id: string;
+  name: string;
+  title: string;
+  bio: string;
+  emoji: string;
+  skills: AdvisorSkills;
+  weeklyFee: number;
+  specialty: string; // "General" | Sector | "Crypto"
+}
+
+export interface HiredAdvisor {
+  advisor: Advisor;
+  hiredOnDay: number;
+  currentSkills: AdvisorSkills; // drifts weekly
+}
+
+export interface AdvisorEmail {
+  id: string;
+  advisorId: string;
+  advisorName: string;
+  advisorEmoji: string;
+  day: number;
+  subject: string;
+  body: string;
+  tickers: string[];
+  tipDirection: "bullish" | "bearish" | null;
+  isRead: boolean;
+  type: "weekly" | "hot_tip";
+}
+
+// ============================================================
 // Trader Progression
 // ============================================================
 
@@ -237,6 +279,10 @@ export interface GameState {
   traderSkillsXP: TraderSkills;     // organic XP per skill (float); ±10/-5 auto-levels
   playerInfluence: number;
   premiumBlogSubscription: { purchasedDay: number } | null;
+  advisorPool: Advisor[];
+  hiredAdvisors: HiredAdvisor[];
+  advisorEmails: AdvisorEmail[];
+  advisorPoolWeek: number;
 }
 
 export interface SaveSlot {
@@ -306,8 +352,18 @@ export type GameAction =
         newFollowerCount: number;
         npcVotesOnPlayerPosts: { postId: string; votes: number }[];
         weeklySkillPoints: number;
+        advisorHotTips?: AdvisorEmail[];
+        advisorWeeklyEmails?: AdvisorEmail[];
+        newAdvisorPool?: Advisor[] | null;
+        advisorSkillUpdates?: Array<{ id: string; skills: AdvisorSkills }>;
+        weeklyAdvisorFee?: number;
       };
     }
+  | { type: "REFRESH_ADVISOR_POOL"; payload: { pool: Advisor[] } }
+  | { type: "HIRE_ADVISOR"; payload: { advisor: Advisor } }
+  | { type: "FIRE_ADVISOR"; payload: { advisorId: string } }
+  | { type: "MARK_ADVISOR_EMAILS_READ" }
+  | { type: "DISMISS_ADVISOR_EMAIL"; payload: { emailId: string } }
   | { type: "EXECUTE_TRADE"; payload: Transaction }
   | { type: "SET_PENDING_TRADE"; payload: PendingTrade | null }
   | { type: "LOAD_GAME"; payload: GameState }
@@ -339,6 +395,11 @@ export type GameAction =
           newFollowerCount: number;
           npcVotesOnPlayerPosts: { postId: string; votes: number }[];
           weeklySkillPoints: number;
+          advisorHotTips?: AdvisorEmail[];
+          advisorWeeklyEmails?: AdvisorEmail[];
+          newAdvisorPool?: Advisor[] | null;
+          advisorSkillUpdates?: Array<{ id: string; skills: AdvisorSkills }>;
+          weeklyAdvisorFee?: number;
         }>;
       };
     };

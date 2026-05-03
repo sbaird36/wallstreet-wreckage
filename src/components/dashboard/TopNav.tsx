@@ -14,6 +14,7 @@ const NAV_TABS = [
   { href: "/news",        label: "Market News",  icon: "📰" },
   { href: "/blog",        label: "WSB",          icon: "💬" },
   { href: "/algorithm",   label: "My Algorithm", icon: "🤖" },
+  { href: "/advisors",    label: "Advisors",     icon: "👔" },
   { href: "/hedge-fund",  label: "Hedge Fund",   icon: "🏦" },
   { href: "/stats",       label: "Stats",        icon: "🏆" },
   { href: "/skills",      label: "Skills",       icon: "⚡" },
@@ -115,11 +116,15 @@ export function TopNav() {
               const isActive = pathname === tab.href;
               const isBlog = tab.href === "/blog";
               const isSkills = tab.href === "/skills";
+              const isAdvisors = tab.href === "/advisors";
               const unreadTips = isBlog
                 ? (state.contactTips ?? []).filter((t) => !t.isRead).length
                 : 0;
               const unspentPoints = isSkills ? (state.skillPoints ?? 0) : 0;
-              const hasBadge = unreadTips > 0 || unspentPoints > 0;
+              const unreadEmails = isAdvisors
+                ? (state.advisorEmails ?? []).filter((e) => !e.isRead).length
+                : 0;
+              const hasBadge = unreadTips > 0 || unspentPoints > 0 || unreadEmails > 0;
               return (
                 <Link
                   key={tab.href}
@@ -142,6 +147,11 @@ export function TopNav() {
                   )}
                   {hasBadge && (
                     <span className={`absolute top-2 right-2 sm:right-1 w-2 h-2 rounded-full ${isSkills ? "bg-amber-500" : "bg-blue-500"} ${isSkills ? "sm:hidden" : ""}`} />
+                  )}
+                  {isAdvisors && unreadEmails > 0 && (
+                    <span className="hidden sm:flex items-center justify-center text-[10px] font-mono font-bold min-w-[18px] h-[18px] px-1 rounded-full bg-blue-600 text-white">
+                      {unreadEmails}
+                    </span>
                   )}
                 </Link>
               );

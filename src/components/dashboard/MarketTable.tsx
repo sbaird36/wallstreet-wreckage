@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useGame } from "@/context/GameContext";
 import { ChangeIndicator } from "@/components/ui/ChangeIndicator";
 import { SectorBadge, TypeBadge } from "@/components/ui/Badge";
+import { AssetSignals } from "@/components/dashboard/AssetSignals";
 import { getPriceChangePercent } from "@/utils/calculations";
 import { formatPrice } from "@/utils/formatting";
 import type { Asset, Sector } from "@/types";
@@ -213,6 +214,7 @@ export function MarketTable() {
                         {asset.name}
                       </div>
                     </Link>
+                    <AssetSignals asset={asset} />
                   </td>
                   <td className="py-2 hidden md:table-cell">
                     {asset.type === "stock" ? (

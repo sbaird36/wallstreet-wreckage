@@ -9,6 +9,7 @@ const NAV_TABS = [
   { href: "/news",       label: "News",   icon: "📰" },
   { href: "/blog",       label: "WSB",    icon: "💬" },
   { href: "/algorithm",  label: "Algo",   icon: "🤖" },
+  { href: "/advisors",   label: "Advisor",icon: "👔" },
   { href: "/hedge-fund", label: "Fund",   icon: "🏦" },
   { href: "/stats",      label: "Stats",  icon: "🏆" },
   { href: "/skills",     label: "Skills", icon: "⚡" },
@@ -27,11 +28,15 @@ export function BottomNav() {
           const isActive = pathname === tab.href;
           const isBlog = tab.href === "/blog";
           const isSkills = tab.href === "/skills";
+          const isAdvisors = tab.href === "/advisors";
           const unreadTips = isBlog
             ? (state.contactTips ?? []).filter((t) => !t.isRead).length
             : 0;
           const unspentPoints = isSkills ? (state.skillPoints ?? 0) : 0;
-          const hasBadge = unreadTips > 0 || unspentPoints > 0;
+          const unreadEmails = isAdvisors
+            ? (state.advisorEmails ?? []).filter((e) => !e.isRead).length
+            : 0;
+          const hasBadge = unreadTips > 0 || unspentPoints > 0 || unreadEmails > 0;
 
           return (
             <Link
