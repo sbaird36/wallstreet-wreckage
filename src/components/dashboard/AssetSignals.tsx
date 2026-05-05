@@ -169,8 +169,8 @@ function getSignals(
       signals.push({
         icon: "💬",
         label: `Mentioned in a recent WSB post`,
-        color: "text-gray-400",
-        bg: "bg-gray-800/60 border-gray-700/40",
+        color: "text-slate-300",
+        bg: "bg-[#151c2f]/70 border-white/[0.07]",
       });
     }
   }

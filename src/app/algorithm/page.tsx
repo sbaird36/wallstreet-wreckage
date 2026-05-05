@@ -19,7 +19,7 @@ export default function AlgorithmPage() {
   if (!state.gameStarted) return null;
 
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col">
+    <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
       <TopNav />
       <main className="flex-1 p-4 w-full">
         <AlgorithmBuilder />

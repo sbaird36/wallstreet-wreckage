@@ -17,7 +17,7 @@ export function ChangeIndicator({ value, size = "md", showArrow = true }: Props)
   };
 
   const colorClass = isNeutral
-    ? "text-gray-400"
+    ? "text-slate-400"
     : isPositive
     ? "text-emerald-400"
     : "text-rose-400";

@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #03060e;
-  --foreground: #c0d4e8;
+  --background: #0a0a0f;
+  --foreground: #e2e8f0;
 }
 
 html {
@@ -28,14 +28,14 @@ body {
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #070d1a;
+  background: #0a0a0f;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1a3248;
+  background: #1e293b;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2a4862;
+  background: #334155;
 }
 
 /* Ticker animation — content is doubled so -50% loops seamlessly */

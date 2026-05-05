@@ -1,13 +1,20 @@
 import type { GameState, GameAction, Holding, TraderSkills } from "@/types";
 import { getNetWorth } from "@/utils/calculations";
 import { getNewlyUnlockedContacts } from "@/engine/contactEngine";
+import { generateDailyChallenges, checkTradeChallenges, checkDayChallenges } from "@/engine/challengeEngine";
+import { MILESTONES } from "@/data/milestoneData";
+import { getDayOfWeek, getWeekNumber } from "@/utils/dateUtils";
+import { checkAchievements, buildNewAchievements } from "@/engine/achievementEngine";
+import { computeAllRivalNetWorths } from "@/engine/rivalEngine";
+import { generateJournalEntry } from "@/engine/journalEngine";
+import { ACHIEVEMENTS } from "@/data/achievementData";
 
 // ── Organic skill XP ──────────────────────────────────────────────────────────
 // Accumulate XP through performance; crossing thresholds auto-levels the skill.
 const XP_UP   = 20;  // XP needed to gain 1 organic level (~30–50 qualifying actions)
 const XP_DOWN = -10; // XP needed to lose 1 organic level
 
-const DEFAULT_SKILLS: TraderSkills = { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 };
+const DEFAULT_SKILLS: TraderSkills = { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0, riskManagement: 0, marketTiming: 0 };
 
 function applySkillXP(
   skills: TraderSkills,
@@ -31,12 +38,38 @@ function applySkillXP(
   return { skills: newSkills, xp: newXP };
 }
 
+// ── XP & skill-point helpers ──────────────────────────────────────────────────
+function xpThresholdForLevel(n: number): number {
+  return Math.floor(100 * Math.pow(1.5, n));
+}
+
+function skillPointsEarnedFromXP(totalXp: number): number {
+  let points = 0;
+  let spent = 0;
+  while (spent + xpThresholdForLevel(points) <= totalXp) {
+    spent += xpThresholdForLevel(points);
+    points++;
+  }
+  return points;
+}
+
+function gainSkillPoints(
+  currentXp: number,
+  gained: number,
+  currentSkillPoints: number
+): { newXp: number; newSkillPoints: number } {
+  const newXp = currentXp + gained;
+  const before = skillPointsEarnedFromXP(currentXp);
+  const after = skillPointsEarnedFromXP(newXp);
+  return { newXp, newSkillPoints: currentSkillPoints + (after - before) };
+}
+
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "ADVANCE_DAY": {
       const {
         newAssets, events, volatilityOverrides, newCooldowns, newIndexes,
-        newBlogPosts, newFollowerCount, npcVotesOnPlayerPosts, weeklySkillPoints,
+        newBlogPosts, newFollowerCount, npcVotesOnPlayerPosts,
       } = action.payload;
       const newDay = state.currentDay + 1;
       const newHistory = [...state.eventHistory, ...events];
@@ -134,13 +167,207 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ? { ...newPortfolio, cash: cashAfterFees }
         : newPortfolio;
 
+      // ── Milestone check ───────────────────────────────────────────────
+      const currentNetWorth = getNetWorth(portfolioAfterFees, newAssets);
+      const unlockedMilestones = state.unlockedMilestones ?? [];
+      let newUnlockedMilestones = [...unlockedMilestones];
+      let pendingMilestone = state.pendingMilestone;
+      let milestoneXP = 0;
+
+      const newlyHitMilestones = MILESTONES.filter(
+        (m) => currentNetWorth >= m.netWorthThreshold && !unlockedMilestones.includes(m.id)
+      );
+      if (newlyHitMilestones.length > 0) {
+        for (const m of newlyHitMilestones) {
+          newUnlockedMilestones.push(m.id);
+          milestoneXP += m.xpReward;
+        }
+        // Show the highest threshold milestone
+        const highest = newlyHitMilestones.sort((a, b) => b.netWorthThreshold - a.netWorthThreshold)[0];
+        pendingMilestone = highest.id;
+      }
+
+      // ── Weekly profit XP (replaces old skill point) ───────────────────
+      const isMonday = getDayOfWeek(state.startDate, newDay) === 1;
+      let weeklyXP = 0;
+      if (isMonday) {
+        const weekStart = newDay - 7;
+        const weekStartEntry = state.portfolio.netWorthHistory.slice().reverse().find(e => e.day <= weekStart);
+        const weekStartNW = weekStartEntry?.netWorth ?? (state.portfolio.netWorthHistory[0]?.netWorth ?? 10000);
+        if (currentNetWorth > weekStartNW) weeklyXP = 40;
+      }
+
+      // ── Day challenges check (portfolio-based) + generate tomorrow's ──
+      const holdingCount = Object.keys(portfolioAfterFees.holdings).length;
+      const prevDayNW = state.portfolio.netWorthHistory.slice(-1)[0]?.netWorth ?? portfolioAfterFees.cash;
+      const portfolioUpToday = currentNetWorth > prevDayNW;
+      const updatedChallengesDay = checkDayChallenges(
+        state.dailyChallenges ?? [],
+        state.currentDay,  // challenges are for the day being completed
+        holdingCount,
+        portfolioUpToday,
+      );
+
+      // XP + cash from day-based challenges
+      let dayChallengeXP = 0;
+      let dayChallengeCash = 0;
+      {
+        const justCompleted = updatedChallengesDay.filter((c, i) => {
+          const prev = (state.dailyChallenges ?? [])[i];
+          return c.completed && prev && !prev.completed;
+        });
+        for (const c of justCompleted) {
+          dayChallengeXP += c.xpReward;
+          dayChallengeCash += c.cashReward;
+        }
+      }
+
+      // Generate challenges for the NEW day
+      const newDayChallenges = generateDailyChallenges(newDay);
+      const allChallenges = [
+        ...updatedChallengesDay.filter(c => c.day !== newDay),
+        ...newDayChallenges,
+      ].slice(-30);
+
+      // Total XP from day events (before achievements)
+      const totalDayXP = milestoneXP + weeklyXP + dayChallengeXP;
+
+      // ── Achievement checking ───────────────────────────────────────────────
+      const dayAchievementIds = checkAchievements(state, null, newDay);
+      const dayAchievementXP = dayAchievementIds.reduce((sum, id) => {
+        const def = ACHIEVEMENTS.find((a) => a.id === id);
+        return sum + (def?.xpReward ?? 0);
+      }, 0);
+      const dayAchievementObjects = buildNewAchievements(dayAchievementIds, newDay);
+
+      // ── Perfect week achievement (Monday) ─────────────────────────────
+      const perfectWeekIds: string[] = [];
+      if (isMonday) {
+        const weekStart = newDay - 7;
+        const weekSells = state.portfolio.transactions.filter(
+          (t) => t.action === "SELL" && t.day >= weekStart && t.day < newDay
+        );
+        if (weekSells.length >= 3) {
+          const allWon = (state.tradeStreak ?? 0) >= weekSells.length;
+          const alreadyHas = (state.achievements ?? []).some(a => a.id === "perfect_week");
+          if (allWon && !alreadyHas) {
+            perfectWeekIds.push("perfect_week");
+          }
+        }
+      }
+      const perfectWeekObjects = buildNewAchievements(perfectWeekIds, newDay);
+      const perfectWeekXP = perfectWeekIds.reduce((sum, id) => {
+        const def = ACHIEVEMENTS.find((a) => a.id === id);
+        return sum + (def?.xpReward ?? 0);
+      }, 0);
+
+      const allNewAchievementIds = [...dayAchievementIds, ...perfectWeekIds];
+      const allNewAchievementObjects = [...dayAchievementObjects, ...perfectWeekObjects];
+      const allNewAchievementXP = dayAchievementXP + perfectWeekXP;
+
+      // ── Rival net worths update (weekly) ──────────────────────────────
+      const weekNum = getWeekNumber(state.startDate, newDay);
+      const newRivalNetWorths = isMonday ? computeAllRivalNetWorths(weekNum) : (state.rivalNetWorths ?? {});
+
+      // ── Detect new sector plays from current holdings ─────────────────
+      const currentHoldings = Object.values(portfolioAfterFees.holdings);
+      const sectorGroups: Record<string, string[]> = {};
+      for (const holding of currentHoldings) {
+        const asset = newAssets[holding.ticker];
+        if (!asset || asset.type !== "stock") continue;
+        const sector = (asset as { sector: string }).sector;
+        if (!sectorGroups[sector]) sectorGroups[sector] = [];
+        sectorGroups[sector].push(holding.ticker);
+      }
+
+      let currentSectorPlays = [...(state.activeSectorPlays ?? [])];
+      for (const [sector, tickers] of Object.entries(sectorGroups)) {
+        if (tickers.length >= 3) {
+          const alreadyActive = currentSectorPlays.some(
+            (p) => !p.completed && p.sector === sector
+          );
+          if (!alreadyActive) {
+            currentSectorPlays.push({
+              id: `sp_${newDay}_${sector}`,
+              sector,
+              tickers: tickers.slice(0, 3),
+              startDay: newDay,
+              completed: false,
+              won: null,
+              resolvedDay: null,
+            });
+          }
+        }
+      }
+
+      // ── Sector play checks ────────────────────────────────────────────
+      const updatedSectorPlays = currentSectorPlays.map((play) => {
+        if (play.completed) return play;
+        if (newDay - play.startDay < 5) return play; // need at least 5 days
+        // Check if all tickers are up from when the play started
+        const allUp = play.tickers.every((ticker) => {
+          const asset = newAssets[ticker];
+          if (!asset) return false;
+          const startEntry = asset.priceHistory.find((p) => p.day === play.startDay);
+          if (!startEntry) return false;
+          return asset.currentPrice > startEntry.close;
+        });
+        if (allUp) {
+          return { ...play, completed: true, won: true, resolvedDay: newDay };
+        }
+        // Expire after 10 days
+        if (newDay - play.startDay >= 10) {
+          return { ...play, completed: true, won: false, resolvedDay: newDay };
+        }
+        return play;
+      });
+
+      // Check for sector_master achievement
+      const wonASectorPlay = updatedSectorPlays.some(
+        (p) => p.won === true && !(state.activeSectorPlays ?? []).find((op) => op.id === p.id && op.won === true)
+      );
+      const sectorMasterIds: string[] = [];
+      if (wonASectorPlay && !(state.achievements ?? []).some(a => a.id === "sector_master")) {
+        sectorMasterIds.push("sector_master");
+      }
+
+      // ── Journal entry (Monday) ────────────────────────────────────────
+      let newJournal = state.weeklyJournal ?? [];
+      if (isMonday) {
+        const weekStart = newDay - 7;
+        const weekStartNW = state.portfolio.netWorthHistory.slice().reverse().find(e => e.day <= weekStart)?.netWorth ?? 10000;
+        const weekEndNW = currentNetWorth;
+        const journalEntry = generateJournalEntry(
+          state,
+          weekNum - 1, // just-completed week number
+          weekStart,
+          newDay - 1,
+          weekStartNW,
+          weekEndNW,
+          allNewAchievementIds,
+        );
+        newJournal = [...newJournal, journalEntry].slice(-52); // keep ~1 year
+      }
+
+      // ── Recalculate XP with all day-advance sources ───────────────────
+      const totalAdvanceXP = totalDayXP + allNewAchievementXP + perfectWeekXP;
+      const { newXp: finalAdvXp, newSkillPoints: finalAdvSP } = gainSkillPoints(
+        state.xp ?? 0,
+        totalAdvanceXP,
+        state.skillPoints ?? 0,
+      );
+
+      const portfolioWithDayCash = dayChallengeCash > 0
+        ? { ...portfolioAfterFees, cash: portfolioAfterFees.cash + dayChallengeCash }
+        : portfolioAfterFees;
+
       return {
         ...state,
         currentDay: newDay,
         assets: newAssets,
         activeEvents: events,
         eventHistory: newHistory,
-        portfolio: portfolioAfterFees,
+        portfolio: portfolioWithDayCash,
         volatilityOverrides: newVolOverrides,
         recentEventCooldowns: newCooldowns,
         indexes: newIndexes,
@@ -148,7 +375,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         playerFollowerCount: newFollowerCount,
         playerVerifiedPostCount: (state.playerVerifiedPostCount ?? 0) + newVerifications,
         playerWrongPostCount: (state.playerWrongPostCount ?? 0) + newWrongPredictions,
-        skillPoints: (state.skillPoints ?? 0) + weeklySkillPoints,
+        skillPoints: finalAdvSP,
         traderSkills: newTraderSkills,
         traderSkillsXP: newTraderSkillsXP,
         playerInfluence: newInfluence,
@@ -156,6 +383,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         hiredAdvisors: updatedHired,
         advisorPool: newAdvisorPool ?? (state.advisorPool ?? []),
         advisorPoolWeek: newAdvisorPool ? Math.ceil(newDay / 7) : (state.advisorPoolWeek ?? 0),
+        xp: finalAdvXp,
+        dailyChallenges: allChallenges,
+        unlockedMilestones: newUnlockedMilestones,
+        pendingMilestone,
+        achievements: [...(state.achievements ?? []), ...allNewAchievementObjects],
+        pendingAchievements: [...(state.pendingAchievements ?? []), ...allNewAchievementIds],
+        rivalNetWorths: newRivalNetWorths,
+        weeklyJournal: newJournal,
+        activeSectorPlays: updatedSectorPlays,
       };
     }
 
@@ -231,6 +467,97 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         }
       }
 
+      // ── Streak + XP from sell ─────────────────────────────────────────
+      let xpGained = 0;
+      let newTradeStreak = state.tradeStreak ?? 0;
+      let newBestStreak = state.bestTradeStreak ?? 0;
+      let lastTradeResult: GameState["lastTradeResult"] = state.lastTradeResult;
+
+      if (tx.action === "SELL") {
+        const preSell = state.portfolio.holdings[tx.ticker];
+        const returnPct = preSell
+          ? (tx.pricePerUnit - preSell.averageCostBasis) / preSell.averageCostBasis
+          : 0;
+        const profitDollars = preSell
+          ? (tx.pricePerUnit - preSell.averageCostBasis) * tx.quantity
+          : 0;
+
+        if (returnPct > 0) {
+          newTradeStreak += 1;
+          newBestStreak = Math.max(newBestStreak, newTradeStreak);
+          const streakBonus = Math.min(newTradeStreak, 5) * 5;
+          if (returnPct >= 0.50) xpGained = 75 + streakBonus;
+          else if (returnPct >= 0.20) xpGained = 40 + streakBonus;
+          else xpGained = 15 + streakBonus;
+        } else {
+          newTradeStreak = 0;
+        }
+
+        void profitDollars; // suppress unused variable warning
+      }
+
+      // ── Challenge completion from this trade ─────────────────────────
+      const preSellHoldingForChallenge = state.portfolio.holdings[tx.ticker];
+      const returnPctForChallenge = preSellHoldingForChallenge && tx.action === "SELL"
+        ? (tx.pricePerUnit - preSellHoldingForChallenge.averageCostBasis) / preSellHoldingForChallenge.averageCostBasis
+        : null;
+      const asset = state.assets[tx.ticker];
+      const isPenny = asset ? ((asset as { sector?: string }).sector === "Speculative" || asset.currentPrice < 5) : false;
+      const prevCompletedCount = (state.dailyChallenges ?? []).filter(c => c.day === state.currentDay && c.completed).length;
+      const updatedChallenges = checkTradeChallenges(
+        state.dailyChallenges ?? [],
+        state.currentDay,
+        tx.action,
+        tx.assetType,
+        isPenny,
+        returnPctForChallenge,
+      );
+      const newCompletedCount = updatedChallenges.filter(c => c.day === state.currentDay && c.completed).length;
+      const newlyCompleted = newCompletedCount - prevCompletedCount;
+
+      // XP + cash from newly completed challenges
+      let challengeXP = 0;
+      let challengeCashReward = 0;
+      if (newlyCompleted > 0) {
+        const justCompleted = updatedChallenges.filter((c, i) => {
+          const prev = (state.dailyChallenges ?? [])[i];
+          return c.completed && prev && !prev.completed;
+        });
+        for (const c of justCompleted) {
+          challengeXP += c.xpReward;
+          challengeCashReward += c.cashReward;
+        }
+      }
+
+      const totalXPGained = xpGained + challengeXP;
+
+      // ── Achievement checking ───────────────────────────────────────────
+      const newAchievementIds = checkAchievements(
+        { ...state, tradeStreak: newTradeStreak },
+        tx,
+        state.currentDay,
+      );
+      const achievementXP = newAchievementIds.reduce((sum, id) => {
+        const def = ACHIEVEMENTS.find((a) => a.id === id);
+        return sum + (def?.xpReward ?? 0);
+      }, 0);
+      const newAchievementObjects = buildNewAchievements(newAchievementIds, state.currentDay);
+
+      // Single gainSkillPoints call including all XP sources
+      const { newXp, newSkillPoints } = gainSkillPoints(state.xp ?? 0, totalXPGained + achievementXP, state.skillPoints ?? 0);
+
+      if (tx.action === "SELL" && xpGained > 0) {
+        const preSell = state.portfolio.holdings[tx.ticker];
+        lastTradeResult = {
+          returnPct: preSell ? (tx.pricePerUnit - preSell.averageCostBasis) / preSell.averageCostBasis : 0,
+          profitDollars: preSell ? (tx.pricePerUnit - preSell.averageCostBasis) * tx.quantity : 0,
+          ticker: tx.ticker,
+          xpGained: totalXPGained + achievementXP,
+          streakCount: newTradeStreak,
+          challengesCompleted: newlyCompleted,
+        };
+      }
+
       const { skills: tradeSkills, xp: tradeXP } = Object.keys(tradeXPDeltas).length > 0
         ? applySkillXP(state.traderSkills ?? DEFAULT_SKILLS, state.traderSkillsXP ?? DEFAULT_SKILLS, tradeXPDeltas)
         : { skills: state.traderSkills ?? DEFAULT_SKILLS, xp: state.traderSkillsXP ?? DEFAULT_SKILLS };
@@ -240,12 +567,20 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         pendingTrade: null,
         portfolio: {
           ...state.portfolio,
-          cash,
+          cash: cash + challengeCashReward,
           holdings,
           transactions: [...state.portfolio.transactions, tx],
         },
         traderSkills: tradeSkills,
         traderSkillsXP: tradeXP,
+        xp: newXp,
+        skillPoints: newSkillPoints,
+        tradeStreak: newTradeStreak,
+        bestTradeStreak: newBestStreak,
+        dailyChallenges: updatedChallenges,
+        lastTradeResult,
+        achievements: [...(state.achievements ?? []), ...newAchievementObjects],
+        pendingAchievements: [...(state.pendingAchievements ?? []), ...newAchievementIds],
       };
     }
 
@@ -260,9 +595,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "NEW_GAME":
       return { ...action.payload.initialState };
-
-    case "CREATE_HEDGE_FUND":
-      return { ...state, playerHedgeFund: action.payload };
 
     case "UNLOCK_ANALYST_STOCK": {
       const { ticker } = action.payload;
@@ -428,6 +760,25 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         const multiCash = Math.max(0, newPortfolio.cash - fee);
         const multiPortfolio = fee > 0 ? { ...newPortfolio, cash: multiCash } : newPortfolio;
 
+        // XP: weekly profit bonus + milestone check
+        const multiNW = getNetWorth(multiPortfolio, day.newAssets);
+        const multiIsMonday = getDayOfWeek(state.startDate, newDay) === 1;
+        let multiXPGain = 0;
+        if (multiIsMonday) {
+          const mwStart = newDay - 7;
+          const mwEntry = s.portfolio.netWorthHistory.slice().reverse().find(e => e.day <= mwStart);
+          const mwNW = mwEntry?.netWorth ?? (s.portfolio.netWorthHistory[0]?.netWorth ?? 10000);
+          if (multiNW > mwNW) multiXPGain = 40;
+        }
+        const multiNewMilestones = MILESTONES.filter(m => multiNW >= m.netWorthThreshold && !(s.unlockedMilestones ?? []).includes(m.id));
+        for (const m of multiNewMilestones) multiXPGain += m.xpReward;
+        const multiUnlocked = [...(s.unlockedMilestones ?? []), ...multiNewMilestones.map(m => m.id)];
+        const multiPending = multiNewMilestones.length > 0
+          ? multiNewMilestones.sort((a, b) => b.netWorthThreshold - a.netWorthThreshold)[0].id
+          : s.pendingMilestone;
+        const { newXp: mXp, newSkillPoints: mSP } = gainSkillPoints(s.xp ?? 0, multiXPGain, s.skillPoints ?? 0);
+        const multiChallenges = generateDailyChallenges(newDay);
+
         s = {
           ...s,
           currentDay: newDay,
@@ -443,7 +794,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           playerFollowerCount: day.newFollowerCount,
           playerVerifiedPostCount: (s.playerVerifiedPostCount ?? 0) + newVerifications,
           playerWrongPostCount: (s.playerWrongPostCount ?? 0) + newWrongPredictions,
-          skillPoints: (s.skillPoints ?? 0) + day.weeklySkillPoints,
+          skillPoints: mSP,
           traderSkills: multiSkills,
           traderSkillsXP: multiXP,
           playerInfluence: multiInfluence,
@@ -451,6 +802,16 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           hiredAdvisors: multiHired,
           advisorPool: day.newAdvisorPool ?? (s.advisorPool ?? []),
           advisorPoolWeek: day.newAdvisorPool ? Math.ceil(newDay / 7) : (s.advisorPoolWeek ?? 0),
+          xp: mXp,
+          unlockedMilestones: multiUnlocked,
+          pendingMilestone: multiPending,
+          dailyChallenges: multiChallenges,
+          achievements: [...(s.achievements ?? [])],
+          pendingAchievements: s.pendingAchievements ?? [],
+          rivalNetWorths: multiIsMonday ? computeAllRivalNetWorths(Math.ceil(newDay / 7)) : (s.rivalNetWorths ?? {}),
+          activeSectorPlays: s.activeSectorPlays ?? [],
+          researchPurchases: s.researchPurchases ?? [],
+          weeklyJournal: s.weeklyJournal ?? [],
         };
       }
       return s;
@@ -485,7 +846,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         skillPoints: (state.skillPoints ?? 0) - cost,
         traderSkills: {
-          ...(state.traderSkills ?? { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 }),
+          ...(state.traderSkills ?? DEFAULT_SKILLS),
           [skill]: currentLevel + 1,
         },
       };
@@ -538,6 +899,35 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    case "DISMISS_MILESTONE":
+      return { ...state, pendingMilestone: null };
+
+    case "DISMISS_TRADE_RESULT":
+      return { ...state, lastTradeResult: null };
+
+    case "DISMISS_ACHIEVEMENTS":
+      return { ...state, pendingAchievements: [] };
+
+    case "BUY_RESEARCH": {
+      const purchase = action.payload;
+      if (state.portfolio.cash < purchase.cost) return state;
+      return {
+        ...state,
+        portfolio: { ...state.portfolio, cash: state.portfolio.cash - purchase.cost },
+        researchPurchases: [...(state.researchPurchases ?? []), purchase],
+      };
+    }
+
+    case "COMPLETE_SECTOR_PLAY": {
+      const { id, won, resolvedDay } = action.payload;
+      return {
+        ...state,
+        activeSectorPlays: (state.activeSectorPlays ?? []).map((p) =>
+          p.id === id ? { ...p, completed: true, won, resolvedDay } : p
+        ),
+      };
+    }
+
     case "RESET_GAME":
       return {
         currentDay: 1,
@@ -557,7 +947,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         pendingTrade: null,
         gameStarted: false,
         indexes: {},
-        playerHedgeFund: null,
         blogFeed: [],
         analystUnlocks: [],
         analystSubscription: null,
@@ -568,14 +957,27 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         playerVerifiedPostCount: 0,
         playerWrongPostCount: 0,
         skillPoints: 0,
-        traderSkills: { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 },
-        traderSkillsXP: { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 },
+        traderSkills: { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0, riskManagement: 0, marketTiming: 0 },
+        traderSkillsXP: { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0, riskManagement: 0, marketTiming: 0 },
         playerInfluence: 0,
         premiumBlogSubscription: null,
         advisorPool: [],
         hiredAdvisors: [],
         advisorEmails: [],
         advisorPoolWeek: 0,
+        xp: 0,
+        tradeStreak: 0,
+        bestTradeStreak: 0,
+        dailyChallenges: [],
+        unlockedMilestones: [],
+        pendingMilestone: null,
+        lastTradeResult: null,
+        achievements: [],
+        pendingAchievements: [],
+        rivalNetWorths: {},
+        activeSectorPlays: [],
+        researchPurchases: [],
+        weeklyJournal: [],
       };
 
     default:

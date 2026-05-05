@@ -128,13 +128,13 @@ export function ROIChart() {
   const hasHoldings = totalCostBasis > 0;
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+    <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xs text-gray-400 uppercase tracking-wider">
+        <h2 className="text-sm font-semibold text-slate-300">
           Portfolio Performance
         </h2>
-        <div className="flex items-center gap-2 text-xs text-gray-500">
-          <span className="inline-block w-3 h-0.5 bg-gray-500 border-dashed" />
+        <div className="flex items-center gap-2 text-xs text-slate-400">
+          <span className="inline-block w-3 h-0.5 bg-slate-400 border-dashed" />
           Starting Capital
         </div>
       </div>
@@ -155,7 +155,7 @@ export function ROIChart() {
           label="Total Invested"
           value={formatCurrency(totalCostBasis)}
           sub={
-            <span className="text-gray-500">
+            <span className="text-slate-400">
               {hasHoldings
                 ? `${((totalCostBasis / currentNetWorth) * 100).toFixed(1)}% of portfolio`
                 : "No open positions"}
@@ -181,7 +181,7 @@ export function ROIChart() {
                 on open positions
               </span>
             ) : (
-              <span className="text-gray-500">No open positions</span>
+              <span className="text-slate-400">No open positions</span>
             )
           }
           highlight={unrealizedGain >= 0 ? "emerald" : "rose"}
@@ -198,7 +198,7 @@ export function ROIChart() {
                   ? "text-emerald-400"
                   : realizedGain < 0
                   ? "text-rose-400"
-                  : "text-gray-500"
+                  : "text-slate-400"
               }
             >
               {realizedGain === 0
@@ -292,7 +292,7 @@ export function ROIChart() {
           </svg>
         </div>
       ) : (
-        <div className="h-20 flex items-center justify-center text-gray-600 text-xs mb-4">
+        <div className="h-20 flex items-center justify-center text-slate-500 text-xs mb-4">
           Advance a day to see performance history
         </div>
       )}
@@ -300,11 +300,11 @@ export function ROIChart() {
       {/* ── Composition bar ── */}
       {barData && (
         <div>
-          <div className="text-xs text-gray-500 mb-1.5">Portfolio Composition</div>
-          <div className="w-full h-5 rounded-full overflow-hidden flex bg-gray-800">
+          <div className="text-xs text-slate-400 mb-1.5">Portfolio Composition</div>
+          <div className="w-full h-5 rounded-full overflow-hidden flex bg-[#151c2f]">
             {/* Cash */}
             <div
-              className="h-full bg-gray-600 transition-all duration-500"
+              className="h-full bg-slate-600 transition-all duration-500"
               style={{ width: `${barData.cashPct * 100}%` }}
               title={`Cash: ${formatCurrency(portfolio.cash)}`}
             />
@@ -331,9 +331,9 @@ export function ROIChart() {
               />
             )}
           </div>
-          <div className="flex gap-4 mt-1.5 text-xs text-gray-500">
+          <div className="flex gap-4 mt-1.5 text-xs text-slate-400">
             <span className="flex items-center gap-1">
-              <span className="inline-block w-2 h-2 rounded-sm bg-gray-600" />
+              <span className="inline-block w-2 h-2 rounded-sm bg-slate-600" />
               Cash {((barData.cashPct) * 100).toFixed(0)}%
             </span>
             {totalCostBasis > 0 && (
@@ -377,12 +377,12 @@ function StatCard({
     emerald: "border-l-emerald-600",
     rose: "border-l-rose-600",
     blue: "border-l-blue-600",
-    gray: "border-l-gray-600",
+    gray: "border-l-slate-600",
   }[highlight];
 
   return (
-    <div className={`bg-gray-800 rounded-lg p-3 border-l-2 ${borderColor}`}>
-      <div className="text-xs text-gray-500 mb-0.5">{label}</div>
+    <div className={`bg-[#151c2f] rounded-xl p-3 border-l-2 ${borderColor}`}>
+      <div className="text-xs text-slate-400 mb-0.5">{label}</div>
       <div className="text-sm font-mono font-bold text-white tabular-nums leading-tight">
         {value}
       </div>

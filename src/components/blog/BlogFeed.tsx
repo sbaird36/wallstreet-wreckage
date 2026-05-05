@@ -9,7 +9,7 @@ import { PostComposer } from "@/components/blog/PostComposer";
 const FLAIR_STYLES: Record<BlogPostFlair, string> = {
   DD:         "bg-blue-900/60 text-blue-300 border-blue-700",
   News:       "bg-cyan-900/60 text-cyan-300 border-cyan-700",
-  Discussion: "bg-gray-800 text-gray-300 border-gray-600",
+  Discussion: "bg-[#151c2f] text-slate-200 border-slate-500",
   Meme:       "bg-purple-900/60 text-purple-300 border-purple-700",
   YOLO:       "bg-orange-900/60 text-orange-300 border-orange-700",
   Shitpost:   "bg-rose-900/60 text-rose-300 border-rose-700",
@@ -68,22 +68,22 @@ function PostCard({ post, literacy }: { post: BlogPost; literacy: number }) {
   }
 
   return (
-    <div className={`rounded-lg overflow-hidden transition-colors ${post.isPlayerPost ? "bg-gray-900 border border-blue-900/60 hover:border-blue-800/80" : "bg-gray-900 border border-gray-800 hover:border-gray-700"}`}>
+    <div className={`rounded-xl overflow-hidden transition-colors ${post.isPlayerPost ? "bg-[#0f1221] border border-blue-900/60 hover:border-blue-800/80" : "bg-[#0f1221] border border-white/[0.07] hover:border-white/[0.07]"}`}>
       <div className="flex gap-0">
         {/* Vote column */}
-        <div className="flex flex-col items-center gap-1 px-3 py-3 bg-gray-950/60 border-r border-gray-800 min-w-[48px]">
+        <div className="flex flex-col items-center gap-1 px-3 py-3 bg-[#0a0a0f]/60 border-r border-white/[0.07] min-w-[48px]">
           <button
             onClick={() => vote("UP")}
-            className={`text-sm transition-colors ${post.playerVote === "UP" ? "text-orange-400" : "text-gray-600 hover:text-orange-400"}`}
+            className={`text-sm transition-colors ${post.playerVote === "UP" ? "text-orange-400" : "text-slate-500 hover:text-orange-400"}`}
           >
             ▲
           </button>
-          <span className={`text-xs font-mono font-bold tabular-nums ${netScore > 0 ? "text-orange-400" : netScore < 0 ? "text-blue-400" : "text-gray-500"}`}>
+          <span className={`text-xs font-mono font-bold tabular-nums ${netScore > 0 ? "text-orange-400" : netScore < 0 ? "text-blue-400" : "text-slate-400"}`}>
             {netScore >= 1000 ? `${(netScore / 1000).toFixed(1)}k` : netScore}
           </span>
           <button
             onClick={() => vote("DOWN")}
-            className={`text-sm transition-colors ${post.playerVote === "DOWN" ? "text-blue-400" : "text-gray-600 hover:text-blue-400"}`}
+            className={`text-sm transition-colors ${post.playerVote === "DOWN" ? "text-blue-400" : "text-slate-500 hover:text-blue-400"}`}
           >
             ▼
           </button>
@@ -157,7 +157,7 @@ function PostCard({ post, literacy }: { post: BlogPost; literacy: number }) {
               </span>
             )}
             {status === "UNVERIFIED" && !post.isPredictionWrong && (
-              <span className="text-xs px-1.5 py-0.5 rounded border font-mono bg-gray-800 text-gray-500 border-gray-700">
+              <span className="text-xs px-1.5 py-0.5 rounded border font-mono bg-[#151c2f] text-slate-400 border-white/[0.07]">
                 ✗ UNVERIFIED
               </span>
             )}
@@ -180,19 +180,19 @@ function PostCard({ post, literacy }: { post: BlogPost; literacy: number }) {
 
           {/* Expanded body */}
           {expanded && (
-            <div className="mt-2 text-xs text-gray-300 leading-relaxed border-t border-gray-800 pt-2">
+            <div className="mt-2 text-xs text-slate-200 leading-relaxed border-t border-white/[0.07] pt-2">
               {post.body}
             </div>
           )}
 
           {/* Footer */}
-          <div className="mt-1.5 flex items-center gap-3 text-xs text-gray-600">
+          <div className="mt-1.5 flex items-center gap-3 text-xs text-slate-500">
             <span>u/{post.author}</span>
             <span>·</span>
             <span>Day {post.day}</span>
             <button
               onClick={() => setExpanded((v) => !v)}
-              className="hover:text-gray-400 transition-colors"
+              className="hover:text-slate-300 transition-colors"
             >
               {expanded ? "collapse" : "read more"}
             </button>
@@ -279,10 +279,10 @@ export function BlogFeed() {
           {/* WSB tab */}
           <button
             onClick={() => handleSourceChange("wsb")}
-            className={`flex-shrink-0 px-4 py-2 rounded-lg border font-mono text-xs font-bold transition-colors ${
+            className={`flex-shrink-0 px-4 py-2 rounded-xl border font-mono text-xs font-bold transition-colors ${
               activeBlogSource === "wsb"
                 ? "bg-cyan-900/40 border-cyan-700 text-cyan-300"
-                : "bg-gray-900 border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600"
+                : "bg-[#0f1221] border-white/[0.07] text-slate-400 hover:text-slate-200 hover:border-white/[0.07]"
             }`}
           >
             <span className="block">r/WallStreetWreckage</span>
@@ -292,10 +292,10 @@ export function BlogFeed() {
           {/* Premium tab */}
           <button
             onClick={() => handleSourceChange("premium")}
-            className={`flex-shrink-0 px-4 py-2 rounded-lg border font-mono text-xs font-bold transition-colors ${
+            className={`flex-shrink-0 px-4 py-2 rounded-xl border font-mono text-xs font-bold transition-colors ${
               activeBlogSource === "premium"
                 ? "bg-amber-900/40 border-amber-700 text-amber-300"
-                : "bg-gray-900 border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600"
+                : "bg-[#0f1221] border-white/[0.07] text-slate-400 hover:text-slate-200 hover:border-white/[0.07]"
             }`}
           >
             <span className="block">WealthWatch Insider</span>
@@ -307,10 +307,10 @@ export function BlogFeed() {
           {/* Wildcat tab */}
           <button
             onClick={() => handleSourceChange("wildcat")}
-            className={`flex-shrink-0 px-4 py-2 rounded-lg border font-mono text-xs font-bold transition-colors ${
+            className={`flex-shrink-0 px-4 py-2 rounded-xl border font-mono text-xs font-bold transition-colors ${
               activeBlogSource === "wildcat"
                 ? "bg-orange-900/40 border-orange-700 text-orange-300"
-                : "bg-gray-900 border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600"
+                : "bg-[#0f1221] border-white/[0.07] text-slate-400 hover:text-slate-200 hover:border-white/[0.07]"
             }`}
           >
             <span className="block">ApeStation</span>
@@ -320,19 +320,19 @@ export function BlogFeed() {
       </div>
 
       {/* Header — per source */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 mb-4">
+      <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4 mb-4">
         {activeBlogSource === "wsb" && (
           <>
             <div className="flex items-start justify-between">
               <div>
                 <h1 className="font-mono font-bold text-white text-lg">r/WallStreetWreckage</h1>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   The internet&apos;s finest financial misinformation, curated daily.
                   <span className="text-yellow-600 ml-2">80% of posts are FUD. You figure out which.</span>
                 </p>
               </div>
-              <div className="text-right text-xs text-gray-600">
-                <div className="font-mono text-gray-400">{wsbCount.toLocaleString()}</div>
+              <div className="text-right text-xs text-slate-500">
+                <div className="font-mono text-slate-300">{wsbCount.toLocaleString()}</div>
                 <div>posts</div>
                 {(state.playerFollowerCount ?? 0) > 0 && (
                   <div className="mt-1">
@@ -343,20 +343,20 @@ export function BlogFeed() {
               </div>
             </div>
             {/* Verification legend */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 pt-3 border-t border-gray-800 text-xs">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 pt-3 border-t border-white/[0.07] text-xs">
               {literacy >= 5 ? (
                 <span className="text-amber-400 font-mono">⚡ Truth Broker: Real/fake status shown immediately</span>
               ) : literacy >= 3 ? (
                 <>
-                  <span className="text-gray-500">After 1 day:</span>
+                  <span className="text-slate-400">After 1 day:</span>
                   <span className="text-emerald-400 font-mono">✓ VERIFIED = real news</span>
-                  <span className="text-gray-500 font-mono">✗ UNVERIFIED = FUD</span>
+                  <span className="text-slate-400 font-mono">✗ UNVERIFIED = FUD</span>
                 </>
               ) : (
                 <>
-                  <span className="text-gray-500">After 2 days:</span>
+                  <span className="text-slate-400">After 2 days:</span>
                   <span className="text-emerald-400 font-mono">✓ VERIFIED = real news</span>
-                  <span className="text-gray-500 font-mono">✗ UNVERIFIED = FUD</span>
+                  <span className="text-slate-400 font-mono">✗ UNVERIFIED = FUD</span>
                 </>
               )}
             </div>
@@ -368,20 +368,20 @@ export function BlogFeed() {
             <div className="flex items-start justify-between">
               <div>
                 <h1 className="font-mono font-bold text-amber-300 text-lg">WealthWatch Insider</h1>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Professional analyst research.
                   {hasPremiumBlog
                     ? <span className="text-amber-500 ml-2">40% of posts reflect real market events.</span>
-                    : <span className="text-gray-600 ml-2">Subscribe for $5,000/week to unlock.</span>
+                    : <span className="text-slate-500 ml-2">Subscribe for $5,000/week to unlock.</span>
                   }
                 </p>
               </div>
-              <div className="text-right text-xs text-gray-600">
+              <div className="text-right text-xs text-slate-500">
                 <div className="font-mono text-amber-400">{premiumCount.toLocaleString()}</div>
                 <div>posts</div>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 pt-3 border-t border-gray-800 text-xs">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 pt-3 border-t border-white/[0.07] text-xs">
               <span className="text-amber-600 font-mono">40% of posts here reflect real events — higher signal than WSB</span>
             </div>
           </>
@@ -392,18 +392,18 @@ export function BlogFeed() {
             <div className="flex items-start justify-between">
               <div>
                 <h1 className="font-mono font-bold text-orange-400 text-lg">ApeStation</h1>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Maximum degeneracy. Free entry.
                   <span className="text-orange-600 ml-2">95% fabricated. The 5% that aren&apos;t move markets.</span>
                 </p>
               </div>
-              <div className="text-right text-xs text-gray-600">
+              <div className="text-right text-xs text-slate-500">
                 <div className="font-mono text-orange-400">{wildcatCount.toLocaleString()}</div>
                 <div>posts</div>
               </div>
             </div>
             {/* Warning banner */}
-            <div className="mt-3 pt-3 border-t border-gray-800">
+            <div className="mt-3 pt-3 border-t border-white/[0.07]">
               <div className="bg-orange-950/40 border border-orange-800/60 rounded px-3 py-2 text-xs text-orange-400 font-mono">
                 ⚠ 95% of posts are fabricated. The 5% that aren&apos;t trigger extreme market moves via volatility multipliers.
               </div>
@@ -414,14 +414,14 @@ export function BlogFeed() {
 
       {/* Premium lock panel */}
       {activeBlogSource === "premium" && !hasPremiumBlog && (
-        <div className="bg-gray-900 border border-amber-800/50 rounded-lg p-6 mb-4 text-center">
+        <div className="bg-[#0f1221] border border-amber-800/50 rounded-xl p-6 mb-4 text-center">
           <div className="text-3xl mb-3">🔒</div>
           <h2 className="font-mono font-bold text-amber-300 text-base mb-2">WealthWatch Insider</h2>
-          <p className="text-sm text-gray-400 mb-4 max-w-sm mx-auto">
+          <p className="text-sm text-slate-300 mb-4 max-w-sm mx-auto">
             Professional analyst research with 40% real event coverage.
             Higher signal-to-noise than the free feeds.
           </p>
-          <div className="text-xs text-gray-500 font-mono mb-4">
+          <div className="text-xs text-slate-400 font-mono mb-4">
             $5,000 / week · {state.portfolio.cash >= 5000
               ? <span className="text-emerald-400">You can afford this</span>
               : <span className="text-red-400">Need ${(5000 - state.portfolio.cash).toLocaleString()} more</span>
@@ -433,7 +433,7 @@ export function BlogFeed() {
             className={`px-6 py-2 rounded border font-mono font-bold text-sm transition-colors ${
               state.portfolio.cash >= 5000
                 ? "bg-amber-900/40 border-amber-700 text-amber-300 hover:bg-amber-800/50 active:scale-95"
-                : "bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed"
+                : "bg-[#151c2f] border-white/[0.07] text-slate-500 cursor-not-allowed"
             }`}
           >
             Subscribe — $5,000/week
@@ -446,12 +446,12 @@ export function BlogFeed() {
 
       {/* Filters */}
       {(activeBlogSource !== "premium" || hasPremiumBlog) && (
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-3 mb-4">
+        <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-3 mb-4">
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-xs text-gray-500 font-mono uppercase tracking-wider mr-1">Flair:</span>
+            <span className="text-xs text-slate-400 font-medium mr-1">Flair:</span>
             <button
               onClick={() => { setFlairFilter(null); setMyPostsOnly(false); }}
-              className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${!flairFilter && !myPostsOnly ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
+              className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${!flairFilter && !myPostsOnly ? "bg-[#1e2a45] border-white/[0.07] text-white" : "border-white/[0.07] text-slate-400 hover:text-slate-200"}`}
             >
               All
             </button>
@@ -459,7 +459,7 @@ export function BlogFeed() {
               <button
                 key={f}
                 onClick={() => { setFlairFilter(flairFilter === f ? null : f); setMyPostsOnly(false); }}
-                className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${flairFilter === f && !myPostsOnly ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
+                className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${flairFilter === f && !myPostsOnly ? "bg-[#1e2a45] border-white/[0.07] text-white" : "border-white/[0.07] text-slate-400 hover:text-slate-200"}`}
               >
                 {f}
               </button>
@@ -475,11 +475,11 @@ export function BlogFeed() {
           </div>
 
           {mentionedTickers.length > 0 && (
-            <div className="flex flex-wrap gap-2 items-center mt-2 pt-2 border-t border-gray-800">
-              <span className="text-xs text-gray-500 font-mono uppercase tracking-wider mr-1">Ticker:</span>
+            <div className="flex flex-wrap gap-2 items-center mt-2 pt-2 border-t border-white/[0.07]">
+              <span className="text-xs text-slate-400 font-medium mr-1">Ticker:</span>
               <button
                 onClick={() => setTickerFilter(null)}
-                className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${!tickerFilter ? "bg-gray-700 border-gray-500 text-white" : "border-gray-700 text-gray-500 hover:text-gray-300"}`}
+                className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${!tickerFilter ? "bg-[#1e2a45] border-white/[0.07] text-white" : "border-white/[0.07] text-slate-400 hover:text-slate-200"}`}
               >
                 All
               </button>
@@ -487,7 +487,7 @@ export function BlogFeed() {
                 <button
                   key={t}
                   onClick={() => setTickerFilter(tickerFilter === t ? null : t)}
-                  className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${tickerFilter === t ? "bg-blue-800 border-blue-600 text-white" : "border-gray-700 text-gray-500 hover:text-blue-400"}`}
+                  className={`text-xs px-2 py-1 rounded border font-mono transition-colors ${tickerFilter === t ? "bg-blue-800 border-blue-600 text-white" : "border-white/[0.07] text-slate-400 hover:text-blue-400"}`}
                 >
                   {t}
                 </button>
@@ -499,29 +499,29 @@ export function BlogFeed() {
 
       {/* Feed */}
       {activeBlogSource === "premium" && !hasPremiumBlog ? null : blogFeed.filter((p) => (p.source ?? "wsb") === activeBlogSource).length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
+        <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-8 text-center">
           <div className="text-3xl mb-3">📭</div>
-          <div className="text-gray-400 text-sm">No posts yet.</div>
-          <div className="text-gray-600 text-xs mt-1">Advance a day to see the community react to market events.</div>
+          <div className="text-slate-300 text-sm">No posts yet.</div>
+          <div className="text-slate-500 text-xs mt-1">Advance a day to see the community react to market events.</div>
         </div>
       ) : byDay.length === 0 && myPostsOnly ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
+        <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-8 text-center">
           <div className="text-3xl mb-3">✏️</div>
-          <div className="text-gray-400 text-sm">No posts from you yet.</div>
-          <div className="text-gray-600 text-xs mt-1">Write something above to share your take with the community.</div>
+          <div className="text-slate-300 text-sm">No posts from you yet.</div>
+          <div className="text-slate-500 text-xs mt-1">Write something above to share your take with the community.</div>
         </div>
       ) : byDay.length === 0 ? (
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-6 text-center text-gray-500 text-sm">
+        <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-6 text-center text-slate-400 text-sm">
           No posts match your filters.
         </div>
       ) : (
         <div className="space-y-4">
           {byDay.map(([day, posts]) => (
             <div key={day}>
-              <div className="text-xs font-mono text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-2">
-                <span className="border-b border-gray-800 flex-1" />
+              <div className="text-xs font-mono text-slate-400 font-medium mb-2 flex items-center gap-2">
+                <span className="border-b border-white/[0.07] flex-1" />
                 <span>{day === currentDay ? "TODAY" : `Day ${day}`} · {posts.length} posts</span>
-                <span className="border-b border-gray-800 flex-1" />
+                <span className="border-b border-white/[0.07] flex-1" />
               </div>
               <div className="space-y-2">
                 {posts.map((post) => (
@@ -534,7 +534,7 @@ export function BlogFeed() {
           {/* Load more */}
           <button
             onClick={() => setDaysShown((d) => d + 7)}
-            className="w-full py-2 text-xs text-gray-500 hover:text-gray-300 border border-gray-800 hover:border-gray-700 rounded-lg transition-colors font-mono"
+            className="w-full py-2 text-xs text-slate-400 hover:text-slate-200 border border-white/[0.07] hover:border-white/[0.07] rounded-xl transition-colors font-mono"
           >
             Load older posts ↓
           </button>

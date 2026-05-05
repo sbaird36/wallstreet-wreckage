@@ -9,7 +9,7 @@ const FLAIRS: BlogPostFlair[] = ["DD", "Discussion", "YOLO", "Meme", "Shitpost"]
 const FLAIR_STYLES: Record<BlogPostFlair, string> = {
   DD:         "bg-blue-900/60 text-blue-300 border-blue-700",
   News:       "bg-cyan-900/60 text-cyan-300 border-cyan-700",
-  Discussion: "bg-gray-800 text-gray-300 border-gray-600",
+  Discussion: "bg-[#151c2f] text-slate-200 border-slate-500",
   Meme:       "bg-purple-900/60 text-purple-300 border-purple-700",
   YOLO:       "bg-orange-900/60 text-orange-300 border-orange-700",
   Shitpost:   "bg-rose-900/60 text-rose-300 border-rose-700",
@@ -112,12 +112,12 @@ export function PostComposer({ onPosted }: Props) {
     return (
       <button
         onClick={handleOpen}
-        className="w-full bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-lg p-3 text-left flex items-center gap-3 transition-colors group mb-4"
+        className="w-full bg-[#0f1221] border border-white/[0.07] hover:border-white/[0.07] rounded-xl p-3 text-left flex items-center gap-3 transition-colors group mb-4"
       >
-        <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-sm flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-[#1e2a45] flex items-center justify-center text-sm flex-shrink-0">
           {state.playerName?.[0]?.toUpperCase() ?? "?"}
         </div>
-        <span className="text-sm text-gray-500 group-hover:text-gray-400 flex-1">
+        <span className="text-sm text-slate-400 group-hover:text-slate-300 flex-1">
           Share your take with r/WallStreetWreckage…
         </span>
         <span className="text-xs text-blue-400 border border-blue-800 px-2 py-1 rounded font-mono">
@@ -128,7 +128,7 @@ export function PostComposer({ onPosted }: Props) {
   }
 
   return (
-    <div className="bg-gray-900 border border-blue-800/60 rounded-lg p-4 mb-4">
+    <div className="bg-[#0f1221] border border-blue-800/60 rounded-xl p-4 mb-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-blue-800 flex items-center justify-center text-xs font-bold text-white">
@@ -136,7 +136,7 @@ export function PostComposer({ onPosted }: Props) {
           </div>
           <span className="text-xs font-mono text-blue-400">u/{state.playerName || "You"}</span>
         </div>
-        <button onClick={handleCancel} className="text-gray-600 hover:text-gray-400 text-sm">✕</button>
+        <button onClick={handleCancel} className="text-slate-500 hover:text-slate-300 text-sm">✕</button>
       </div>
 
       {/* Flair picker */}
@@ -146,7 +146,7 @@ export function PostComposer({ onPosted }: Props) {
             key={f}
             onClick={() => setFlair(f)}
             className={`text-xs px-2 py-0.5 rounded border font-mono transition-colors ${
-              flair === f ? FLAIR_STYLES[f] : "border-gray-700 text-gray-600 hover:text-gray-400"
+              flair === f ? FLAIR_STYLES[f] : "border-white/[0.07] text-slate-500 hover:text-slate-300"
             }`}
           >
             {f}
@@ -159,7 +159,7 @@ export function PostComposer({ onPosted }: Props) {
         <select
           value={ticker}
           onChange={(e) => setTicker(e.target.value)}
-          className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-xs text-gray-300 font-mono focus:outline-none focus:border-blue-600"
+          className="w-full bg-[#151c2f] border border-white/[0.07] rounded px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-blue-600"
         >
           <option value="">No ticker (general post)</option>
           {tickers.map((t) => (
@@ -175,7 +175,7 @@ export function PostComposer({ onPosted }: Props) {
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Post title (required)"
         maxLength={200}
-        className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-600 mb-2"
+        className="w-full bg-[#151c2f] border border-white/[0.07] rounded px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-600 mb-2"
       />
 
       {/* Body */}
@@ -184,22 +184,22 @@ export function PostComposer({ onPosted }: Props) {
         onChange={(e) => setBody(e.target.value)}
         placeholder="Your thesis, your loss porn, your DD… (optional)"
         rows={4}
-        className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-blue-600 resize-none mb-3"
+        className="w-full bg-[#151c2f] border border-white/[0.07] rounded px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-600 resize-none mb-3"
       />
 
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-600">{title.length}/200</span>
+        <span className="text-xs text-slate-500">{title.length}/200</span>
         <div className="flex gap-2">
           <button
             onClick={handleCancel}
-            className="text-xs text-gray-500 hover:text-gray-300 px-3 py-1.5 transition-colors"
+            className="text-xs text-slate-400 hover:text-slate-200 px-3 py-1.5 transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={!title.trim() || submitting}
-            className="text-xs bg-blue-700 hover:bg-blue-600 disabled:bg-gray-700 disabled:text-gray-500 text-white px-4 py-1.5 rounded font-mono transition-colors"
+            className="text-xs bg-blue-700 hover:bg-blue-600 disabled:bg-[#151c2f] disabled:text-slate-500 text-white px-4 py-1.5 rounded font-mono transition-colors"
           >
             {submitting ? "Posting…" : "Post"}
           </button>

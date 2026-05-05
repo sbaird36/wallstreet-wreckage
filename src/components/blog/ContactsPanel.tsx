@@ -12,7 +12,7 @@ const TIER_LABELS: Record<number, string> = {
 };
 
 const TIER_STYLES: Record<number, string> = {
-  1: "text-gray-400 bg-gray-800 border-gray-600",
+  1: "text-slate-300 bg-[#151c2f] border-slate-500",
   2: "text-blue-300 bg-blue-900/50 border-blue-700",
   3: "text-yellow-300 bg-yellow-900/40 border-yellow-700",
 };
@@ -28,11 +28,11 @@ function TipCard({ tip }: { tip: ContactTip }) {
   const asset = state.assets[tip.ticker];
 
   return (
-    <div className={`rounded-lg border p-3 mb-2 ${tip.isRead ? "opacity-70" : "border-l-2"} ${tip.isRead ? "border-gray-800" : tip.direction === "bullish" ? "border-l-emerald-700 border-gray-800" : "border-l-rose-700 border-gray-800"}`}>
+    <div className={`rounded-xl border p-3 mb-2 ${tip.isRead ? "opacity-70" : "border-l-2"} ${tip.isRead ? "border-white/[0.07]" : tip.direction === "bullish" ? "border-l-emerald-700 border-white/[0.07]" : "border-l-rose-700 border-white/[0.07]"}`}>
       <div className="flex items-start justify-between gap-2 mb-1.5">
         <div className="flex items-center gap-1.5 flex-1 min-w-0">
           <span className="text-base">{contact?.emoji ?? "👤"}</span>
-          <span className="text-xs font-mono text-gray-300 font-bold truncate">
+          <span className="text-xs font-mono text-slate-200 font-bold truncate">
             u/{contact?.username ?? tip.contactId}
           </span>
           {!tip.isRead && (
@@ -41,13 +41,13 @@ function TipCard({ tip }: { tip: ContactTip }) {
         </div>
         <button
           onClick={() => dispatch({ type: "DISMISS_CONTACT_TIP", payload: { tipId: tip.id } })}
-          className="text-gray-700 hover:text-gray-400 text-xs flex-shrink-0"
+          className="text-slate-600 hover:text-slate-300 text-xs flex-shrink-0"
         >
           ✕
         </button>
       </div>
 
-      <p className="text-xs text-gray-300 leading-relaxed mb-2">{tip.message}</p>
+      <p className="text-xs text-slate-200 leading-relaxed mb-2">{tip.message}</p>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5">
@@ -60,7 +60,7 @@ function TipCard({ tip }: { tip: ContactTip }) {
             {tip.direction === "bullish" ? "↑ BULLISH" : "↓ BEARISH"}
           </span>
         </div>
-        <span className="text-xs text-gray-600 font-mono">Day {tip.day}</span>
+        <span className="text-xs text-slate-500 font-mono">Day {tip.day}</span>
       </div>
     </div>
   );
@@ -68,12 +68,12 @@ function TipCard({ tip }: { tip: ContactTip }) {
 
 function LockedContactSlot({ postCount, threshold }: { postCount: number; threshold: number }) {
   return (
-    <div className="bg-gray-900/40 border border-gray-800 rounded-lg p-3 opacity-50">
+    <div className="bg-[#0f1221]/40 border border-white/[0.07] rounded-xl p-3 opacity-50">
       <div className="flex items-center gap-2">
         <span className="text-lg">🔒</span>
         <div>
-          <div className="text-xs text-gray-500 font-mono">Locked Contact</div>
-          <div className="text-xs text-gray-600">{threshold - postCount} more posts to unlock</div>
+          <div className="text-xs text-slate-400 font-mono">Locked Contact</div>
+          <div className="text-xs text-slate-500">{threshold - postCount} more posts to unlock</div>
         </div>
       </div>
     </div>
@@ -102,13 +102,13 @@ export function ContactsPanel() {
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
+    <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="flex border-b border-gray-800">
+      <div className="flex border-b border-white/[0.07]">
         <button
           onClick={() => setActiveTab("tips")}
           className={`flex-1 px-3 py-2.5 text-xs font-mono uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors ${
-            activeTab === "tips" ? "bg-gray-800 text-white" : "text-gray-500 hover:text-gray-300"
+            activeTab === "tips" ? "bg-[#151c2f] text-white" : "text-slate-400 hover:text-slate-200"
           }`}
         >
           Inbox
@@ -121,7 +121,7 @@ export function ContactsPanel() {
         <button
           onClick={() => setActiveTab("contacts")}
           className={`flex-1 px-3 py-2.5 text-xs font-mono uppercase tracking-wider transition-colors ${
-            activeTab === "contacts" ? "bg-gray-800 text-white" : "text-gray-500 hover:text-gray-300"
+            activeTab === "contacts" ? "bg-[#151c2f] text-white" : "text-slate-400 hover:text-slate-200"
           }`}
         >
           Contacts
@@ -134,8 +134,8 @@ export function ContactsPanel() {
           {tips.length === 0 ? (
             <div className="text-center py-6">
               <div className="text-2xl mb-2">📭</div>
-              <div className="text-xs text-gray-500">No tips yet.</div>
-              <div className="text-xs text-gray-600 mt-1">
+              <div className="text-xs text-slate-400">No tips yet.</div>
+              <div className="text-xs text-slate-500 mt-1">
                 {unlockedContacts.length === 0
                   ? "Post on the blog to unlock contacts who'll tip you."
                   : "Your contacts will tip you as the market evolves."}
@@ -146,7 +146,7 @@ export function ContactsPanel() {
               {unreadCount > 0 && (
                 <button
                   onClick={handleMarkRead}
-                  className="w-full text-xs text-gray-500 hover:text-gray-300 mb-3 transition-colors"
+                  className="w-full text-xs text-slate-400 hover:text-slate-200 mb-3 transition-colors"
                 >
                   Mark all read
                 </button>
@@ -167,8 +167,8 @@ export function ContactsPanel() {
           {unlockedContacts.length === 0 && (
             <div className="text-center py-4">
               <div className="text-2xl mb-2">🤝</div>
-              <div className="text-xs text-gray-500">No contacts yet.</div>
-              <div className="text-xs text-gray-600 mt-1">
+              <div className="text-xs text-slate-400">No contacts yet.</div>
+              <div className="text-xs text-slate-500 mt-1">
                 Make your first post to attract attention.
               </div>
             </div>
@@ -177,7 +177,7 @@ export function ContactsPanel() {
           {unlockedContacts.map((contact) => (
             <div
               key={contact.id}
-              className="bg-gray-800/60 border border-gray-700 rounded-lg p-3"
+              className="bg-[#151c2f]/60 border border-white/[0.07] rounded-xl p-3"
             >
               <div className="flex items-start gap-2.5">
                 <span className="text-xl flex-shrink-0">{contact.emoji}</span>
@@ -188,11 +188,11 @@ export function ContactsPanel() {
                       {TIER_LABELS[contact.tier]}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-500 mt-0.5">u/{contact.username}</div>
-                  <div className="text-xs text-gray-400 mt-1.5 leading-relaxed">{contact.bio}</div>
+                  <div className="text-xs text-slate-400 mt-0.5">u/{contact.username}</div>
+                  <div className="text-xs text-slate-300 mt-1.5 leading-relaxed">{contact.bio}</div>
                   <div className="mt-2 flex flex-wrap gap-1">
                     {contact.specialty.slice(0, 4).map((s) => (
-                      <span key={s} className="text-xs font-mono px-1.5 py-0.5 bg-gray-700 text-gray-400 rounded border border-gray-600">
+                      <span key={s} className="text-xs font-mono px-1.5 py-0.5 bg-[#1e2a45] text-slate-300 rounded border border-white/[0.07]">
                         {s}
                       </span>
                     ))}
@@ -211,7 +211,7 @@ export function ContactsPanel() {
             />
           ))}
 
-          <div className="text-xs text-gray-600 text-center pt-1 border-t border-gray-800 mt-2">
+          <div className="text-xs text-slate-500 text-center pt-1 border-t border-white/[0.07] mt-2">
             {playerPostCount} post{playerPostCount !== 1 ? "s" : ""} made · {CONTACTS.length} total contacts
           </div>
         </div>

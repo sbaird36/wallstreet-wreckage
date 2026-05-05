@@ -101,30 +101,30 @@ export function TradeModal() {
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={() => dispatch({ type: "CANCEL_TRADE" })}
       />
-      <div className="relative bg-gray-900 border border-gray-700 rounded-xl p-4 sm:p-6 w-full max-w-md shadow-2xl">
+      <div className="relative bg-[#0f1221] border border-white/[0.07] rounded-xl p-4 sm:p-6 w-full max-w-md shadow-2xl shadow-black/40">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div>
             <h2 className="text-xl font-mono font-bold text-white">
               {pendingTrade.ticker}
             </h2>
-            <div className="text-sm text-gray-400">{asset.name}</div>
+            <div className="text-sm text-slate-400">{asset.name}</div>
           </div>
           <button
             onClick={() => dispatch({ type: "CANCEL_TRADE" })}
-            className="text-gray-500 hover:text-white text-xl"
+            className="text-slate-500 hover:text-white text-xl"
           >
             ✕
           </button>
         </div>
 
         {/* Price */}
-        <div className="bg-gray-800 rounded-lg p-3 mb-4 text-center">
-          <div className="text-xs text-gray-400 mb-0.5">Current Price</div>
+        <div className="bg-[#151c2f] rounded-xl p-3 mb-4 text-center">
+          <div className="text-xs text-slate-400 mb-0.5">Current Price</div>
           <div className="text-2xl font-mono font-bold text-white tabular-nums">
             ${formatPrice(asset.currentPrice)}
           </div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-xs text-slate-400 mt-1">
             Cash available: {formatCurrency(portfolio.cash)}
             {holding && (
               <> · Holding: {holding.quantity.toLocaleString()} {asset.type === 'crypto' ? 'coins' : 'shares'}</>
@@ -133,13 +133,13 @@ export function TradeModal() {
         </div>
 
         {/* Buy / Sell toggle */}
-        <div className="flex rounded-lg overflow-hidden border border-gray-700 mb-4">
+        <div className="flex rounded-xl overflow-hidden border border-white/[0.07] mb-4">
           <button
             onClick={() => { setAction("BUY"); setError(""); }}
             className={`flex-1 py-2 text-sm font-mono font-bold transition-colors ${
               action === "BUY"
                 ? "bg-emerald-900 text-emerald-300"
-                : "text-gray-500 hover:text-gray-300"
+                : "text-slate-400 hover:text-slate-200"
             }`}
           >
             BUY
@@ -150,7 +150,7 @@ export function TradeModal() {
             className={`flex-1 py-2 text-sm font-mono font-bold transition-colors ${
               action === "SELL"
                 ? "bg-rose-900 text-rose-300"
-                : "text-gray-500 hover:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                : "text-slate-400 hover:text-slate-200 disabled:opacity-40 disabled:cursor-not-allowed"
             }`}
           >
             SELL
@@ -160,7 +160,7 @@ export function TradeModal() {
         {/* Quantity */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <label className="text-xs text-gray-400">
+            <label className="text-xs text-slate-400">
               Quantity ({asset.type === "crypto" ? "coins" : "shares"})
             </label>
             <button
@@ -178,7 +178,7 @@ export function TradeModal() {
                 <button
                   key={pct}
                   onClick={() => { setQuantity(getPresetValue(pct)); setError(""); }}
-                  className="flex-1 py-1.5 text-xs font-mono rounded border border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-200 hover:bg-gray-800 transition-colors"
+                  className="flex-1 py-1.5 text-xs font-mono rounded border border-white/[0.07] text-slate-400 hover:border-white/20 hover:text-slate-200 hover:bg-[#151c2f] transition-colors"
                 >
                   {label}
                 </button>
@@ -191,22 +191,22 @@ export function TradeModal() {
             onChange={(e) => { setQuantity(e.target.value); setError(""); }}
             min={asset.type === "crypto" ? "0.0001" : "1"}
             step={asset.type === "crypto" ? "0.0001" : "1"}
-            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-gray-500"
+            className="w-full bg-[#151c2f] border border-white/[0.07] rounded-xl px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-white/20"
           />
         </div>
 
         {/* Total */}
-        <div className="bg-gray-800 rounded-lg p-3 mb-4">
+        <div className="bg-[#151c2f] rounded-xl p-3 mb-4">
           <div className="flex justify-between items-center">
-            <span className="text-xs text-gray-400">Total {action === "BUY" ? "Cost" : "Proceeds"}</span>
+            <span className="text-xs text-slate-400">Total {action === "BUY" ? "Cost" : "Proceeds"}</span>
             <span className="text-lg font-mono font-bold text-white tabular-nums">
               {formatCurrency(totalCost)}
             </span>
           </div>
           {action === "BUY" && (
             <div className="flex justify-between items-center mt-1">
-              <span className="text-xs text-gray-500">Cash after</span>
-              <span className={`text-xs font-mono tabular-nums ${portfolio.cash - totalCost < 0 ? "text-rose-400" : "text-gray-400"}`}>
+              <span className="text-xs text-slate-400">Cash after</span>
+              <span className={`text-xs font-mono tabular-nums ${portfolio.cash - totalCost < 0 ? "text-rose-400" : "text-slate-400"}`}>
                 {formatCurrency(portfolio.cash - totalCost)}
               </span>
             </div>

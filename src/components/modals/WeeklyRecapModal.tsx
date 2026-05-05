@@ -90,22 +90,22 @@ export function WeeklyRecapModal({ onClose }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/85 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative bg-gray-900 border border-gray-700 rounded-xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-[#0f1221] border border-white/[0.07] rounded-xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gray-900 border-b border-gray-800 px-5 py-4 rounded-t-xl">
+        <div className="sticky top-0 bg-[#0f1221] border-b border-white/[0.07] px-5 py-4 rounded-t-xl">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs text-gray-500 uppercase tracking-widest mb-0.5">
+              <div className="text-xs text-slate-400 font-medium mb-0.5">
                 Week {recap.weekNum} Complete
               </div>
               <h2 className="text-lg font-mono font-bold text-white">
                 Weekly Trading Recap
               </h2>
-              <div className="text-xs text-gray-500 mt-0.5">
+              <div className="text-xs text-slate-400 mt-0.5">
                 {formatGameDate(startDate, recap.startOfWeek)} — {formatGameDate(startDate, currentDay)}
               </div>
             </div>
-            <button onClick={onClose} className="text-gray-500 hover:text-white text-xl ml-4">
+            <button onClick={onClose} className="text-slate-400 hover:text-white text-xl ml-4">
               ✕
             </button>
           </div>
@@ -113,11 +113,11 @@ export function WeeklyRecapModal({ onClose }: Props) {
 
         <div className="p-4 sm:p-5 space-y-4">
           {/* Net worth */}
-          <div className="bg-gray-800 rounded-lg p-4">
-            <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">Portfolio</div>
+          <div className="bg-[#151c2f] rounded-xl p-4">
+            <div className="text-xs text-slate-400 font-medium mb-2">Portfolio</div>
             <div className="flex items-end justify-between">
               <div>
-                <div className="text-xs text-gray-500 mb-0.5">End of week</div>
+                <div className="text-xs text-slate-400 mb-0.5">End of week</div>
                 <div className="text-2xl font-mono font-bold text-white tabular-nums">
                   {formatCurrency(recap.endNetWorth)}
                 </div>
@@ -134,23 +134,23 @@ export function WeeklyRecapModal({ onClose }: Props) {
           </div>
 
           {/* vs Market */}
-          <div className="bg-gray-800 rounded-lg p-4">
-            <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">vs Market (SNP499)</div>
+          <div className="bg-[#151c2f] rounded-xl p-4">
+            <div className="text-xs text-slate-400 font-medium mb-3">vs Market (SNP499)</div>
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
-                <div className="text-xs text-gray-500 mb-1">Your Return</div>
+                <div className="text-xs text-slate-400 mb-1">Your Return</div>
                 <div className={`text-sm font-mono font-bold tabular-nums ${recap.nwChangePct >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                   {formatPercent(recap.nwChangePct)}
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-500 mb-1">SNP499</div>
+                <div className="text-xs text-slate-400 mb-1">SNP499</div>
                 <div className={`text-sm font-mono font-bold tabular-nums ${recap.snpWeekPct >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                   {formatPercent(recap.snpWeekPct)}
                 </div>
               </div>
               <div>
-                <div className="text-xs text-gray-500 mb-1">Alpha</div>
+                <div className="text-xs text-slate-400 mb-1">Alpha</div>
                 <div className={`text-sm font-mono font-bold tabular-nums ${recap.alpha >= 0 ? "text-yellow-400" : "text-rose-400"}`}>
                   {formatPercent(recap.alpha)}
                 </div>
@@ -159,21 +159,21 @@ export function WeeklyRecapModal({ onClose }: Props) {
           </div>
 
           {/* Top movers */}
-          <div className="bg-gray-800 rounded-lg p-4">
-            <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">Weekly Movers</div>
+          <div className="bg-[#151c2f] rounded-xl p-4">
+            <div className="text-xs text-slate-400 font-medium mb-3">Weekly Movers</div>
             <div className="space-y-2">
               {/* Stocks */}
-              <div className="text-xs text-gray-600 mb-1">Stocks (Mon–Fri)</div>
+              <div className="text-xs text-slate-500 mb-1">Stocks (Mon–Fri)</div>
               <div className="grid grid-cols-2 gap-2">
                 {recap.topStockGainer && (
-                  <div className="bg-emerald-950/60 border border-emerald-800/50 rounded-lg px-3 py-2">
+                  <div className="bg-emerald-950/60 border border-emerald-800/50 rounded-xl px-3 py-2">
                     <div className="text-xs text-emerald-600 mb-0.5">Top Gainer</div>
                     <div className="font-mono font-bold text-white text-sm">{recap.topStockGainer.ticker}</div>
                     <div className="font-mono text-emerald-400 text-xs">{formatPercent(recap.topStockGainer.changePct)}</div>
                   </div>
                 )}
                 {recap.topStockLoser && recap.topStockLoser.ticker !== recap.topStockGainer?.ticker && (
-                  <div className="bg-rose-950/60 border border-rose-800/50 rounded-lg px-3 py-2">
+                  <div className="bg-rose-950/60 border border-rose-800/50 rounded-xl px-3 py-2">
                     <div className="text-xs text-rose-600 mb-0.5">Biggest Loser</div>
                     <div className="font-mono font-bold text-white text-sm">{recap.topStockLoser.ticker}</div>
                     <div className="font-mono text-rose-400 text-xs">{formatPercent(recap.topStockLoser.changePct)}</div>
@@ -181,17 +181,17 @@ export function WeeklyRecapModal({ onClose }: Props) {
                 )}
               </div>
               {/* Crypto */}
-              <div className="text-xs text-gray-600 mb-1 mt-2">Crypto (24/7)</div>
+              <div className="text-xs text-slate-500 mb-1 mt-2">Crypto (24/7)</div>
               <div className="grid grid-cols-2 gap-2">
                 {recap.topCryptoGainer && (
-                  <div className="bg-emerald-950/60 border border-emerald-800/50 rounded-lg px-3 py-2">
+                  <div className="bg-emerald-950/60 border border-emerald-800/50 rounded-xl px-3 py-2">
                     <div className="text-xs text-emerald-600 mb-0.5">Top Gainer</div>
                     <div className="font-mono font-bold text-white text-sm">{recap.topCryptoGainer.ticker}</div>
                     <div className="font-mono text-emerald-400 text-xs">{formatPercent(recap.topCryptoGainer.changePct)}</div>
                   </div>
                 )}
                 {recap.topCryptoLoser && recap.topCryptoLoser.ticker !== recap.topCryptoGainer?.ticker && (
-                  <div className="bg-rose-950/60 border border-rose-800/50 rounded-lg px-3 py-2">
+                  <div className="bg-rose-950/60 border border-rose-800/50 rounded-xl px-3 py-2">
                     <div className="text-xs text-rose-600 mb-0.5">Biggest Loser</div>
                     <div className="font-mono font-bold text-white text-sm">{recap.topCryptoLoser.ticker}</div>
                     <div className="font-mono text-rose-400 text-xs">{formatPercent(recap.topCryptoLoser.changePct)}</div>
@@ -203,22 +203,22 @@ export function WeeklyRecapModal({ onClose }: Props) {
 
           {/* Trades this week */}
           {recap.weekTxs.length > 0 && (
-            <div className="bg-gray-800 rounded-lg p-4">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+            <div className="bg-[#151c2f] rounded-xl p-4">
+              <div className="text-xs text-slate-400 font-medium mb-3">
                 Trades This Week ({recap.weekTxs.length})
               </div>
               <div className="space-y-1.5 max-h-36 overflow-y-auto">
                 {recap.weekTxs.map((tx) => (
                   <div key={tx.id} className="flex items-center justify-between text-xs font-mono">
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-600 w-8">{getShortDayName(startDate, tx.day)}</span>
+                      <span className="text-slate-500 w-8">{getShortDayName(startDate, tx.day)}</span>
                       <span className={tx.action === "BUY" ? "text-emerald-400" : "text-rose-400"}>
                         {tx.action}
                       </span>
                       <span className="text-white">{tx.ticker}</span>
-                      <span className="text-gray-500">×{tx.quantity}</span>
+                      <span className="text-slate-400">×{tx.quantity}</span>
                     </div>
-                    <span className="text-gray-400 tabular-nums">
+                    <span className="text-slate-300 tabular-nums">
                       {formatCurrency(tx.totalValue)}
                     </span>
                   </div>
@@ -228,16 +228,16 @@ export function WeeklyRecapModal({ onClose }: Props) {
           )}
 
           {recap.weekTxs.length === 0 && (
-            <div className="bg-gray-800 rounded-lg p-4 text-center">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Trades This Week</div>
-              <div className="text-sm text-gray-600">No trades placed this week.</div>
+            <div className="bg-[#151c2f] rounded-xl p-4 text-center">
+              <div className="text-xs text-slate-400 font-medium mb-1">Trades This Week</div>
+              <div className="text-sm text-slate-500">No trades placed this week.</div>
             </div>
           )}
 
           {/* Events this week */}
           {recap.weekEvents.length > 0 && (
-            <div className="bg-gray-800 rounded-lg p-4">
-              <div className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+            <div className="bg-[#151c2f] rounded-xl p-4">
+              <div className="text-xs text-slate-400 font-medium mb-3">
                 Market Events ({recap.weekEvents.length})
               </div>
               <div className="space-y-1.5 max-h-32 overflow-y-auto">
@@ -245,9 +245,9 @@ export function WeeklyRecapModal({ onClose }: Props) {
                   <div key={i} className="flex items-start gap-2 text-xs">
                     <span className="text-base leading-none mt-0.5">{fe.event.icon}</span>
                     <div>
-                      <span className="text-gray-300">{fe.event.headline}</span>
-                      <span className="text-gray-600 ml-2">·</span>
-                      <span className="text-gray-600 ml-2">{getShortDayName(startDate, fe.day)}</span>
+                      <span className="text-slate-200">{fe.event.headline}</span>
+                      <span className="text-slate-500 ml-2">·</span>
+                      <span className="text-slate-500 ml-2">{getShortDayName(startDate, fe.day)}</span>
                     </div>
                   </div>
                 ))}
@@ -256,7 +256,7 @@ export function WeeklyRecapModal({ onClose }: Props) {
           )}
 
           {/* Weekend note */}
-          <div className="bg-gray-800/50 border border-gray-700/50 rounded-lg px-4 py-3 text-xs text-gray-500 flex items-start gap-2">
+          <div className="bg-[#151c2f]/60 border border-white/[0.07] rounded-xl px-4 py-3 text-xs text-slate-400 flex items-start gap-2">
             <span>📅</span>
             <span>
               Stock markets are closed Saturday &amp; Sunday — equity prices held flat over the weekend.
@@ -266,10 +266,10 @@ export function WeeklyRecapModal({ onClose }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-900 border-t border-gray-800 px-5 py-4 rounded-b-xl">
+        <div className="sticky bottom-0 bg-[#0f1221] border-t border-white/[0.07] px-5 py-4 rounded-b-xl">
           <button
             onClick={onClose}
-            className="w-full py-3 bg-emerald-900 hover:bg-emerald-800 text-emerald-200 rounded-lg font-mono font-bold text-sm transition-colors border border-emerald-700 flex items-center justify-center gap-2"
+            className="w-full py-3 bg-emerald-900 hover:bg-emerald-800 text-emerald-200 rounded-xl font-mono font-bold text-sm transition-colors border border-emerald-700 flex items-center justify-center gap-2"
           >
             <span>▶</span> Start Week {recap.weekNum + 1}
           </button>

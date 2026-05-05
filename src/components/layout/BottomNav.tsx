@@ -10,9 +10,9 @@ const NAV_TABS = [
   { href: "/blog",       label: "WSB",    icon: "💬" },
   { href: "/algorithm",  label: "Algo",   icon: "🤖" },
   { href: "/advisors",   label: "Advisor",icon: "👔" },
-  { href: "/hedge-fund", label: "Fund",   icon: "🏦" },
   { href: "/stats",      label: "Stats",  icon: "🏆" },
-  { href: "/skills",     label: "Skills", icon: "⚡" },
+  { href: "/skills",     label: "Skills",    icon: "⚡" },
+  { href: "/research",   label: "Research",  icon: "🔬" },
 ];
 
 export function BottomNav() {
@@ -22,7 +22,7 @@ export function BottomNav() {
   if (!state.gameStarted) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-gray-900 border-t border-gray-800 safe-area-inset-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-[#0f1221] border-t border-white/[0.07] safe-area-inset-bottom">
       <div className="flex items-stretch h-14">
         {NAV_TABS.map((tab) => {
           const isActive = pathname === tab.href;
@@ -44,12 +44,12 @@ export function BottomNav() {
               href={tab.href}
               className={`
                 relative flex-1 flex flex-col items-center justify-center gap-0.5
-                transition-colors active:bg-gray-800
-                ${isActive ? "text-blue-400" : "text-gray-500"}
+                transition-colors active:bg-[#151c2f]
+                ${isActive ? "text-blue-400" : "text-slate-500"}
               `}
             >
               <span className="text-lg leading-none">{tab.icon}</span>
-              <span className="text-[9px] font-mono tracking-wide leading-none">{tab.label}</span>
+              <span className="text-[10px] font-medium leading-none">{tab.label}</span>
               {isActive && (
                 <span className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-blue-400 rounded-b-full" />
               )}

@@ -20,16 +20,16 @@ export function MarketTicker() {
   });
 
   return (
-    <div className="bg-gray-900 border-t border-gray-800 overflow-hidden py-3 text-sm font-mono">
+    <div className="bg-[#0f1221] border-t border-white/[0.07] overflow-hidden py-3 text-sm font-mono">
       <div className="ticker-scroll inline-block whitespace-nowrap">
         {[...tickerItems, ...tickerItems].map((item, i) => (
           <span key={i} className="inline-flex items-center gap-1.5">
-            <span className="text-gray-200 font-bold">{item.ticker}</span>
-            <span className="text-gray-400">${formatPrice(item.price)}</span>
+            <span className="text-slate-100 font-bold">{item.ticker}</span>
+            <span className="text-slate-300">${formatPrice(item.price)}</span>
             <span className={item.isUp ? "text-emerald-400" : "text-rose-400"}>
               {item.isUp ? "▲" : "▼"} {formatPercent(item.change)}
             </span>
-            <span className="text-gray-700 mx-3">·</span>
+            <span className="text-slate-600 mx-3">·</span>
           </span>
         ))}
       </div>

@@ -29,7 +29,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`dark ${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="bg-gray-950 text-gray-100 min-h-screen font-sans pb-14 sm:pb-0">
+      <body className="bg-[#0a0a0f] text-slate-100 min-h-screen font-sans pb-14 sm:pb-0">
         <GameProvider>
           {children}
           <BottomNav />

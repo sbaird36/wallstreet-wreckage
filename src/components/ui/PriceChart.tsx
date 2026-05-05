@@ -117,8 +117,8 @@ export function PriceChart({
               onClick={() => setRange(r)}
               className={`text-xs px-2.5 py-1 rounded border transition-colors ${
                 range === r
-                  ? "bg-gray-700 border-gray-500 text-white"
-                  : "border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300"
+                  ? "bg-[#1e2a45] border-white/[0.07] text-white"
+                  : "border-white/[0.07] text-slate-400 hover:border-white/[0.07] hover:text-slate-200"
               }`}
             >
               {r}
@@ -126,7 +126,7 @@ export function PriceChart({
           ))}
         </div>
         {showMA && (
-          <div className="flex items-center gap-3 text-xs text-gray-500">
+          <div className="flex items-center gap-3 text-xs text-slate-400">
             <span className="flex items-center gap-1">
               <span className="inline-block w-4 h-0.5 bg-blue-400" />
               MA20
@@ -266,19 +266,19 @@ export function PriceChart({
 
         {/* Tooltip */}
         {hoveredPoint && (
-          <div className="absolute top-1 right-12 bg-gray-900 border border-gray-700 rounded p-2 text-xs pointer-events-none z-10 shadow-lg">
-            <div className="text-gray-400 mb-1 font-mono">Day {hoveredPoint.day}</div>
+          <div className="absolute top-1 right-12 bg-[#0f1221] border border-white/[0.07] rounded p-2 text-xs pointer-events-none z-10 shadow-lg">
+            <div className="text-slate-300 mb-1 font-mono">Day {hoveredPoint.day}</div>
             <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 font-mono tabular-nums">
-              <span className="text-gray-500">O</span>
+              <span className="text-slate-400">O</span>
               <span className="text-white">${formatPrice(hoveredPoint.open)}</span>
-              <span className="text-gray-500">H</span>
+              <span className="text-slate-400">H</span>
               <span className="text-emerald-400">${formatPrice(hoveredPoint.high)}</span>
-              <span className="text-gray-500">L</span>
+              <span className="text-slate-400">L</span>
               <span className="text-rose-400">${formatPrice(hoveredPoint.low)}</span>
-              <span className="text-gray-500">C</span>
+              <span className="text-slate-400">C</span>
               <span className="text-white">${formatPrice(hoveredPoint.close)}</span>
-              <span className="text-gray-500">Vol</span>
-              <span className="text-gray-300">
+              <span className="text-slate-400">Vol</span>
+              <span className="text-slate-200">
                 {(hoveredPoint.volume / 1_000_000).toFixed(1)}M
               </span>
             </div>

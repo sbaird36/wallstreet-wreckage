@@ -8,6 +8,8 @@ import { useGame } from "@/context/GameContext";
 import { getNetWorth } from "@/utils/calculations";
 import { formatCurrency, formatDayAsDate } from "@/utils/formatting";
 import { SaveLoadModal } from "@/components/modals/SaveLoadModal";
+import { TraderRankBadge } from "@/components/ui/TraderRank";
+import { AdvanceDayButton } from "@/components/dashboard/AdvanceDayButton";
 
 const NAV_TABS = [
   { href: "/dashboard",   label: "Dashboard",    icon: "📊" },
@@ -15,9 +17,9 @@ const NAV_TABS = [
   { href: "/blog",        label: "WSB",          icon: "💬" },
   { href: "/algorithm",   label: "My Algorithm", icon: "🤖" },
   { href: "/advisors",    label: "Advisors",     icon: "👔" },
-  { href: "/hedge-fund",  label: "Hedge Fund",   icon: "🏦" },
   { href: "/stats",       label: "Stats",        icon: "🏆" },
   { href: "/skills",      label: "Skills",       icon: "⚡" },
+  { href: "/research",    label: "Research",     icon: "🔬" },
 ];
 
 export function TopNav() {
@@ -26,18 +28,17 @@ export function TopNav() {
   const pathname = usePathname();
   const netWorth = getNetWorth(state.portfolio, state.assets);
   const displayDate = formatDayAsDate(state.currentDay, state.startDate);
-  const fundName = state.playerHedgeFund?.name;
 
   return (
     <>
-      <nav className="bg-gray-900 border-b border-gray-800 sticky top-0 z-40">
+      <nav className="bg-[#0f1221] border-b border-white/[0.07] sticky top-0 z-40">
         {/* Main bar */}
         <div className="px-5 h-12 flex items-center justify-between gap-4">
-          {/* Left: Brand + live indicator */}
-          <div className="flex items-center h-full gap-0 flex-shrink-0">
+          {/* Left: Brand */}
+          <div className="flex items-center h-full flex-shrink-0">
             <Link
               href="/dashboard"
-              className="flex items-center gap-2 pr-5 border-r border-gray-800 h-full"
+              className="flex items-center gap-2 pr-4 border-r border-white/[0.07] h-full"
             >
               <Image
                 src="/logo.png"
@@ -46,38 +47,37 @@ export function TopNav() {
                 height={44}
                 className="h-9 w-auto object-contain flex-shrink-0"
               />
-              <span className="hidden sm:block font-bold text-sm text-white tracking-wide">
+              <span className="hidden sm:block font-bold text-sm text-white">
                 Wall<span className="text-blue-400">Street</span>{" "}
-                <span className="text-gray-400 font-normal">Wreckage</span>
+                <span className="text-slate-400 font-normal">Wreckage</span>
               </span>
             </Link>
-            <div className="hidden md:flex items-center gap-2 pl-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse-fast" />
-              <span className="text-xs font-mono text-gray-500 tracking-widest">LIVE</span>
-            </div>
-          </div>
 
-          {/* Center: Date + fund */}
-          <div className="hidden md:flex flex-col items-center flex-1">
-            <div className="text-xs font-mono text-gray-500 uppercase tracking-widest">
-              {displayDate}
-            </div>
-            {fundName && (
-              <div className="text-xs text-yellow-500 font-mono font-bold">{fundName}</div>
+            {/* Advance Day — inline in nav, only when game active */}
+            {state.gameStarted && (
+              <div className="pl-4">
+                <AdvanceDayButton compact />
+              </div>
             )}
           </div>
 
-          {/* Right: Stats + action */}
-          <div className="flex items-center h-full flex-shrink-0">
+          {/* Right: Date + rank + stats + save */}
+          <div className="flex items-center h-full flex-shrink-0 gap-0">
+            {state.gameStarted && (
+              <div className="hidden md:flex flex-col items-end pr-4 border-r border-white/[0.07] mr-0">
+                <div className="text-xs font-medium text-slate-400 leading-none">{displayDate}</div>
+                <div className="mt-0.5"><TraderRankBadge xp={state.xp ?? 0} size="xs" /></div>
+              </div>
+            )}
             <div className="hidden sm:flex items-center h-full">
-              <div className="px-5 border-r border-gray-800 text-right">
-                <div className="text-xs font-mono text-gray-500 uppercase tracking-widest">Net Worth</div>
+              <div className="px-4 border-r border-white/[0.07] text-right">
+                <div className="text-xs text-slate-400 font-medium mb-0.5">net worth</div>
                 <div className="font-mono font-bold text-white tabular-nums text-sm leading-tight">
                   {formatCurrency(netWorth)}
                 </div>
               </div>
-              <div className="px-5 border-r border-gray-800 text-right">
-                <div className="text-xs font-mono text-gray-500 uppercase tracking-widest">Cash</div>
+              <div className="px-4 border-r border-white/[0.07] text-right">
+                <div className="text-xs text-slate-400 font-medium mb-0.5">cash</div>
                 <div className="font-mono font-bold text-emerald-400 tabular-nums text-sm leading-tight">
                   {formatCurrency(state.portfolio.cash)}
                 </div>
@@ -86,9 +86,9 @@ export function TopNav() {
             <div className="pl-4">
               <button
                 onClick={() => setShowSaveLoad(true)}
-                className="text-xs px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-gray-200 rounded border border-gray-700 hover:border-gray-600 transition-colors font-mono tracking-wide"
+                className="text-xs px-3 py-1.5 bg-[#151c2f] hover:bg-[#1e2a45] text-slate-300 hover:text-white rounded border border-white/[0.07] hover:border-white/20 transition-colors font-medium"
               >
-                SAVE / LOAD
+                Save / Load
               </button>
             </div>
           </div>
@@ -96,22 +96,22 @@ export function TopNav() {
 
         {/* Mobile stats strip — shown only on small screens when in a game */}
         {state.gameStarted && (
-          <div className="sm:hidden border-t border-gray-800 px-4 py-2 flex items-center justify-between text-xs font-mono">
+          <div className="sm:hidden border-t border-white/[0.07] px-4 py-2 flex items-center justify-between text-xs font-mono">
             <div>
-              <span className="text-gray-500 uppercase tracking-widest">NW </span>
+              <span className="text-slate-400">NW </span>
               <span className="text-white tabular-nums">{formatCurrency(netWorth)}</span>
             </div>
             <div>
-              <span className="text-gray-500 uppercase tracking-widest">Cash </span>
+              <span className="text-slate-400">Cash </span>
               <span className="text-emerald-400 tabular-nums">{formatCurrency(state.portfolio.cash)}</span>
             </div>
-            <div className="text-gray-500">{displayDate}</div>
+            <div className="text-slate-400">{displayDate}</div>
           </div>
         )}
 
         {/* Tab navigation — hidden on mobile (BottomNav handles it), shown on sm+ */}
         {state.gameStarted && (
-          <div className="border-t border-gray-800 px-2 sm:px-5 hidden sm:flex items-center gap-0 sm:gap-1 h-12">
+          <div className="border-t border-white/[0.07] px-2 sm:px-5 hidden sm:flex items-center gap-0 sm:gap-1 h-12">
             {NAV_TABS.map((tab) => {
               const isActive = pathname === tab.href;
               const isBlog = tab.href === "/blog";
@@ -130,11 +130,11 @@ export function TopNav() {
                   key={tab.href}
                   href={tab.href}
                   className={`
-                    relative flex items-center gap-2 px-3 sm:px-5 h-full text-sm font-mono tracking-wide
+                    relative flex items-center gap-2 px-3 sm:px-5 h-full text-sm font-medium
                     border-b-2 transition-colors flex-1 sm:flex-none justify-center sm:justify-start
                     ${isActive
-                      ? "border-blue-500 text-white"
-                      : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-600"
+                      ? "border-blue-500 text-white font-medium"
+                      : "border-transparent text-slate-400 hover:text-slate-200 hover:border-white/20"
                     }
                   `}
                 >

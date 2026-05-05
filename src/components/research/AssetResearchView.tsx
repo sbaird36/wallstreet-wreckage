@@ -65,17 +65,17 @@ function MetricRow({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border-b border-gray-800 last:border-0">
+    <div className="border-b border-white/[0.07] last:border-0">
       <div className="flex items-start justify-between py-2">
         <div className="flex items-center gap-1">
-          <span className="text-xs text-gray-500">{label}</span>
+          <span className="text-xs text-slate-400">{label}</span>
           {explanation && (
             <button
               onClick={() => setOpen((v) => !v)}
               className={`text-xs w-4 h-4 rounded-full flex items-center justify-center transition-colors ${
                 open
                   ? "bg-blue-700 text-white"
-                  : "bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-gray-200"
+                  : "bg-[#1e2a45] text-slate-300 hover:bg-[#1e2a45]/80 hover:text-slate-200"
               }`}
               title="What is this?"
             >
@@ -85,7 +85,7 @@ function MetricRow({
         </div>
         <div className="text-right">
           <div className={`text-xs font-mono tabular-nums ${valueClass}`}>{value}</div>
-          {sub && <div className="text-xs text-gray-600 mt-0.5">{sub}</div>}
+          {sub && <div className="text-xs text-slate-500 mt-0.5">{sub}</div>}
         </div>
       </div>
       {open && explanation && (
@@ -101,7 +101,7 @@ function RSIGauge({ value }: { value: number | null }) {
   const [showExplanation, setShowExplanation] = useState(false);
 
   if (value === null) {
-    return <span className="text-gray-500 text-xs">Insufficient data (need 14+ days)</span>;
+    return <span className="text-slate-400 text-xs">Insufficient data (need 14+ days)</span>;
   }
 
   const pct = value / 100;
@@ -117,7 +117,7 @@ function RSIGauge({ value }: { value: number | null }) {
   return (
     <div>
       <div className="flex items-center gap-3 mb-1">
-        <div className="flex-1 h-2 bg-gray-800 rounded-full overflow-hidden">
+        <div className="flex-1 h-2 bg-[#151c2f] rounded-full overflow-hidden">
           <div className="h-full relative">
             <div
               className="absolute top-0 left-0 h-full rounded-full transition-all duration-500"
@@ -127,28 +127,28 @@ function RSIGauge({ value }: { value: number | null }) {
                 clipPath: `inset(0 ${100 - pct * 100}% 0 0)`,
               }}
             />
-            <div className="absolute top-0 left-[30%] w-px h-full bg-gray-600" />
-            <div className="absolute top-0 left-[70%] w-px h-full bg-gray-600" />
+            <div className="absolute top-0 left-[30%] w-px h-full bg-[#1e2a45]/60" />
+            <div className="absolute top-0 left-[70%] w-px h-full bg-[#1e2a45]/60" />
           </div>
         </div>
         <div className="flex-shrink-0 flex items-center gap-1.5">
           <span className="text-xs font-mono tabular-nums" style={{ color }}>
             {value.toFixed(1)}
           </span>
-          <span className="text-xs text-gray-500">({label})</span>
+          <span className="text-xs text-slate-400">({label})</span>
           <button
             onClick={() => setShowExplanation((v) => !v)}
             className={`text-xs w-4 h-4 rounded-full flex items-center justify-center transition-colors ${
               showExplanation
                 ? "bg-blue-700 text-white"
-                : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                : "bg-[#1e2a45] text-slate-300 hover:bg-[#1e2a45]/80"
             }`}
           >
             ?
           </button>
         </div>
       </div>
-      <div className="flex justify-between text-xs text-gray-700 mb-1">
+      <div className="flex justify-between text-xs text-slate-500 mb-1">
         <span>Oversold &lt;30</span>
         <span>Neutral</span>
         <span>&gt;70 Overbought</span>
@@ -213,7 +213,7 @@ export function AssetResearchView({ ticker }: Props) {
 
   if (!asset || !technicals) {
     return (
-      <div className="p-8 text-center text-gray-500">
+      <div className="p-8 text-center text-slate-400">
         <div className="text-4xl mb-4">🤷</div>
         <div>Asset &quot;{ticker}&quot; not found.</div>
         <Link href="/dashboard" className="text-emerald-400 hover:underline mt-2 inline-block">
@@ -273,13 +273,13 @@ export function AssetResearchView({ ticker }: Props) {
       {/* Back */}
       <Link
         href="/dashboard"
-        className="text-xs text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-1 w-fit"
+        className="text-xs text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-1 w-fit"
       >
         ← Dashboard
       </Link>
 
       {/* ── Header ── */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
+      <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-5">
         <div className="flex items-start justify-between flex-wrap gap-4 mb-4">
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
@@ -287,26 +287,26 @@ export function AssetResearchView({ ticker }: Props) {
               <TypeBadge type={asset.type} />
               {asset.type === "stock" && <SectorBadge sector={asset.sector} />}
             </div>
-            <div className="text-gray-400 text-sm">{asset.name}</div>
+            <div className="text-slate-300 text-sm">{asset.name}</div>
           </div>
           <div className="text-right">
             <div className="text-3xl font-mono font-bold text-white tabular-nums">
               ${formatPrice(asset.currentPrice)}
             </div>
             <ChangeIndicator value={changePct} size="lg" />
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-xs text-slate-400 mt-1">
               Prev close: ${formatPrice(asset.previousPrice)}
             </div>
           </div>
         </div>
 
         {/* Key stats row */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-gray-800">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-white/[0.07]">
           <QuickStat label="Market Cap" value={`$${formatLargeNumber(marketCap)}`} />
           <QuickStat
             label="Analyst Rating"
             value={analystAccess ? (coverage?.consensusRating ?? "—") : "🔒 Locked"}
-            valueClass={analystAccess ? (coverage ? RATING_STYLES[coverage.consensusRating].text : "text-gray-400") : "text-amber-500"}
+            valueClass={analystAccess ? (coverage ? RATING_STYLES[coverage.consensusRating].text : "text-slate-300") : "text-amber-500"}
           />
           <QuickStat
             label="Consensus Target"
@@ -332,8 +332,8 @@ export function AssetResearchView({ ticker }: Props) {
         <div className="lg:col-span-2 space-y-4">
 
           {/* Price chart */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
-            <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-4">
+          <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">
               Price History
             </h2>
             <PriceChart
@@ -346,8 +346,8 @@ export function AssetResearchView({ ticker }: Props) {
           </div>
 
           {/* Trade panel */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
-            <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-4">
+          <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">
               Trade {ticker}
             </h2>
             <div className="flex gap-2 mb-4">
@@ -356,7 +356,7 @@ export function AssetResearchView({ ticker }: Props) {
                 className={`flex-1 py-2 text-sm font-mono font-bold rounded border transition-colors ${
                   tradeAction === "BUY"
                     ? "bg-emerald-900 border-emerald-600 text-emerald-300"
-                    : "border-gray-700 text-gray-500 hover:text-gray-300"
+                    : "border-white/[0.07] text-slate-400 hover:text-slate-200"
                 }`}
               >
                 BUY
@@ -367,7 +367,7 @@ export function AssetResearchView({ ticker }: Props) {
                 className={`flex-1 py-2 text-sm font-mono font-bold rounded border transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                   tradeAction === "SELL"
                     ? "bg-rose-900 border-rose-600 text-rose-300"
-                    : "border-gray-700 text-gray-500 hover:text-gray-300"
+                    : "border-white/[0.07] text-slate-400 hover:text-slate-200"
                 }`}
               >
                 SELL
@@ -376,7 +376,7 @@ export function AssetResearchView({ ticker }: Props) {
             <div className="flex flex-col sm:flex-row gap-3 sm:items-end mb-3">
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs text-gray-400">Quantity</label>
+                  <label className="text-xs text-slate-300">Quantity</label>
                   <button
                     onClick={() => {
                       if (tradeAction === "BUY") {
@@ -396,12 +396,12 @@ export function AssetResearchView({ ticker }: Props) {
                   onChange={(e) => setQuantity(e.target.value)}
                   min={asset.type === "crypto" ? "0.0001" : "1"}
                   step={asset.type === "crypto" ? "0.0001" : "1"}
-                  className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-gray-500"
+                  className="w-full bg-[#151c2f] border border-white/[0.07] rounded px-3 py-2 text-white font-mono text-sm focus:outline-none focus:border-white/20"
                 />
               </div>
               <div className="flex-1">
-                <div className="text-xs text-gray-400 mb-1">Total</div>
-                <div className="font-mono text-white bg-gray-800 rounded px-3 py-2 border border-gray-700 tabular-nums text-sm">
+                <div className="text-xs text-slate-300 mb-1">Total</div>
+                <div className="font-mono text-white bg-[#151c2f] rounded px-3 py-2 border border-white/[0.07] tabular-nums text-sm">
                   {formatCurrency(qty * asset.currentPrice)}
                 </div>
               </div>
@@ -416,24 +416,24 @@ export function AssetResearchView({ ticker }: Props) {
                 {tradeAction === "BUY" ? "Buy" : "Sell"}
               </button>
             </div>
-            <div className="text-xs text-gray-600">
+            <div className="text-xs text-slate-500">
               Cash available: {formatCurrency(state.portfolio.cash)}
               {holding && <> · Holding: {holding.quantity.toLocaleString()} {asset.type === "crypto" ? "coins" : "shares"}</>}
             </div>
           </div>
 
           {/* Company description */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
-            <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+          <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">
               About {asset.name}
             </h2>
-            <p className="text-sm text-gray-300 leading-relaxed">{asset.description}</p>
+            <p className="text-sm text-slate-200 leading-relaxed">{asset.description}</p>
           </div>
 
           {/* Related events */}
           {relatedEvents.length > 0 && (
-            <div className="bg-gray-900 border border-gray-800 rounded-lg p-5">
-              <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-4">
+            <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">
                 Market Events ({relatedEvents.length})
               </h2>
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
@@ -451,8 +451,8 @@ export function AssetResearchView({ ticker }: Props) {
                     >
                       <span className="text-base">{fired.event.icon}</span>
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs text-gray-300 truncate">{fired.event.headline}</div>
-                        <div className="text-xs text-gray-500">Day {fired.day}</div>
+                        <div className="text-xs text-slate-200 truncate">{fired.event.headline}</div>
+                        <div className="text-xs text-slate-400">Day {fired.day}</div>
                       </div>
                       <span
                         className={`text-xs font-mono tabular-nums whitespace-nowrap ${
@@ -474,13 +474,13 @@ export function AssetResearchView({ ticker }: Props) {
 
           {/* Your position */}
           {holding && (
-            <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-              <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+            <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
+              <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">
                 Your Position
               </h2>
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
-                  <div className="text-xs text-gray-500 mb-0.5">
+                  <div className="text-xs text-slate-400 mb-0.5">
                     {asset.type === "crypto" ? "Coins" : "Shares"}
                   </div>
                   <div className="text-base font-mono font-bold text-white tabular-nums">
@@ -488,19 +488,19 @@ export function AssetResearchView({ ticker }: Props) {
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500 mb-0.5">Avg Cost</div>
+                  <div className="text-xs text-slate-400 mb-0.5">Avg Cost</div>
                   <div className="text-base font-mono font-bold text-white tabular-nums">
                     ${formatPrice(holding.averageCostBasis)}
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500 mb-0.5">Market Value</div>
+                  <div className="text-xs text-slate-400 mb-0.5">Market Value</div>
                   <div className="text-base font-mono font-bold text-white tabular-nums">
                     {formatCurrency(getHoldingValue(holding, state.assets))}
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500 mb-0.5">P&amp;L</div>
+                  <div className="text-xs text-slate-400 mb-0.5">P&amp;L</div>
                   <div
                     className={`text-base font-mono font-bold tabular-nums ${
                       getHoldingPnL(holding, state.assets) >= 0
@@ -518,9 +518,9 @@ export function AssetResearchView({ ticker }: Props) {
           )}
 
           {/* Analyst Coverage */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+          <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xs text-gray-400 uppercase tracking-wider">
+              <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">
                 Analyst Coverage
               </h2>
               {analystAccess && (
@@ -534,11 +534,11 @@ export function AssetResearchView({ ticker }: Props) {
               <div className="space-y-3">
                 {/* Consensus summary */}
                 <div className={`${RATING_STYLES[coverage.consensusRating].bg} ${RATING_STYLES[coverage.consensusRating].border} border rounded-lg p-3 text-center`}>
-                  <div className="text-xs text-gray-400 mb-0.5">3-Firm Consensus</div>
+                  <div className="text-xs text-slate-300 mb-0.5">3-Firm Consensus</div>
                   <div className={`text-lg font-mono font-bold ${RATING_STYLES[coverage.consensusRating].text}`}>
                     {coverage.consensusRating}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-slate-400 mt-1">
                     Target: ${formatPrice(coverage.consensusTarget)}
                   </div>
                 </div>
@@ -548,25 +548,25 @@ export function AssetResearchView({ ticker }: Props) {
                   const firm = ANALYST_FIRMS[view.firmId];
                   const style = RATING_STYLES[view.rating];
                   return (
-                    <div key={view.firmId} className="border border-gray-800 rounded-lg p-3">
+                    <div key={view.firmId} className="border border-white/[0.07] rounded-lg p-3">
                       <div className="flex items-start justify-between gap-2 mb-1.5">
                         <div>
                           <div className="flex items-center gap-1.5">
                             <span className="text-sm">{firm.icon}</span>
                             <span className="text-xs font-mono font-bold text-white">{firm.shortName}</span>
                           </div>
-                          <div className="text-xs text-gray-600 mt-0.5">{firm.focus}</div>
+                          <div className="text-xs text-slate-500 mt-0.5">{firm.focus}</div>
                         </div>
                         <div className="text-right flex-shrink-0">
                           <span className={`text-xs font-mono px-1.5 py-0.5 rounded border ${style.bg} ${style.text} ${style.border}`}>
                             {view.rating}
                           </span>
-                          <div className="text-xs font-mono text-gray-500 mt-1">
+                          <div className="text-xs font-mono text-slate-400 mt-1">
                             ${formatPrice(view.priceTarget)}
                           </div>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-400 leading-relaxed">{view.rationale}</p>
+                      <p className="text-xs text-slate-300 leading-relaxed">{view.rationale}</p>
                     </div>
                   );
                 })}
@@ -576,16 +576,16 @@ export function AssetResearchView({ ticker }: Props) {
               <div>
                 <div className="text-center py-4 mb-3">
                   <div className="text-3xl mb-2">🔒</div>
-                  <div className="text-sm font-mono text-gray-300 mb-1">3 Analyst Firms Available</div>
-                  <div className="text-xs text-gray-500 mb-3">
+                  <div className="text-sm font-mono text-slate-200 mb-1">3 Analyst Firms Available</div>
+                  <div className="text-xs text-slate-400 mb-3">
                     Get independent ratings from Apex Research, Momentum Capital Analytics, and Sentinel Risk Partners — each with their own methodology and price targets.
                   </div>
-                  <div className="space-y-2 text-left text-xs text-gray-500 mb-4">
+                  <div className="space-y-2 text-left text-xs text-slate-400 mb-4">
                     {Object.values(ANALYST_FIRMS).map((f) => (
                       <div key={f.id} className="flex items-center gap-2">
                         <span>{f.icon}</span>
-                        <span className="text-gray-400 font-mono">{f.name}</span>
-                        <span className="text-gray-600">· {f.focus}</span>
+                        <span className="text-slate-300 font-mono">{f.name}</span>
+                        <span className="text-slate-500">· {f.focus}</span>
                       </div>
                     ))}
                   </div>
@@ -606,7 +606,7 @@ export function AssetResearchView({ ticker }: Props) {
                   >
                     Subscribe All — ${ANALYST_SUB_COST.toLocaleString()}/week
                   </button>
-                  <div className="text-center text-xs text-gray-600">
+                  <div className="text-center text-xs text-slate-500">
                     Subscription covers all {Object.keys(state.assets).length} assets for {ANALYST_SUB_DAYS} days
                   </div>
                 </div>
@@ -615,13 +615,13 @@ export function AssetResearchView({ ticker }: Props) {
           </div>
 
           {/* Technical Indicators */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-            <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+          <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
+            <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">
               Technical Indicators
             </h2>
 
             <div className="mb-4">
-              <div className="text-xs text-gray-500 mb-2">RSI (14)</div>
+              <div className="text-xs text-slate-400 mb-2">RSI (14)</div>
               <RSIGauge value={technicals.rsiVal} />
             </div>
 
@@ -632,7 +632,7 @@ export function AssetResearchView({ ticker }: Props) {
               sma50={technicals.sma50}
             />
 
-            <div className="divide-y divide-gray-800">
+            <div className="divide-y divide-white/[0.07]">
               <MetricRow
                 label="20-day MA"
                 value={technicals.sma20 ? `$${formatPrice(technicals.sma20)}` : "N/A"}
@@ -646,7 +646,7 @@ export function AssetResearchView({ ticker }: Props) {
                 valueClass={
                   technicals.sma20
                     ? asset.currentPrice > technicals.sma20 ? "text-emerald-400" : "text-rose-400"
-                    : "text-gray-500"
+                    : "text-slate-400"
                 }
                 explanation={`The 20-day Moving Average is the average closing price over the last 20 trading days. It smooths out short-term noise to show the recent trend.\n\nPrice above MA20 = short-term bullish momentum. Price below MA20 = short-term bearish pressure.\n\nTraders use MA20 as a dynamic support/resistance level. A stock bouncing off its MA20 in an uptrend is often a low-risk buy signal.`}
               />
@@ -663,7 +663,7 @@ export function AssetResearchView({ ticker }: Props) {
                 valueClass={
                   technicals.sma50
                     ? asset.currentPrice > technicals.sma50 ? "text-emerald-400" : "text-rose-400"
-                    : "text-gray-500"
+                    : "text-slate-400"
                 }
                 explanation={`The 50-day Moving Average represents the medium-term trend — roughly 10 weeks of trading.\n\nMany institutional investors use it as a benchmark: is the stock "healthy" (above MA50) or in a downtrend (below MA50)?\n\nWhen the 20-day MA crosses above the 50-day MA = Golden Cross (buy signal). When it crosses below = Death Cross (sell signal).`}
               />
@@ -695,8 +695,8 @@ export function AssetResearchView({ ticker }: Props) {
           </div>
 
           {/* Fundamental Metrics */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-            <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+          <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
+            <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">
               Fundamentals
             </h2>
 
@@ -708,7 +708,7 @@ export function AssetResearchView({ ticker }: Props) {
               position={hlPosition}
             />
 
-            <div className="divide-y divide-gray-800">
+            <div className="divide-y divide-white/[0.07]">
               <MetricRow
                 label="Market Cap"
                 value={`$${formatLargeNumber(marketCap)}`}
@@ -817,13 +817,13 @@ function MATrendWidget({
   return (
     <div className="mb-3">
       <div className="flex items-center gap-2 mb-1.5">
-        <span className="text-xs text-gray-500">MA Trend Signal</span>
+        <span className="text-xs text-slate-400">MA Trend Signal</span>
         <button
           onClick={() => setShowExplanation((v) => !v)}
           className={`text-xs w-4 h-4 rounded-full flex items-center justify-center transition-colors ${
             showExplanation
               ? "bg-blue-700 text-white"
-              : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+              : "bg-[#1e2a45] text-slate-300 hover:bg-[#1e2a45]/80"
           }`}
         >
           ?
@@ -835,12 +835,12 @@ function MATrendWidget({
             ? "bg-emerald-900 text-emerald-300 border-emerald-700"
             : trend === "BEARISH"
             ? "bg-rose-900 text-rose-300 border-rose-700"
-            : "bg-gray-800 text-gray-400 border-gray-700"
+            : "bg-[#151c2f] text-slate-300 border-white/[0.07]"
         }`}
       >
         {trend}
       </span>
-      <div className="text-xs text-gray-600 mt-1">
+      <div className="text-xs text-slate-500 mt-1">
         Price {currentPrice > (sma20 ?? 0) ? "above" : "below"} MA20
         {sma20 && sma50
           ? ` · MA20 ${sma20 > sma50 ? "above" : "below"} MA50`
@@ -873,7 +873,7 @@ function FiftyTwoWeekRange({
 
   return (
     <div className="mb-4">
-      <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+      <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
         <span>52-Wk Low</span>
         <div className="flex items-center gap-1">
           <span>52-Wk Range</span>
@@ -882,7 +882,7 @@ function FiftyTwoWeekRange({
             className={`text-xs w-4 h-4 rounded-full flex items-center justify-center transition-colors ${
               showExplanation
                 ? "bg-blue-700 text-white"
-                : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                : "bg-[#1e2a45] text-slate-300 hover:bg-[#1e2a45]/80"
             }`}
           >
             ?
@@ -890,20 +890,20 @@ function FiftyTwoWeekRange({
         </div>
         <span>52-Wk High</span>
       </div>
-      <div className="relative h-2 bg-gray-800 rounded-full overflow-visible">
+      <div className="relative h-2 bg-[#151c2f] rounded-full overflow-visible">
         <div
           className="absolute top-0 left-0 h-full bg-gradient-to-r from-rose-700 to-emerald-600 rounded-full"
           style={{ width: "100%" }}
           aria-hidden
         />
         <div
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white border-2 border-gray-900 shadow"
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white border-2 border-[#0a0a0f] shadow"
           style={{ left: `${position * 100}%` }}
         />
       </div>
       <div className="flex items-center justify-between text-xs font-mono tabular-nums mt-1">
         <span className="text-rose-400">${formatPrice(low)}</span>
-        <span className="text-gray-400">${formatPrice(current)} ({pctFromLow.toFixed(0)}% of range)</span>
+        <span className="text-slate-300">${formatPrice(current)} ({pctFromLow.toFixed(0)}% of range)</span>
         <span className="text-emerald-400">${formatPrice(high)}</span>
       </div>
       {showExplanation && (
@@ -929,10 +929,10 @@ function QuickStat({
   valueClass?: string;
 }) {
   return (
-    <div className="bg-gray-800 rounded-lg p-3">
-      <div className="text-xs text-gray-500 mb-0.5">{label}</div>
+    <div className="bg-[#151c2f] rounded-lg p-3">
+      <div className="text-xs text-slate-400 mb-0.5">{label}</div>
       <div className={`text-sm font-mono font-bold tabular-nums ${valueClass}`}>{value}</div>
-      {sub && <div className="text-xs text-gray-500 mt-0.5">{sub}</div>}
+      {sub && <div className="text-xs text-slate-400 mt-0.5">{sub}</div>}
     </div>
   );
 }

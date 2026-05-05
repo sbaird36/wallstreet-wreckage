@@ -26,7 +26,7 @@ export default function StockPage({ params }: Props) {
   if (!state.gameStarted) return null;
 
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col">
+    <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
       <TopNav />
       <main className="flex-1 py-4">
         <AssetResearchView ticker={ticker} />

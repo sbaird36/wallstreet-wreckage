@@ -51,7 +51,7 @@ function EarningsPanel({ alerts }: { alerts: EarningsAlert[] }) {
   if (alerts.length === 0) return null;
 
   return (
-    <div className="bg-yellow-950/40 border border-yellow-800/50 rounded-lg p-3 mb-3">
+    <div className="bg-yellow-950/40 border border-yellow-800/50 rounded-xl p-3 mb-3">
       <button
         className="w-full flex items-center justify-between"
         onClick={() => setExpanded((v) => !v)}
@@ -65,7 +65,7 @@ function EarningsPanel({ alerts }: { alerts: EarningsAlert[] }) {
             {alerts.length}
           </span>
         </div>
-        <span className="text-xs text-gray-500">{expanded ? "▲" : "▼"}</span>
+        <span className="text-xs text-slate-400">{expanded ? "▲" : "▼"}</span>
       </button>
 
       {expanded && (
@@ -78,22 +78,22 @@ function EarningsPanel({ alerts }: { alerts: EarningsAlert[] }) {
               <Link
                 key={a.ticker}
                 href={a.href}
-                className="flex items-center justify-between bg-yellow-900/30 hover:bg-yellow-900/50 border border-yellow-800/40 rounded-lg px-3 py-2 transition-colors"
+                className="flex items-center justify-between bg-yellow-900/30 hover:bg-yellow-900/50 border border-yellow-800/40 rounded-xl px-3 py-2 transition-colors"
               >
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-bold text-white text-xs">{a.ticker}</span>
-                  <span className="text-xs text-gray-400 truncate max-w-[120px]">{a.name}</span>
+                  <span className="text-xs text-slate-300 truncate max-w-[120px]">{a.name}</span>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <span
                     className={`text-xs font-mono font-bold ${
-                      a.daysAway === 1 ? "text-rose-400" : a.daysAway <= 3 ? "text-yellow-400" : "text-gray-400"
+                      a.daysAway === 1 ? "text-rose-400" : a.daysAway <= 3 ? "text-yellow-400" : "text-slate-300"
                     }`}
                   >
                     {a.daysAway === 1 ? "TOMORROW" : `Day ${a.earningsDay}`}
                   </span>
                   {a.daysAway > 1 && (
-                    <div className="text-xs text-gray-600">{a.daysAway} days away</div>
+                    <div className="text-xs text-slate-500">{a.daysAway} days away</div>
                   )}
                 </div>
               </Link>
@@ -115,7 +115,7 @@ function CompanyList({ recs }: { recs: CompanyRecommendation[] }) {
 
   return (
     <div className="mt-2">
-      <div className="text-xs text-gray-500 uppercase tracking-wider mb-1.5">
+      <div className="text-xs text-slate-400 font-medium mb-1.5">
         🔍 Companies to Watch
       </div>
       <div className="space-y-1">
@@ -137,7 +137,7 @@ function CompanyList({ recs }: { recs: CompanyRecommendation[] }) {
           </Link>
         ))}
         {recs.length > 6 && (
-          <div className="text-xs text-gray-600 text-center">
+          <div className="text-xs text-slate-500 text-center">
             +{recs.length - 6} more affected
           </div>
         )}
@@ -160,10 +160,10 @@ function EventCard({
   const [expanded, setExpanded] = useState(isToday); // auto-expand today's events
   const education = getEventEducation(fired.event);
   const recs = getCompanyRecommendations(fired.event, assets);
-  const borderColor = SENTIMENT_BORDER[fired.event.sentiment] ?? "border-l-gray-500";
+  const borderColor = SENTIMENT_BORDER[fired.event.sentiment] ?? "border-l-slate-400";
 
   return (
-    <div className={`border-l-4 ${borderColor} bg-gray-800 rounded-r mb-2 overflow-hidden`}>
+    <div className={`border-l-4 ${borderColor} bg-[#151c2f] rounded-r mb-2 overflow-hidden`}>
       {/* Header */}
       <div className="p-3">
         <div className="flex items-start justify-between gap-2 mb-1">
@@ -175,7 +175,7 @@ function EventCard({
                   TODAY
                 </span>
               )}
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-slate-400">
                 {getCategoryLabel(fired.event.category)} · Day {fired.day}
               </span>
             </div>
@@ -184,7 +184,7 @@ function EventCard({
         </div>
 
         <div className="text-sm font-bold text-white mb-1">{fired.event.headline}</div>
-        <div className="text-xs text-gray-400 mb-2 leading-relaxed">{fired.event.body}</div>
+        <div className="text-xs text-slate-300 mb-2 leading-relaxed">{fired.event.body}</div>
 
         {/* Price impact tags */}
         {fired.affectedTickers.length > 0 && (
@@ -208,7 +208,7 @@ function EventCard({
               );
             })}
             {fired.affectedTickers.length > 8 && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-slate-400">
                 +{fired.affectedTickers.length - 8} more
               </span>
             )}
@@ -226,24 +226,24 @@ function EventCard({
 
       {/* Educational expansion */}
       {expanded && (
-        <div className="border-t border-gray-700 bg-gray-900/60 p-3 space-y-3">
+        <div className="border-t border-white/[0.07] bg-[#0f1221]/60 p-3 space-y-3">
           <div>
             <div className="text-xs text-blue-400 font-bold uppercase tracking-wider mb-1">
               📊 Why Markets Move
             </div>
-            <p className="text-xs text-gray-300 leading-relaxed">{education.mechanism}</p>
+            <p className="text-xs text-slate-200 leading-relaxed">{education.mechanism}</p>
           </div>
           <div>
             <div className="text-xs text-yellow-400 font-bold uppercase tracking-wider mb-1">
               👀 What to Watch For
             </div>
-            <p className="text-xs text-gray-300 leading-relaxed">{education.watchFor}</p>
+            <p className="text-xs text-slate-200 leading-relaxed">{education.watchFor}</p>
           </div>
           <div>
             <div className="text-xs text-emerald-400 font-bold uppercase tracking-wider mb-1">
               💡 Trader Tip
             </div>
-            <p className="text-xs text-gray-300 leading-relaxed">{education.traderTip}</p>
+            <p className="text-xs text-slate-200 leading-relaxed">{education.traderTip}</p>
           </div>
 
           {/* Company recommendations */}
@@ -271,14 +271,14 @@ export function DailyDigest() {
     .sort((a, b) => b.day - a.day);
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 flex flex-col">
-      <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+    <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4 flex flex-col">
+      <h2 className="text-sm font-semibold text-slate-300 mb-3">
         Market News &amp; Education
       </h2>
 
       {/* Tip of the Day */}
       {!tipDismissed && (
-        <div className="bg-blue-950/60 border border-blue-800/60 rounded-lg p-3 mb-3">
+        <div className="bg-blue-950/60 border border-blue-800/60 rounded-xl p-3 mb-3">
           <div className="flex items-start justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="text-base">{CATEGORY_ICONS[tip.category] ?? "💡"}</span>
@@ -291,12 +291,12 @@ export function DailyDigest() {
             </div>
             <button
               onClick={() => setTipDismissed(true)}
-              className="text-gray-600 hover:text-gray-400 text-xs ml-2 flex-shrink-0"
+              className="text-slate-500 hover:text-slate-300 text-xs ml-2 flex-shrink-0"
             >
               ✕
             </button>
           </div>
-          <p className="text-xs text-gray-300 leading-relaxed mb-2">{tip.body}</p>
+          <p className="text-xs text-slate-200 leading-relaxed mb-2">{tip.body}</p>
           <div className="bg-blue-900/40 border border-blue-800/40 rounded px-2.5 py-1.5">
             <span className="text-xs text-blue-300 font-bold">Key takeaway: </span>
             <span className="text-xs text-blue-200">{tip.takeaway}</span>
@@ -310,7 +310,7 @@ export function DailyDigest() {
       {/* Today's events */}
       {activeEvents.length > 0 ? (
         <div className="mb-2">
-          <div className="text-xs text-gray-600 uppercase tracking-wider mb-2">
+          <div className="text-xs text-slate-500 font-medium mb-2">
             Today&apos;s Events
           </div>
           {activeEvents.map((fired) => (
@@ -323,7 +323,7 @@ export function DailyDigest() {
           ))}
         </div>
       ) : (
-        <div className="text-center text-gray-600 py-4 text-xs mb-2">
+        <div className="text-center text-slate-500 py-4 text-xs mb-2">
           {currentDay === 1
             ? "Advance a day to see market events."
             : "No events today. Markets were quiet — a good day to research companies."}
@@ -335,7 +335,7 @@ export function DailyDigest() {
         <div>
           <button
             onClick={() => setShowHistory((v) => !v)}
-            className="text-xs text-gray-500 hover:text-gray-300 transition-colors w-full text-left mb-2 flex items-center gap-1"
+            className="text-xs text-slate-400 hover:text-slate-200 transition-colors w-full text-left mb-2 flex items-center gap-1"
           >
             <span>{showHistory ? "▲" : "▼"}</span>
             {showHistory ? "Hide" : "Show"} past events ({historyEvents.length})

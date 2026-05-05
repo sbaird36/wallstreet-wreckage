@@ -8,7 +8,7 @@ import type { MarketIndex } from "@/types";
 
 function IndexSparkline({ history }: { history: MarketIndex["history"] }) {
   if (history.length < 2) {
-    return <div className="w-20 h-8 flex items-center justify-center text-gray-600 text-xs">—</div>;
+    return <div className="w-20 h-8 flex items-center justify-center text-slate-500 text-xs">—</div>;
   }
 
   const values = history.map((h) => h.value);
@@ -79,13 +79,13 @@ function IndexDetailModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-xl shadow-2xl">
+      <div className="relative bg-[#0f1221] border border-white/[0.07] rounded-xl p-6 w-full max-w-xl shadow-2xl">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h2 className="text-xl font-mono font-bold text-white">{index.ticker}</h2>
-            <div className="text-sm text-gray-400">{index.name}</div>
+            <div className="text-sm text-slate-300">{index.name}</div>
           </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-white text-xl">✕</button>
+          <button onClick={onClose} className="text-slate-400 hover:text-white text-xl">✕</button>
         </div>
 
         <div className="flex items-end gap-4 mb-5">
@@ -95,7 +95,7 @@ function IndexDetailModal({
           <div className="pb-1">
             <ChangeIndicator value={changePct} size="lg" />
           </div>
-          <div className="pb-1 text-xs text-gray-500">
+          <div className="pb-1 text-xs text-slate-400">
             All-time: <span className={totalChangePct >= 0 ? "text-emerald-400" : "text-rose-400"}>
               {totalChangePct >= 0 ? "+" : ""}{(totalChangePct * 100).toFixed(2)}%
             </span>
@@ -121,15 +121,15 @@ function IndexDetailModal({
           </svg>
         </div>
 
-        <p className="text-xs text-gray-400 leading-relaxed mb-4">{index.description}</p>
+        <p className="text-xs text-slate-300 leading-relaxed mb-4">{index.description}</p>
 
         <div>
-          <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">
+          <div className="text-xs text-slate-400 font-medium mb-2">
             Constituents ({index.constituents.length})
           </div>
           <div className="flex flex-wrap gap-1">
             {index.constituents.map((t) => (
-              <span key={t} className="text-xs font-mono bg-gray-800 border border-gray-700 px-2 py-0.5 rounded text-gray-300">
+              <span key={t} className="text-xs font-mono bg-[#151c2f] border border-white/[0.07] px-2 py-0.5 rounded text-slate-200">
                 {t}
               </span>
             ))}
@@ -149,8 +149,8 @@ export function IndexWidget() {
 
   return (
     <>
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-        <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+      <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
+        <h2 className="text-sm font-semibold text-slate-300 mb-3">
           Market Indexes
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -169,14 +169,14 @@ export function IndexWidget() {
               <button
                 key={index.id}
                 onClick={() => setSelectedIndex(index)}
-                className="bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 rounded-lg p-3 text-left transition-colors group"
+                className="bg-[#151c2f] hover:bg-[#1e2a45] border border-white/[0.07] rounded-xl p-3 text-left transition-colors group"
               >
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <div className="text-xs font-mono font-bold text-white group-hover:text-blue-400 transition-colors">
                       {index.ticker}
                     </div>
-                    <div className="text-xs text-gray-500 truncate">{index.name}</div>
+                    <div className="text-xs text-slate-400 truncate">{index.name}</div>
                   </div>
                   <IndexSparkline history={index.history} />
                 </div>
@@ -185,7 +185,7 @@ export function IndexWidget() {
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   <ChangeIndicator value={changePct} size="sm" />
-                  <span className="text-xs text-gray-600">today</span>
+                  <span className="text-xs text-slate-500">today</span>
                   <span className={`text-xs font-mono tabular-nums ${isUp ? "text-emerald-500" : "text-rose-500"}`}>
                     {totalChangePct >= 0 ? "+" : ""}{(totalChangePct * 100).toFixed(1)}% all-time
                   </span>

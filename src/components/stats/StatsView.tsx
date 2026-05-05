@@ -5,6 +5,10 @@ import { useGame } from "@/context/GameContext";
 import { getNetWorth } from "@/utils/calculations";
 import { formatCurrency, formatPercent } from "@/utils/formatting";
 import { ANALYST_SUB_DAYS } from "@/utils/analystEngine";
+import { AchievementsPanel } from "@/components/stats/AchievementsPanel";
+import { RivalsLeaderboard } from "@/components/stats/RivalsLeaderboard";
+import { WeeklyJournal } from "@/components/stats/WeeklyJournal";
+import { TraderRankBadge } from "@/components/ui/TraderRank";
 
 const STARTING_CAPITAL = 10_000;
 
@@ -22,11 +26,11 @@ function StatRow({
   sub?: string;
 }) {
   return (
-    <div className="flex items-center justify-between py-2 border-b border-gray-800 last:border-0">
-      <span className="text-xs text-gray-500 font-mono">{label}</span>
+    <div className="flex items-center justify-between py-2 border-b border-white/[0.07] last:border-0">
+      <span className="text-xs text-slate-400 font-mono">{label}</span>
       <div className="text-right">
         <span className={`text-xs font-mono font-bold ${valueClass}`}>{value}</span>
-        {sub && <div className="text-xs text-gray-600 font-mono">{sub}</div>}
+        {sub && <div className="text-xs text-slate-500 font-mono">{sub}</div>}
       </div>
     </div>
   );
@@ -42,10 +46,10 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-800">
+    <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
+      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/[0.07]">
         <span className="text-base">{icon}</span>
-        <h2 className="text-xs font-mono font-bold text-gray-300 uppercase tracking-wider">{title}</h2>
+        <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">{title}</h2>
       </div>
       {children}
     </div>
@@ -100,7 +104,7 @@ function TradingStats() {
 
       {holdingPnl.length > 0 && (
         <>
-          <div className="mt-4 mb-2 text-xs text-gray-600 font-mono uppercase tracking-wider">Open Positions</div>
+          <div className="mt-4 mb-2 text-xs text-slate-400 font-medium uppercase tracking-wider">Open Positions</div>
           <div className="space-y-0">
             <StatRow
               label="Positions in profit"
@@ -110,7 +114,7 @@ function TradingStats() {
             <StatRow
               label="Positions at a loss"
               value={`${losers} / ${holdingPnl.length}`}
-              valueClass={losers > 0 ? "text-red-400" : "text-gray-500"}
+              valueClass={losers > 0 ? "text-red-400" : "text-slate-400"}
             />
             <StatRow
               label="Total unrealised P&L"
@@ -164,7 +168,7 @@ function OpenPositions() {
       <div className="overflow-x-auto -mx-1">
         <table className="w-full text-xs font-mono">
           <thead>
-            <tr className="text-gray-600 uppercase tracking-wider">
+            <tr className="text-slate-500 uppercase tracking-wider">
               <th className="text-left pb-2 pr-3">Ticker</th>
               <th className="text-right pb-2 pr-3">Qty</th>
               <th className="text-right pb-2 pr-3">Avg Cost</th>
@@ -173,17 +177,17 @@ function OpenPositions() {
               <th className="text-right pb-2">P&L</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-800">
+          <tbody className="divide-y divide-white/[0.07]">
             {rows.map((r) => (
               <tr key={r.ticker}>
                 <td className="py-2 pr-3">
                   <div className="text-white font-bold">{r.ticker}</div>
-                  <div className="text-gray-600 truncate max-w-[100px]">{r.name}</div>
+                  <div className="text-slate-500 truncate max-w-[100px]">{r.name}</div>
                 </td>
-                <td className="py-2 pr-3 text-right text-gray-300">{r.qty.toLocaleString()}</td>
-                <td className="py-2 pr-3 text-right text-gray-400">${r.avgCost.toFixed(2)}</td>
-                <td className="py-2 pr-3 text-right text-gray-300">${r.currentPrice.toFixed(2)}</td>
-                <td className="py-2 pr-3 text-right text-gray-300">{formatCurrency(r.currentValue)}</td>
+                <td className="py-2 pr-3 text-right text-slate-200">{r.qty.toLocaleString()}</td>
+                <td className="py-2 pr-3 text-right text-slate-300">${r.avgCost.toFixed(2)}</td>
+                <td className="py-2 pr-3 text-right text-slate-200">${r.currentPrice.toFixed(2)}</td>
+                <td className="py-2 pr-3 text-right text-slate-200">{formatCurrency(r.currentValue)}</td>
                 <td className="py-2 text-right">
                   <div className={r.pnl >= 0 ? "text-emerald-400" : "text-red-400"}>
                     {r.pnl >= 0 ? "+" : ""}{formatCurrency(r.pnl)}
@@ -225,13 +229,13 @@ function BlogStats() {
         <StatRow
           label="Wrong calls ✗"
           value={`${wrong}`}
-          valueClass={wrong > 0 ? "text-red-400" : "text-gray-500"}
+          valueClass={wrong > 0 ? "text-red-400" : "text-slate-400"}
           sub={total > 0 ? `${((wrong / Math.max(total, 1)) * 100).toFixed(0)}% of posts` : undefined}
         />
         <StatRow
           label="Pending / untickered"
           value={`${unresolved}`}
-          valueClass="text-gray-500"
+          valueClass="text-slate-400"
         />
         {accuracy !== null && (
           <StatRow
@@ -255,17 +259,17 @@ function BlogStats() {
               style={{ width: `${(wrong / (verified + wrong)) * 100}%` }}
             />
           </div>
-          <div className="flex justify-between text-xs text-gray-600 font-mono mt-1">
+          <div className="flex justify-between text-xs text-slate-500 font-mono mt-1">
             <span>✓ {verified} correct</span>
             <span>{wrong} wrong ✗</span>
           </div>
         </div>
       )}
 
-      <div className="mt-4 pt-3 border-t border-gray-800">
+      <div className="mt-4 pt-3 border-t border-white/[0.07]">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-gray-500 font-mono">Followers</span>
-          <span className={`text-sm font-mono font-bold ${followers >= 50 ? "text-blue-400" : "text-gray-400"}`}>
+          <span className="text-xs text-slate-400 font-mono">Followers</span>
+          <span className={`text-sm font-mono font-bold ${followers >= 50 ? "text-blue-400" : "text-slate-300"}`}>
             {followers.toLocaleString()}
           </span>
         </div>
@@ -275,12 +279,12 @@ function BlogStats() {
           </div>
         )}
         {followers > 0 && followers < 50 && (
-          <div className="text-xs text-gray-600 font-mono mt-1 text-right">
+          <div className="text-xs text-slate-500 font-mono mt-1 text-right">
             {50 - followers} more until posts move prices
           </div>
         )}
         {followers === 0 && (
-          <div className="text-xs text-gray-700 font-mono mt-1 text-right">
+          <div className="text-xs text-slate-500 font-medium mt-1 text-right">
             Followers unlock after sustained alpha vs SNP499
           </div>
         )}
@@ -317,7 +321,7 @@ function AnalystStats() {
   return (
     <SectionCard title="Analyst Reports" icon="🔬">
       {!hasAny && (
-        <div className="text-xs text-gray-600 font-mono text-center py-4">
+        <div className="text-xs text-slate-500 font-mono text-center py-4">
           No analyst reports purchased yet.<br />
           Individual unlocks cost $100 · Weekly all-access $10,000.
         </div>
@@ -328,7 +332,7 @@ function AnalystStats() {
         <div className={`flex items-center justify-between rounded px-3 py-2 mb-3 border text-xs font-mono ${
           subActive
             ? "bg-emerald-900/30 border-emerald-800 text-emerald-400"
-            : "bg-gray-800 border-gray-700 text-gray-500"
+            : "bg-[#151c2f] border-white/[0.07] text-slate-400"
         }`}>
           <span>All-Access Subscription</span>
           <span>{subActive ? `${subDaysLeft}d remaining` : "Expired"}</span>
@@ -338,18 +342,18 @@ function AnalystStats() {
       {/* Individual unlocks */}
       {unlockedRows.length > 0 && (
         <>
-          <div className="text-xs text-gray-600 font-mono uppercase tracking-wider mb-2">
+          <div className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-2">
             Individual Unlocks ({unlockedRows.length})
           </div>
           <div className="space-y-1">
             {unlockedRows.map((r) => (
-              <div key={r.ticker} className="flex items-center justify-between py-1.5 border-b border-gray-800 last:border-0">
+              <div key={r.ticker} className="flex items-center justify-between py-1.5 border-b border-white/[0.07] last:border-0">
                 <div>
                   <span className="text-xs font-mono font-bold text-white">{r.ticker}</span>
-                  <span className="text-xs text-gray-600 font-mono ml-2 truncate">{r.name}</span>
+                  <span className="text-xs text-slate-500 font-mono ml-2 truncate">{r.name}</span>
                 </div>
                 <div className="text-right flex-shrink-0 ml-2">
-                  <div className="text-xs font-mono text-gray-300">${r.currentPrice.toFixed(2)}</div>
+                  <div className="text-xs font-mono text-slate-200">${r.currentPrice.toFixed(2)}</div>
                   <div className={`text-xs font-mono ${r.pct >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                     {r.pct >= 0 ? "▲" : "▼"} {Math.abs(r.pct * 100).toFixed(1)}% since start
                   </div>
@@ -385,7 +389,7 @@ function NetWorthSummary() {
       <StatRow
         label="Starting Capital"
         value={formatCurrency(STARTING_CAPITAL)}
-        valueClass="text-gray-400"
+        valueClass="text-slate-300"
       />
       <StatRow
         label="Total Return"
@@ -397,7 +401,7 @@ function NetWorthSummary() {
         <StatRow
           label="SNP499 Return"
           value={`${marketReturn >= 0 ? "+" : ""}${(marketReturn * 100).toFixed(2)}%`}
-          valueClass="text-gray-400"
+          valueClass="text-slate-300"
         />
       )}
       {alpha !== null && (
@@ -408,7 +412,7 @@ function NetWorthSummary() {
           sub={alpha > 0 ? "Outperforming" : "Underperforming"}
         />
       )}
-      <StatRow label="Days Played" value={`${state.currentDay}`} valueClass="text-gray-400" />
+      <StatRow label="Days Played" value={`${state.currentDay}`} valueClass="text-slate-300" />
       <StatRow label="Cash on Hand" value={formatCurrency(state.portfolio.cash)} valueClass="text-emerald-400" />
     </SectionCard>
   );
@@ -417,9 +421,31 @@ function NetWorthSummary() {
 // ── Main export ───────────────────────────────────────────────────────────────
 
 export function StatsView() {
+  const { state } = useGame();
+
   return (
     <div className="max-w-4xl mx-auto space-y-4">
-      <div className="text-xs font-mono text-gray-600 uppercase tracking-widest mb-2">Player Statistics</div>
+      <div className="text-sm font-semibold text-slate-300 uppercase tracking-widest mb-2">Player Statistics</div>
+
+      {/* Trader rank hero */}
+      <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4 flex flex-wrap items-center gap-4">
+        <div>
+          <div className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Trader Rank</div>
+          <TraderRankBadge xp={state.xp ?? 0} size="md" />
+        </div>
+        <div className="border-l border-white/[0.07] pl-4">
+          <div className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Total XP</div>
+          <div className="text-xl font-mono font-bold text-amber-400">{(state.xp ?? 0).toLocaleString()}</div>
+        </div>
+        <div className="border-l border-white/[0.07] pl-4">
+          <div className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Best Streak</div>
+          <div className="text-xl font-mono font-bold text-orange-400">🔥 {state.bestTradeStreak ?? 0}</div>
+        </div>
+        <div className="border-l border-white/[0.07] pl-4">
+          <div className="text-xs text-slate-400 font-medium uppercase tracking-wider mb-1">Achievements</div>
+          <div className="text-xl font-mono font-bold text-emerald-400">{(state.achievements ?? []).length}</div>
+        </div>
+      </div>
 
       {/* Top row: performance + trading */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -435,6 +461,10 @@ export function StatsView() {
         <BlogStats />
         <AnalystStats />
       </div>
+
+      <RivalsLeaderboard />
+      <AchievementsPanel />
+      <WeeklyJournal />
     </div>
   );
 }

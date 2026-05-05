@@ -39,7 +39,7 @@ function WeightSelector({
               ? "bg-blue-700 border-blue-500 text-white"
               : value > 0 && n <= value
               ? "bg-blue-900/60 border-blue-700 text-blue-300"
-              : "bg-gray-800 border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300"
+              : "bg-[#151c2f] border-white/[0.07] text-slate-400 hover:border-white/[0.07] hover:text-slate-200"
           }`}
         >
           {n}
@@ -153,14 +153,14 @@ function FactorBar({
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-gray-500 w-28 shrink-0 truncate">{label}</span>
-      <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+      <span className="text-xs text-slate-400 w-28 shrink-0 truncate">{label}</span>
+      <div className="flex-1 h-1.5 bg-[#151c2f] rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-500 ${color}`}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="text-xs font-mono text-gray-400 w-7 text-right tabular-nums">{pct}</span>
+      <span className="text-xs font-mono text-slate-300 w-7 text-right tabular-nums">{pct}</span>
     </div>
   );
 }
@@ -198,12 +198,12 @@ function ResultCard({
   }
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-3 hover:border-gray-700 transition-colors">
+    <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-3 hover:border-white/[0.07] transition-colors">
       {/* Top row */}
       <div className="flex items-start gap-3">
         {/* Rank + score ring */}
         <div className="flex flex-col items-center gap-1 flex-shrink-0">
-          <span className="text-xs font-mono text-gray-600">#{rank}</span>
+          <span className="text-xs font-mono text-slate-500">#{rank}</span>
           <ScoreRing score={result.totalScore} />
         </div>
 
@@ -218,7 +218,7 @@ function ResultCard({
                 <TypeBadge type={asset.type} />
                 {asset.type === "stock" && <SectorBadge sector={asset.sector} />}
               </Link>
-              <div className="text-xs text-gray-500 truncate mt-0.5">{asset.name}</div>
+              <div className="text-xs text-slate-400 truncate mt-0.5">{asset.name}</div>
             </div>
 
             <div className="flex items-center gap-2 flex-shrink-0">
@@ -249,7 +249,7 @@ function ResultCard({
       </div>
 
       {/* Factor bars */}
-      <div className="mt-2.5 pt-2.5 border-t border-gray-800 space-y-1.5">
+      <div className="mt-2.5 pt-2.5 border-t border-white/[0.07] space-y-1.5">
         {FACTOR_META.map((f) => (
           <FactorBar
             key={f.key}
@@ -335,20 +335,20 @@ export function AlgorithmBuilder() {
   return (
     <div className="max-w-6xl mx-auto space-y-4">
       {/* Header */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+      <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <h1 className="font-mono font-bold text-white text-lg flex items-center gap-2">
               <span>🤖</span> My Algorithm
             </h1>
-            <p className="text-xs text-gray-500 mt-1 max-w-xl">
+            <p className="text-xs text-slate-400 mt-1 max-w-xl">
               Configure which signals your algorithm weighs, then watch the rankings update in real-time.
               Set any factor to <span className="text-white font-mono">0</span> to exclude it entirely.
               Adjust your risk profile to control how speculative plays are treated.
             </p>
           </div>
-          <div className="text-right text-xs text-gray-600 font-mono">
-            <div className="text-gray-400">{Object.values(state.assets).length} assets</div>
+          <div className="text-right text-xs text-slate-500 font-mono">
+            <div className="text-slate-300">{Object.values(state.assets).length} assets</div>
             <div>Day {state.currentDay}</div>
           </div>
         </div>
@@ -359,8 +359,8 @@ export function AlgorithmBuilder() {
         <div className="lg:col-span-2 space-y-4">
 
           {/* Factor weights */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-            <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-4">
+          <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
+            <h2 className="text-sm font-semibold text-slate-300 mb-4">
               Signal Weights
             </h2>
             <div className="space-y-4">
@@ -371,15 +371,15 @@ export function AlgorithmBuilder() {
                       <span className="text-sm">{f.icon}</span>
                       <span className="text-sm text-white font-mono">{f.label}</span>
                     </div>
-                    <span className="text-xs font-mono text-gray-500">
+                    <span className="text-xs font-mono text-slate-400">
                       {config.weights[f.key] === 0 ? (
-                        <span className="text-gray-600">off</span>
+                        <span className="text-slate-500">off</span>
                       ) : (
                         <span className="text-blue-400">{config.weights[f.key]}/5</span>
                       )}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-600 mb-2 leading-relaxed">{f.description}</p>
+                  <p className="text-xs text-slate-500 mb-2 leading-relaxed">{f.description}</p>
                   <WeightSelector
                     value={config.weights[f.key]}
                     onChange={(v) => setWeight(f.key, v)}
@@ -390,8 +390,8 @@ export function AlgorithmBuilder() {
           </div>
 
           {/* Risk profile */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-            <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+          <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
+            <h2 className="text-sm font-semibold text-slate-300 mb-3">
               Risk Profile
             </h2>
             <div className="space-y-2">
@@ -399,10 +399,10 @@ export function AlgorithmBuilder() {
                 <button
                   key={rp.value}
                   onClick={() => setRisk(rp.value)}
-                  className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                  className={`w-full text-left p-3 rounded-xl border transition-colors ${
                     config.riskProfile === rp.value
                       ? rp.color
-                      : "bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600"
+                      : "bg-[#151c2f] border-white/[0.07] text-slate-300 hover:border-white/[0.07]"
                   }`}
                 >
                   <div className="text-sm font-mono font-bold mb-0.5">{rp.label}</div>
@@ -413,8 +413,8 @@ export function AlgorithmBuilder() {
           </div>
 
           {/* Asset types */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-            <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+          <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
+            <h2 className="text-sm font-semibold text-slate-300 mb-3">
               Asset Types
             </h2>
             <div className="flex gap-2">
@@ -422,8 +422,8 @@ export function AlgorithmBuilder() {
                 onClick={() => setConfig((c) => ({ ...c, includeStocks: !c.includeStocks }))}
                 className={`flex-1 py-2 text-sm font-mono font-bold rounded border transition-colors ${
                   config.includeStocks
-                    ? "bg-gray-700 border-gray-500 text-white"
-                    : "bg-gray-800 border-gray-700 text-gray-500"
+                    ? "bg-[#1e2a45] border-white/[0.07] text-white"
+                    : "bg-[#151c2f] border-white/[0.07] text-slate-400"
                 }`}
               >
                 Stocks
@@ -433,7 +433,7 @@ export function AlgorithmBuilder() {
                 className={`flex-1 py-2 text-sm font-mono font-bold rounded border transition-colors ${
                   config.includeCrypto
                     ? "bg-amber-900 border-amber-700 text-amber-300"
-                    : "bg-gray-800 border-gray-700 text-gray-500"
+                    : "bg-[#151c2f] border-white/[0.07] text-slate-400"
                 }`}
               >
                 Crypto
@@ -442,8 +442,8 @@ export function AlgorithmBuilder() {
           </div>
 
           {/* Result count */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-            <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+          <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
+            <h2 className="text-sm font-semibold text-slate-300 mb-3">
               Top N Results
             </h2>
             <div className="flex gap-2 flex-wrap">
@@ -453,8 +453,8 @@ export function AlgorithmBuilder() {
                   onClick={() => setConfig((c) => ({ ...c, topN: n }))}
                   className={`px-4 py-2 text-sm font-mono rounded border transition-colors ${
                     config.topN === n
-                      ? "bg-gray-700 border-gray-500 text-white"
-                      : "bg-gray-800 border-gray-700 text-gray-500 hover:border-gray-600"
+                      ? "bg-[#1e2a45] border-white/[0.07] text-white"
+                      : "bg-[#151c2f] border-white/[0.07] text-slate-400 hover:border-white/[0.07]"
                   }`}
                 >
                   {n}
@@ -469,7 +469,7 @@ export function AlgorithmBuilder() {
 
           {/* Analyst access notice */}
           {config.weights.analyst > 0 && (
-            <div className={`rounded-lg border px-3 py-2 text-xs flex items-start gap-2 ${
+            <div className={`rounded-xl border px-3 py-2 text-xs flex items-start gap-2 ${
               analystCoverageCount > 0
                 ? "bg-blue-900/20 border-blue-800/50 text-blue-300"
                 : "bg-amber-900/20 border-amber-800/50 text-amber-400"
@@ -485,11 +485,11 @@ export function AlgorithmBuilder() {
           )}
 
           {/* Results header */}
-          <div className="bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 flex items-center justify-between gap-4 flex-wrap">
+          <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl px-4 py-3 flex items-center justify-between gap-4 flex-wrap">
             <div>
-              <div className="text-xs text-gray-400 uppercase tracking-wider">Algorithm Output</div>
+              <div className="text-sm font-semibold text-slate-300">Algorithm Output</div>
               {results.length > 0 && (
-                <div className="text-xs text-gray-500 mt-0.5">
+                <div className="text-xs text-slate-400 mt-0.5">
                   Top {results.length} picks · total signal weight{" "}
                   <span className="text-blue-400 font-mono">{totalWeight}</span>
                   {" "}· {config.riskProfile} risk
@@ -512,30 +512,30 @@ export function AlgorithmBuilder() {
 
           {/* Edge cases */}
           {totalWeight === 0 && (
-            <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
+            <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-8 text-center">
               <div className="text-3xl mb-3">🎚️</div>
-              <div className="text-gray-400 text-sm">All signal weights are set to 0.</div>
-              <div className="text-gray-600 text-xs mt-1">
+              <div className="text-slate-300 text-sm">All signal weights are set to 0.</div>
+              <div className="text-slate-500 text-xs mt-1">
                 Increase at least one signal weight to generate picks.
               </div>
             </div>
           )}
 
           {totalWeight > 0 && !hasAnyAssetType && (
-            <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
+            <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-8 text-center">
               <div className="text-3xl mb-3">📭</div>
-              <div className="text-gray-400 text-sm">No asset types selected.</div>
-              <div className="text-gray-600 text-xs mt-1">
+              <div className="text-slate-300 text-sm">No asset types selected.</div>
+              <div className="text-slate-500 text-xs mt-1">
                 Enable Stocks and/or Crypto above.
               </div>
             </div>
           )}
 
           {totalWeight > 0 && hasAnyAssetType && results.length === 0 && (
-            <div className="bg-gray-900 border border-gray-800 rounded-lg p-8 text-center">
+            <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-8 text-center">
               <div className="text-3xl mb-3">📊</div>
-              <div className="text-gray-400 text-sm">No data yet.</div>
-              <div className="text-gray-600 text-xs mt-1">
+              <div className="text-slate-300 text-sm">No data yet.</div>
+              <div className="text-slate-500 text-xs mt-1">
                 Advance a few days for the algorithm to have data to work with.
               </div>
             </div>
@@ -552,7 +552,7 @@ export function AlgorithmBuilder() {
           ))}
 
           {results.length > 0 && (
-            <div className="text-center text-xs text-gray-700 font-mono py-2">
+            <div className="text-center text-xs text-slate-600 font-mono py-2">
               — end of results —
             </div>
           )}

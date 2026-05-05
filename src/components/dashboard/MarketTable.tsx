@@ -96,7 +96,7 @@ export function MarketTable() {
 
   const SortHeader = ({ label, keyName }: { label: string; keyName: SortKey }) => (
     <th
-      className="text-right pb-2 cursor-pointer hover:text-gray-200 transition-colors select-none"
+      className="text-right pb-2 cursor-pointer hover:text-slate-200 transition-colors select-none"
       onClick={() => handleSort(keyName)}
     >
       {label}
@@ -108,17 +108,17 @@ export function MarketTable() {
   const endRow = Math.min(safePage * PAGE_SIZE, sorted.length);
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+    <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4 shadow-lg shadow-black/30">
       {/* Header row */}
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-xs text-gray-400 uppercase tracking-wider">Market</h2>
+        <h2 className="text-sm font-semibold text-slate-300">Market</h2>
         <div className="flex gap-1">
           <button
             onClick={() => handleTabChange("stocks")}
             className={`text-xs px-3 py-1 rounded border transition-colors ${
               tab === "stocks"
-                ? "bg-gray-700 border-gray-500 text-white"
-                : "border-gray-700 text-gray-400 hover:border-gray-500"
+                ? "bg-[#151c2f] border-white/20 text-white"
+                : "border-white/[0.07] text-slate-400 hover:border-white/20"
             }`}
           >
             Stocks
@@ -128,7 +128,7 @@ export function MarketTable() {
             className={`text-xs px-3 py-1 rounded border transition-colors ${
               tab === "crypto"
                 ? "bg-amber-900 border-amber-700 text-amber-300"
-                : "border-gray-700 text-gray-400 hover:border-gray-500"
+                : "border-white/[0.07] text-slate-400 hover:border-white/20"
             }`}
           >
             Crypto
@@ -143,7 +143,7 @@ export function MarketTable() {
           placeholder="Search ticker or name…"
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-gray-500 font-mono"
+          className="w-full bg-[#151c2f] border border-white/[0.07] rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-white/20 font-mono"
         />
       </div>
 
@@ -154,8 +154,8 @@ export function MarketTable() {
             onClick={() => handleSectorChange(null)}
             className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
               sectorFilter === null
-                ? "bg-gray-600 border-gray-500 text-white"
-                : "border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300"
+                ? "bg-[#151c2f] border-white/20 text-white"
+                : "border-white/[0.07] text-slate-500 hover:border-white/20 hover:text-slate-300"
             }`}
           >
             All
@@ -166,8 +166,8 @@ export function MarketTable() {
               onClick={() => handleSectorChange(sectorFilter === sector ? null : sector)}
               className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
                 sectorFilter === sector
-                  ? "bg-gray-600 border-gray-500 text-white"
-                  : "border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300"
+                  ? "bg-[#151c2f] border-white/20 text-white"
+                  : "border-white/[0.07] text-slate-500 hover:border-white/20 hover:text-slate-300"
               }`}
             >
               {sector}
@@ -179,7 +179,7 @@ export function MarketTable() {
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr className="text-gray-500 border-b border-gray-800">
+            <tr className="text-slate-400 border-b border-white/[0.07]">
               <th
                 className="text-left pb-2 cursor-pointer hover:text-gray-200 transition-colors select-none"
                 onClick={() => handleSort("name")}
@@ -192,7 +192,7 @@ export function MarketTable() {
               <th className="text-right pb-2">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-800">
+          <tbody className="divide-y divide-white/[0.04]">
             {pageSlice.map((asset) => {
               const changePct = getPriceChangePercent(asset);
               const href =
@@ -203,14 +203,14 @@ export function MarketTable() {
               return (
                 <tr
                   key={asset.ticker}
-                  className="hover:bg-gray-800/40 transition-colors"
+                  className="hover:bg-[#151c2f]/50 transition-colors"
                 >
-                  <td className="py-2">
+                  <td className="py-3">
                     <Link href={href} className="group">
-                      <div className="font-mono font-bold text-white group-hover:text-blue-400 transition-colors">
+                      <div className="font-mono font-bold text-white text-sm group-hover:text-blue-400 transition-colors">
                         {asset.ticker}
                       </div>
-                      <div className="text-gray-500 text-xs truncate max-w-[120px]">
+                      <div className="text-slate-400 text-xs truncate max-w-[120px]">
                         {asset.name}
                       </div>
                     </Link>
@@ -223,13 +223,13 @@ export function MarketTable() {
                       <TypeBadge type="crypto" />
                     )}
                   </td>
-                  <td className="text-right py-2 font-mono text-white tabular-nums">
+                  <td className="text-right py-3 font-mono text-sm text-white tabular-nums">
                     ${formatPrice(asset.currentPrice)}
                   </td>
-                  <td className="text-right py-2">
+                  <td className="text-right py-3">
                     <ChangeIndicator value={changePct} size="sm" />
                   </td>
-                  <td className="text-right py-2">
+                  <td className="text-right py-3">
                     <button
                       onClick={() => handleQuickBuy(asset)}
                       className="text-xs px-2 py-1 bg-emerald-900 hover:bg-emerald-800 text-emerald-300 rounded border border-emerald-700 transition-colors"
@@ -245,8 +245,8 @@ export function MarketTable() {
       </div>
 
       {/* Pagination footer */}
-      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-800">
-        <span className="text-xs text-gray-600 font-mono">
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/[0.07]">
+        <span className="text-xs text-slate-500 font-mono">
           {sorted.length === 0 ? "0 results" : `${startRow}–${endRow} of ${sorted.length}`}
         </span>
 
@@ -254,14 +254,14 @@ export function MarketTable() {
           <button
             onClick={() => setPage(1)}
             disabled={safePage === 1}
-            className="text-xs px-2 py-1 rounded border border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-mono"
+            className="text-xs px-2 py-1 rounded border border-white/[0.07] text-slate-500 hover:text-slate-300 hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-mono"
           >
             «
           </button>
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={safePage === 1}
-            className="text-xs px-2 py-1 rounded border border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-mono"
+            className="text-xs px-2 py-1 rounded border border-white/[0.07] text-slate-500 hover:text-slate-300 hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-mono"
           >
             ‹
           </button>
@@ -276,15 +276,15 @@ export function MarketTable() {
             }, [])
             .map((p, i) =>
               p === "…" ? (
-                <span key={`ellipsis-${i}`} className="text-xs text-gray-600 px-1">…</span>
+                <span key={`ellipsis-${i}`} className="text-xs text-slate-500 px-1">…</span>
               ) : (
                 <button
                   key={p}
                   onClick={() => setPage(p as number)}
                   className={`text-xs w-7 h-6 rounded border transition-colors font-mono ${
                     safePage === p
-                      ? "bg-gray-700 border-gray-500 text-white"
-                      : "border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600"
+                      ? "bg-[#151c2f] border-white/20 text-white"
+                      : "border-white/[0.07] text-slate-500 hover:text-slate-300 hover:border-white/20"
                   }`}
                 >
                   {p}
@@ -295,14 +295,14 @@ export function MarketTable() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={safePage === totalPages}
-            className="text-xs px-2 py-1 rounded border border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-mono"
+            className="text-xs px-2 py-1 rounded border border-white/[0.07] text-slate-500 hover:text-slate-300 hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-mono"
           >
             ›
           </button>
           <button
             onClick={() => setPage(totalPages)}
             disabled={safePage === totalPages}
-            className="text-xs px-2 py-1 rounded border border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-mono"
+            className="text-xs px-2 py-1 rounded border border-white/[0.07] text-slate-500 hover:text-slate-300 hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-mono"
           >
             »
           </button>

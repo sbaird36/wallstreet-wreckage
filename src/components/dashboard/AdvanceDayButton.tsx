@@ -35,7 +35,6 @@ type WeekDayPayload = {
   contactTips: ContactTip[];
   newFollowerCount: number;
   npcVotesOnPlayerPosts: { postId: string; votes: number }[];
-  weeklySkillPoints: number;
   advisorHotTips: AdvisorEmail[];
   advisorWeeklyEmails: AdvisorEmail[];
   newAdvisorPool: Advisor[] | null;
@@ -43,7 +42,7 @@ type WeekDayPayload = {
   weeklyAdvisorFee: number;
 };
 
-export function AdvanceDayButton() {
+export function AdvanceDayButton({ compact = false }: { compact?: boolean }) {
   const { state, dispatch } = useGame();
   const [advancing, setAdvancing] = useState(false);
   const [confirmWeek, setConfirmWeek] = useState(false);
@@ -88,7 +87,6 @@ export function AdvanceDayButton() {
     const netWorth = getNetWorth(state.portfolio, newAssets);
     const newFollowerCount = computeFollowerCount(state.portfolio, netWorth, snp499, targetDay, state.playerVerifiedPostCount ?? 0, state.playerWrongPostCount ?? 0);
     const npcVotesOnPlayerPosts = computeNpcVotesOnPlayerPosts(state, targetDay);
-    const weeklySkillPoints = getDayOfWeek(state.startDate, targetDay) === 1 ? 1 : 0;
 
     // ── Advisor engine ───────────────────────────────────────────────────
     const isMonday = getDayOfWeek(state.startDate, targetDay) === 1;
@@ -113,7 +111,6 @@ export function AdvanceDayButton() {
         newBlogPosts,
         newFollowerCount,
         npcVotesOnPlayerPosts,
-        weeklySkillPoints,
         advisorHotTips,
         advisorWeeklyEmails,
         newAdvisorPool,
@@ -166,7 +163,6 @@ export function AdvanceDayButton() {
       const netWorth = getNetWorth(threaded.portfolio, newAssets);
       const newFollowerCount = computeFollowerCount(threaded.portfolio, netWorth, snp499, targetDay, threaded.playerVerifiedPostCount ?? 0, threaded.playerWrongPostCount ?? 0);
       const npcVotesOnPlayerPosts = computeNpcVotesOnPlayerPosts(threaded, targetDay);
-      const weeklySkillPoints = getDayOfWeek(state.startDate, targetDay) === 1 ? 1 : 0;
 
       // Advisor engine for this day
       const isMon = getDayOfWeek(state.startDate, targetDay) === 1;
@@ -190,7 +186,6 @@ export function AdvanceDayButton() {
         contactTips,
         newFollowerCount,
         npcVotesOnPlayerPosts,
-        weeklySkillPoints,
         advisorHotTips: dayAdvisorHotTips,
         advisorWeeklyEmails: dayAdvisorWeeklyEmails,
         newAdvisorPool: dayAdvisorPool,
@@ -216,6 +211,86 @@ export function AdvanceDayButton() {
     setAdvancing(false);
   }
 
+  // ── Compact mode (embedded in TopNav) ────────────────────────────────
+  if (compact) {
+    return (
+      <div className="relative flex items-center gap-2">
+        {/* Advance button */}
+        <button
+          onClick={handleAdvanceDay}
+          disabled={advancing}
+          className={`
+            flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-medium transition-all duration-150 active:scale-95
+            ${advancing
+              ? "bg-[#151c2f] border-white/[0.07] text-slate-500 cursor-not-allowed"
+              : nextIsWeekend
+              ? "bg-[#151c2f] border-blue-700/70 text-blue-400 hover:bg-[#1e2a45] hover:border-blue-600"
+              : "bg-blue-700 border-blue-600 text-white hover:bg-blue-600"
+            }
+          `}
+        >
+          {advancing ? (
+            <span className="animate-spin inline-block">◌</span>
+          ) : (
+            <span>▶</span>
+          )}
+          <span className="hidden sm:inline">
+            {advancing ? "Processing…" : `Advance to ${nextDayName}`}
+          </span>
+          <span className="sm:hidden">
+            {advancing ? "…" : nextDayName}
+          </span>
+        </button>
+
+        {/* Day info */}
+        <div className="hidden md:flex flex-col leading-none">
+          <span className="text-xs font-mono font-semibold text-white">{currentDayName}</span>
+          <span className="text-[10px] text-slate-500 mt-0.5">Day {state.currentDay}</span>
+        </div>
+
+        {/* Skip to Monday */}
+        {!advancing && (
+          <button
+            onClick={() => setConfirmWeek((v) => !v)}
+            title={`Skip ${daysToNextMonday} days to ${nextMondayName}`}
+            className="hidden md:flex items-center px-2 py-1.5 rounded border text-xs text-slate-400 border-white/[0.07] hover:text-slate-200 hover:border-white/20 transition-colors"
+          >
+            ⏩
+          </button>
+        )}
+
+        {/* Confirmation dropdown */}
+        {confirmWeek && (
+          <div className="absolute top-full left-0 mt-2 z-50 w-72 bg-[#0f1221] border border-yellow-700/60 rounded-xl px-4 py-3 shadow-xl shadow-black/60 flex flex-col gap-3">
+            <div>
+              <div className="text-xs font-semibold text-yellow-400 mb-1">
+                Skip {daysToNextMonday} day{daysToNextMonday !== 1 ? "s" : ""} to {nextMondayName}?
+              </div>
+              <div className="text-xs text-slate-400">
+                All market events and price movements will still occur — simulated at once. A weekly recap will follow.
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleAdvanceWeek}
+                className="flex-1 text-xs px-3 py-1.5 bg-yellow-800 hover:bg-yellow-700 text-yellow-200 rounded border border-yellow-600 transition-colors font-medium"
+              >
+                Yes, skip ahead
+              </button>
+              <button
+                onClick={() => setConfirmWeek(false)}
+                className="text-xs px-3 py-1.5 bg-[#151c2f] hover:bg-[#1e2a45] text-slate-400 hover:text-slate-200 rounded border border-white/[0.07] transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Full mode (standalone panel) ──────────────────────────────────────
   return (
     <div className="flex flex-col gap-2 w-full sm:w-auto">
       {/* Main controls row */}
@@ -230,9 +305,9 @@ export function AdvanceDayButton() {
             transition-all duration-150 flex items-center justify-center sm:justify-start gap-2
             ${
               advancing
-                ? "bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed"
+                ? "bg-[#151c2f] border-white/[0.07] text-slate-500 cursor-not-allowed"
                 : nextIsWeekend
-                ? "bg-gray-800 border-blue-700/70 text-blue-400 hover:bg-gray-700 hover:border-blue-600 active:scale-95"
+                ? "bg-[#151c2f] border-blue-700/70 text-blue-400 hover:bg-slate-700 hover:border-blue-600 active:scale-95"
                 : "bg-blue-700 border-blue-600 text-white hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-900/40 active:scale-95"
             }
           `}
@@ -254,9 +329,9 @@ export function AdvanceDayButton() {
         </button>
 
         {/* Current day info */}
-        <div className="border-l border-gray-800 pl-3 sm:pl-5">
+        <div className="border-l border-white/[0.07] pl-3 sm:pl-5">
           <div className="text-sm font-mono font-bold text-white">{currentDayName}</div>
-          <div className="text-xs text-gray-500 mt-0.5">
+          <div className="text-xs text-slate-400 mt-0.5">
             Day {state.currentDay}
             {nextIsWeekend && (
               <span className="ml-2 text-blue-500/80">· Markets close after today</span>
@@ -268,7 +343,7 @@ export function AdvanceDayButton() {
         {!advancing && (
           <button
             onClick={() => setConfirmWeek(true)}
-            className="text-xs px-3 py-2 rounded border font-mono text-gray-500 border-gray-700 hover:text-gray-300 hover:border-gray-600 transition-colors whitespace-nowrap hidden sm:flex items-center gap-1.5"
+            className="text-xs px-3 py-2 rounded border font-mono text-slate-400 border-white/[0.07] hover:text-slate-300 hover:border-white/20 transition-colors whitespace-nowrap hidden sm:flex items-center gap-1.5"
           >
             <span>⏩</span>
             <span>Skip to Mon</span>
@@ -280,7 +355,7 @@ export function AdvanceDayButton() {
       {!advancing && (
         <button
           onClick={() => setConfirmWeek(true)}
-          className="sm:hidden text-xs px-3 py-2 rounded border font-mono text-gray-500 border-gray-700 hover:text-gray-300 hover:border-gray-600 transition-colors flex items-center gap-1.5 w-fit"
+          className="sm:hidden text-xs px-3 py-2 rounded border font-mono text-slate-400 border-white/[0.07] hover:text-slate-300 hover:border-white/20 transition-colors flex items-center gap-1.5 w-fit"
         >
           <span>⏩</span>
           <span>Skip to Monday</span>
@@ -289,12 +364,12 @@ export function AdvanceDayButton() {
 
       {/* Confirmation prompt */}
       {confirmWeek && (
-        <div className="bg-gray-800 border border-yellow-700/60 rounded-lg px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="bg-[#151c2f] border border-yellow-700/60 rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="flex-1">
             <div className="text-xs font-mono text-yellow-400 font-bold mb-0.5">
               Skip {daysToNextMonday} day{daysToNextMonday !== 1 ? "s" : ""} to {nextMondayName}?
             </div>
-            <div className="text-xs text-gray-400">
+            <div className="text-xs text-slate-300">
               All market events and price movements will still occur — just simulated at once.
               A weekly recap will follow.
             </div>
@@ -308,7 +383,7 @@ export function AdvanceDayButton() {
             </button>
             <button
               onClick={() => setConfirmWeek(false)}
-              className="text-xs px-3 py-2 bg-gray-700 hover:bg-gray-600 text-gray-400 hover:text-gray-200 rounded border border-gray-600 transition-colors font-mono"
+              className="text-xs px-3 py-2 bg-[#151c2f] hover:bg-slate-700 text-slate-400 hover:text-slate-200 rounded border border-white/[0.07] transition-colors font-mono"
             >
               Cancel
             </button>

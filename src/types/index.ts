@@ -119,18 +119,6 @@ export interface FiredEvent {
 }
 
 // ============================================================
-// Hedge Fund Types
-// ============================================================
-
-export interface PlayerHedgeFund {
-  name: string;
-  strategy: string;
-  emoji: string;
-  foundedDay: number;
-  foundedNetWorth: number;
-}
-
-// ============================================================
 // Market Index Types
 // ============================================================
 
@@ -249,6 +237,98 @@ export interface TraderSkills {
   analystAcuity: number;     // 0-5: analyst pick insight & accuracy
   algorithmMastery: number;  // 0-5: stock-picking algorithm upgrades
   eventReading: number;      // 0-5: world/market event awareness
+  riskManagement: number;    // 0-5: risk/drawdown awareness
+  marketTiming: number;      // 0-5: entry/exit timing
+}
+
+// ============================================================
+// Achievement Types
+// ============================================================
+
+export interface Achievement {
+  id: string;
+  unlockedOnDay: number;
+  xpAwarded: number;
+}
+
+// ============================================================
+// NPC Rival Types
+// ============================================================
+
+export interface NpcRival {
+  id: string;
+  name: string;
+  emoji: string;
+  personality: string; // e.g. "Aggressive", "Conservative"
+  weeklyNetWorth: number; // computed each week
+}
+
+// ============================================================
+// Sector Play Types
+// ============================================================
+
+export interface SectorPlay {
+  id: string;
+  sector: string;
+  tickers: string[];
+  startDay: number;
+  completed: boolean;
+  won: boolean | null; // null = active, true/false = resolved
+  resolvedDay: number | null;
+}
+
+// ============================================================
+// Research Purchase Types
+// ============================================================
+
+export type ResearchType = "earnings_preview" | "insider_flow" | "macro_report" | "sentiment_scan";
+
+export interface ResearchPurchase {
+  id: string;
+  type: ResearchType;
+  ticker: string | null;
+  purchasedDay: number;
+  cost: number;
+  result: string; // human-readable result text
+  direction: "bullish" | "bearish" | "neutral" | null;
+}
+
+// ============================================================
+// Weekly Journal Types
+// ============================================================
+
+export interface JournalEntry {
+  weekNumber: number;
+  startDay: number;
+  endDay: number;
+  netWorthStart: number;
+  netWorthEnd: number;
+  changePct: number;
+  tradeCount: number;
+  bestTrade: { ticker: string; returnPct: number } | null;
+  worstTrade: { ticker: string; returnPct: number } | null;
+  narrative: string; // auto-generated summary sentence
+  challengesCompleted: number;
+  achievementsUnlocked: string[];
+}
+
+export type ChallengeType =
+  | "make_trade"
+  | "buy_penny"
+  | "buy_crypto"
+  | "sell_profit"
+  | "big_win"
+  | "hold_diversified"
+  | "portfolio_up";
+
+export interface DailyChallenge {
+  id: string;
+  day: number;
+  type: ChallengeType;
+  description: string;
+  xpReward: number;
+  cashReward: number;
+  completed: boolean;
 }
 
 export interface GameState {
@@ -264,7 +344,6 @@ export interface GameState {
   pendingTrade: PendingTrade | null;
   gameStarted: boolean;
   indexes: Record<string, MarketIndex>;
-  playerHedgeFund: PlayerHedgeFund | null;
   blogFeed: BlogPost[];
   analystUnlocks: string[];                       // individual ticker unlocks ($100 each)
   analystSubscription: AnalystSubscription | null; // weekly all-access ($5,000/week)
@@ -283,6 +362,37 @@ export interface GameState {
   hiredAdvisors: HiredAdvisor[];
   advisorEmails: AdvisorEmail[];
   advisorPoolWeek: number;
+  // XP & progression
+  xp: number;
+  tradeStreak: number;
+  bestTradeStreak: number;
+  dailyChallenges: DailyChallenge[];
+  unlockedMilestones: string[];
+  pendingMilestone: string | null;
+  lastTradeResult: {
+    returnPct: number;
+    profitDollars: number;
+    ticker: string;
+    xpGained: number;
+    streakCount: number;
+    challengesCompleted: number;
+  } | null;
+
+  // Achievements
+  achievements: Achievement[];
+  pendingAchievements: string[]; // achievement IDs to show notification
+
+  // NPC Rivals
+  rivalNetWorths: Record<string, number>; // rivalId -> current net worth
+
+  // Sector plays
+  activeSectorPlays: SectorPlay[];
+
+  // Research
+  researchPurchases: ResearchPurchase[];
+
+  // Journal
+  weeklyJournal: JournalEntry[];
 }
 
 export interface SaveSlot {
@@ -351,7 +461,6 @@ export type GameAction =
         newBlogPosts: BlogPost[];
         newFollowerCount: number;
         npcVotesOnPlayerPosts: { postId: string; votes: number }[];
-        weeklySkillPoints: number;
         advisorHotTips?: AdvisorEmail[];
         advisorWeeklyEmails?: AdvisorEmail[];
         newAdvisorPool?: Advisor[] | null;
@@ -369,7 +478,6 @@ export type GameAction =
   | { type: "LOAD_GAME"; payload: GameState }
   | { type: "NEW_GAME"; payload: { playerName: string; initialState: GameState } }
   | { type: "CANCEL_TRADE" }
-  | { type: "CREATE_HEDGE_FUND"; payload: PlayerHedgeFund }
   | { type: "VOTE_BLOG_POST"; payload: { postId: string; vote: "UP" | "DOWN" | null } }
   | { type: "UNLOCK_ANALYST_STOCK"; payload: { ticker: string } }
   | { type: "BUY_ANALYST_SUBSCRIPTION" }
@@ -394,7 +502,6 @@ export type GameAction =
           contactTips: ContactTip[];
           newFollowerCount: number;
           npcVotesOnPlayerPosts: { postId: string; votes: number }[];
-          weeklySkillPoints: number;
           advisorHotTips?: AdvisorEmail[];
           advisorWeeklyEmails?: AdvisorEmail[];
           newAdvisorPool?: Advisor[] | null;
@@ -402,4 +509,9 @@ export type GameAction =
           weeklyAdvisorFee?: number;
         }>;
       };
-    };
+    }
+  | { type: "DISMISS_MILESTONE" }
+  | { type: "DISMISS_TRADE_RESULT" }
+  | { type: "DISMISS_ACHIEVEMENTS" }
+  | { type: "BUY_RESEARCH"; payload: ResearchPurchase }
+  | { type: "COMPLETE_SECTOR_PLAY"; payload: { id: string; won: boolean; resolvedDay: number } };

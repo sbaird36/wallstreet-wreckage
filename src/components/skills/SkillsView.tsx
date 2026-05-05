@@ -174,6 +174,36 @@ const SKILLS: SkillDef[] = [
       },
     ],
   },
+  {
+    key: "riskManagement",
+    label: "Risk Management",
+    icon: "🛡️",
+    color: "text-rose-400",
+    borderColor: "border-rose-800",
+    bgColor: "bg-rose-900/20",
+    levels: [
+      { name: "Stop-Loss Aware",    description: "You start tracking how far down your positions are.",      mechanic: "Holdings down 10%+ from cost basis highlighted red in portfolio." },
+      { name: "Drawdown Tracker",   description: "You know your worst-case exposure at all times.",           mechanic: "Portfolio shows max drawdown stat + recovery tracking in Stats." },
+      { name: "Portfolio Shield",   description: "One mistake per week doesn't have to define it.",           mechanic: "Once per week, you can reverse a buy trade within 24 hours (undo button appears on fresh positions)." },
+      { name: "Vol Forecaster",     description: "You sense when turbulence is coming before it hits.",      mechanic: "High-volatility assets get a warning badge the day before a volatile event." },
+      { name: "Risk Oracle",        description: "Your whole portfolio risk picture in one glance.",          mechanic: "Daily portfolio concentration risk score shown in dashboard. Alerts when >50% in one asset." },
+    ],
+  },
+  {
+    key: "marketTiming",
+    label: "Market Timing",
+    icon: "⏱️",
+    color: "text-green-400",
+    borderColor: "border-green-800",
+    bgColor: "bg-green-900/20",
+    levels: [
+      { name: "Pattern Reader",   description: "You start to see the rhythm in price movements.",          mechanic: "Price chart shows 7-day moving average overlay on each asset." },
+      { name: "Volume Watcher",   description: "Volume doesn't lie — you know how to read it.",            mechanic: "Market table shows relative volume vs 7-day average (Low/Normal/High/Spike)." },
+      { name: "Momentum Trader",  description: "You ride the wave, not fight it.",                          mechanic: "Momentum score (last 5 days) shown per asset in market table." },
+      { name: "Dip Buyer",        description: "You know when fear creates opportunity.",                    mechanic: "+10 XP bonus when you buy within 2 days of an asset's 14-day low." },
+      { name: "Wave Rider",       description: "Your entries are so good they're almost suspicious.",       mechanic: "Buys near local lows tagged as 'Perfect Entry' in transaction history." },
+    ],
+  },
 ];
 
 // ── Level pip row ─────────────────────────────────────────────────────────────
@@ -185,7 +215,7 @@ function LevelPips({ current, color }: { current: number; color: string }) {
         <div
           key={i}
           className={`w-4 h-1.5 rounded-full transition-colors ${
-            i < current ? color.replace("text-", "bg-") : "bg-gray-700"
+            i < current ? color.replace("text-", "bg-") : "bg-[#1e2a45]"
           }`}
         />
       ))}
@@ -200,14 +230,14 @@ function XPBar({ xp, color }: { xp: number; color: string }) {
   const isGaining = xp > 0;
   const pct = isGaining ? Math.min((xp / 20) * 100, 100) : Math.min((Math.abs(xp) / 10) * 100, 100);
   return (
-    <div className="mt-2 pt-2 border-t border-gray-800">
-      <div className="flex items-center justify-between text-xs text-gray-600 font-mono mb-1">
+    <div className="mt-2 pt-2 border-t border-white/[0.07]">
+      <div className="flex items-center justify-between text-xs text-slate-500 font-mono mb-1">
         <span>{isGaining ? "Organic gain" : "Performance penalty"}</span>
         <span className={isGaining ? "text-emerald-600" : "text-red-600"}>
           {isGaining ? `+${xp.toFixed(1)} / 20` : `${xp.toFixed(1)} / −10`}
         </span>
       </div>
-      <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
+      <div className="h-1 bg-[#151c2f] rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-500 ${isGaining ? color.replace("text-", "bg-") + " opacity-60" : "bg-red-700"}`}
           style={{ width: `${pct}%` }}
@@ -232,14 +262,14 @@ function SkillCard({ skill, currentLevel, currentXP, skillPoints, onUpgrade }: {
   const nextLevel = skill.levels[currentLevel]; // undefined if maxed
 
   return (
-    <div className={`rounded-lg border ${skill.borderColor} ${skill.bgColor} p-4`}>
+    <div className={`rounded-xl border ${skill.borderColor} ${skill.bgColor} p-4`}>
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-xl">{skill.icon}</span>
           <div>
             <h3 className={`text-sm font-mono font-bold ${skill.color}`}>{skill.label}</h3>
-            <div className="text-xs text-gray-500 font-mono mt-0.5">
+            <div className="text-xs text-slate-400 font-mono mt-0.5">
               {isMaxed ? (
                 <span className="text-yellow-400">MASTERED</span>
               ) : (
@@ -258,8 +288,8 @@ function SkillCard({ skill, currentLevel, currentXP, skillPoints, onUpgrade }: {
             <div key={i} className="flex items-start gap-2 text-xs">
               <span className="text-emerald-500 mt-0.5 flex-shrink-0">✓</span>
               <div>
-                <span className="font-mono font-bold text-gray-300">{lvl.name}</span>
-                <span className="text-gray-500 ml-2">{lvl.mechanic}</span>
+                <span className="font-mono font-bold text-slate-200">{lvl.name}</span>
+                <span className="text-slate-400 ml-2">{lvl.mechanic}</span>
               </div>
             </div>
           ))}
@@ -270,10 +300,10 @@ function SkillCard({ skill, currentLevel, currentXP, skillPoints, onUpgrade }: {
       {nextLevel && (
         <div className={`rounded border border-dashed ${skill.borderColor} p-2.5 mb-3`}>
           <div className="flex items-center gap-1.5 mb-1">
-            <span className="text-xs text-gray-500 font-mono uppercase tracking-wider">Next Unlock</span>
+            <span className="text-xs text-slate-400 font-medium">Next Unlock</span>
             <span className={`text-xs font-mono font-bold ${skill.color}`}>Level {currentLevel + 1} · {nextLevel.name}</span>
           </div>
-          <p className="text-xs text-gray-400 leading-relaxed">{nextLevel.description}</p>
+          <p className="text-xs text-slate-300 leading-relaxed">{nextLevel.description}</p>
           <p className={`text-xs font-mono mt-1 ${skill.color}`}>⚡ {nextLevel.mechanic}</p>
         </div>
       )}
@@ -282,7 +312,7 @@ function SkillCard({ skill, currentLevel, currentXP, skillPoints, onUpgrade }: {
       {!isMaxed && currentLevel < MAX_LEVEL - 1 && (
         <div className="flex gap-1 flex-wrap mb-3">
           {skill.levels.slice(currentLevel + 1).map((lvl, i) => (
-            <span key={i} className="text-xs font-mono text-gray-700 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">
+            <span key={i} className="text-xs font-mono text-slate-600 bg-[#151c2f] border border-white/[0.07] rounded px-1.5 py-0.5">
               L{currentLevel + 2 + i} {lvl.name}
             </span>
           ))}
@@ -297,7 +327,7 @@ function SkillCard({ skill, currentLevel, currentXP, skillPoints, onUpgrade }: {
           className={`w-full text-xs font-mono font-bold px-3 py-2 rounded border transition-colors ${
             canAfford
               ? `${skill.bgColor} ${skill.borderColor} ${skill.color} hover:brightness-125 active:scale-95`
-              : "bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed"
+              : "bg-[#151c2f] border-white/[0.07] text-slate-500 cursor-not-allowed"
           }`}
         >
           {canAfford
@@ -320,8 +350,8 @@ function SkillCard({ skill, currentLevel, currentXP, skillPoints, onUpgrade }: {
 // ── Influence tiers ───────────────────────────────────────────────────────────
 
 const INFLUENCE_TIERS = [
-  { min: 0,     label: "Unknown",         color: "text-gray-500" },
-  { min: 100,   label: "Forum Lurker",    color: "text-gray-400" },
+  { min: 0,     label: "Unknown",         color: "text-slate-400" },
+  { min: 100,   label: "Forum Lurker",    color: "text-slate-300" },
   { min: 300,   label: "Regular Poster",  color: "text-blue-400" },
   { min: 700,   label: "Known Trader",    color: "text-cyan-400" },
   { min: 1500,  label: "Market Analyst",  color: "text-green-400" },
@@ -356,24 +386,24 @@ function InfluencePanel({ influence, skillPoints, onSpend }: { influence: number
     : 100;
 
   return (
-    <div className="bg-gray-900 border border-purple-900/50 rounded-lg p-4">
+    <div className="bg-[#0f1221] border border-purple-900/50 rounded-xl p-4">
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
         <div>
-          <h2 className="text-sm font-mono font-bold text-white uppercase tracking-wider">Market Influence</h2>
-          <p className="text-xs text-gray-500 mt-1">
+          <h2 className="text-sm font-mono font-bold text-white">Market Influence</h2>
+          <p className="text-xs text-slate-400 mt-1">
             Grows organically from blog posts, verification, and daily performance.
             Spend skill points to boost it directly.
           </p>
         </div>
         <div className="flex items-center gap-4 flex-shrink-0">
           <div className="text-right">
-            <div className="text-xs text-gray-500 font-mono uppercase tracking-wider">Score</div>
+            <div className="text-xs text-slate-400 font-medium">Score</div>
             <div className="text-2xl font-mono font-bold tabular-nums text-purple-400">
               {influence.toLocaleString()}
             </div>
           </div>
           <div className="text-right">
-            <div className="text-xs text-gray-500 font-mono uppercase tracking-wider">Tier</div>
+            <div className="text-xs text-slate-400 font-medium">Tier</div>
             <div className={`text-base font-mono font-bold ${currentTier.color}`}>
               {currentTier.label}
             </div>
@@ -384,17 +414,17 @@ function InfluencePanel({ influence, skillPoints, onSpend }: { influence: number
       {/* Progress bar */}
       {nextTier && (
         <div className="mb-4">
-          <div className="flex justify-between text-xs text-gray-600 font-mono mb-1">
+          <div className="flex justify-between text-xs text-slate-500 font-mono mb-1">
             <span>{currentTier.label}</span>
             <span>{nextTier.label} at {nextTier.min.toLocaleString()}</span>
           </div>
-          <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+          <div className="h-2 bg-[#151c2f] rounded-full overflow-hidden">
             <div
               className="h-full bg-purple-600 rounded-full transition-all duration-500"
               style={{ width: `${progressPct}%` }}
             />
           </div>
-          <div className="text-xs text-gray-600 font-mono mt-1 text-right">
+          <div className="text-xs text-slate-500 font-mono mt-1 text-right">
             {nextTier.min - influence} more to next tier
           </div>
         </div>
@@ -410,7 +440,7 @@ function InfluencePanel({ influence, skillPoints, onSpend }: { influence: number
         {INFLUENCE_TIERS.map((t) => (
           <span
             key={t.label}
-            className={`text-xs font-mono px-2 py-0.5 rounded border ${influence >= t.min ? `${t.color} border-current opacity-90` : "text-gray-700 border-gray-800"}`}
+            className={`text-xs font-mono px-2 py-0.5 rounded border ${influence >= t.min ? `${t.color} border-current opacity-90` : "text-slate-600 border-white/[0.07]"}`}
           >
             {t.label}
           </span>
@@ -418,25 +448,25 @@ function InfluencePanel({ influence, skillPoints, onSpend }: { influence: number
       </div>
 
       {/* Spend skill point button */}
-      <div className="flex items-center gap-3 pt-3 border-t border-gray-800">
+      <div className="flex items-center gap-3 pt-3 border-t border-white/[0.07]">
         <button
           onClick={onSpend}
           disabled={skillPoints < 1}
           className={`px-4 py-2 rounded border font-mono text-xs font-bold transition-colors ${
             skillPoints >= 1
               ? "bg-purple-900/40 border-purple-700 text-purple-300 hover:bg-purple-800/50 active:scale-95"
-              : "bg-gray-800 border-gray-700 text-gray-600 cursor-not-allowed"
+              : "bg-[#151c2f] border-white/[0.07] text-slate-500 cursor-not-allowed"
           }`}
         >
           Invest 1 skill point → +15 influence
         </button>
-        <span className="text-xs text-gray-600 font-mono">
+        <span className="text-xs text-slate-500 font-mono">
           {skillPoints} pt{skillPoints !== 1 ? "s" : ""} available
         </span>
       </div>
 
       {/* Organic growth note */}
-      <div className="mt-3 text-xs text-gray-600 font-mono space-y-0.5">
+      <div className="mt-3 text-xs text-slate-500 font-mono space-y-0.5">
         <div>· +3 influence per day your portfolio gains &gt;0.5%</div>
         <div>· −1.5 per day your portfolio drops &gt;0.5%</div>
         <div>· +30 per verified post prediction · −12 per wrong call</div>
@@ -449,8 +479,8 @@ function InfluencePanel({ influence, skillPoints, onSpend }: { influence: number
 
 export function SkillsView() {
   const { state, dispatch } = useGame();
-  const skills = state.traderSkills ?? { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 };
-  const skillsXP = state.traderSkillsXP ?? { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0 };
+  const skills = state.traderSkills ?? { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0, riskManagement: 0, marketTiming: 0 };
+  const skillsXP = state.traderSkillsXP ?? { blogLiteracy: 0, analystAcuity: 0, algorithmMastery: 0, eventReading: 0, riskManagement: 0, marketTiming: 0 };
   const skillPoints = state.skillPoints ?? 0;
   const totalSpent = Object.values(skills).reduce((sum, lvl) => {
     let cost = 0;
@@ -478,41 +508,41 @@ export function SkillsView() {
       />
 
       {/* Header */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+      <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-sm font-mono font-bold text-white uppercase tracking-wider">Trader Progression</h1>
-            <p className="text-xs text-gray-500 mt-1">
-              Earn <span className="text-amber-400 font-mono font-bold">{POINTS_PER_WEEK} skill points</span> every Monday.
+            <h1 className="text-sm font-mono font-bold text-white">Trader Progression</h1>
+            <p className="text-xs text-slate-400 mt-1">
+              Earn <span className="text-amber-400 font-mono font-bold">skill points</span> by gaining XP through trading, challenges, and achievements.
               Invest them to permanently unlock new trading capabilities.
             </p>
           </div>
           <div className="flex items-center gap-4 flex-shrink-0">
             <div className="text-right">
-              <div className="text-xs text-gray-500 font-mono uppercase tracking-wider">Available</div>
-              <div className={`text-2xl font-mono font-bold tabular-nums ${skillPoints > 0 ? "text-amber-400" : "text-gray-600"}`}>
+              <div className="text-xs text-slate-400 font-medium">Available</div>
+              <div className={`text-2xl font-mono font-bold tabular-nums ${skillPoints > 0 ? "text-amber-400" : "text-slate-500"}`}>
                 {skillPoints}
               </div>
-              <div className="text-xs text-gray-600 font-mono">skill pts</div>
+              <div className="text-xs text-slate-500 font-mono">skill pts</div>
             </div>
             <div className="text-right">
-              <div className="text-xs text-gray-500 font-mono uppercase tracking-wider">Invested</div>
-              <div className="text-2xl font-mono font-bold tabular-nums text-gray-400">{totalSpent}</div>
-              <div className="text-xs text-gray-600 font-mono">total spent</div>
+              <div className="text-xs text-slate-400 font-medium">Invested</div>
+              <div className="text-2xl font-mono font-bold tabular-nums text-slate-300">{totalSpent}</div>
+              <div className="text-xs text-slate-500 font-mono">total spent</div>
             </div>
           </div>
         </div>
 
         {/* Overall progress bar */}
-        <div className="mt-4 pt-3 border-t border-gray-800">
-          <div className="flex justify-between text-xs text-gray-600 font-mono mb-1.5">
+        <div className="mt-4 pt-3 border-t border-white/[0.07]">
+          <div className="flex justify-between text-xs text-slate-500 font-mono mb-1.5">
             <span>Overall mastery</span>
-            <span>{totalSpent} / {totalCostToMax() * 4} pts</span>
+            <span>{totalSpent} / {totalCostToMax() * 6} pts</span>
           </div>
-          <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-[#151c2f] rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-blue-600 to-amber-500 rounded-full transition-all duration-500"
-              style={{ width: `${Math.min((totalSpent / (totalCostToMax() * 4)) * 100, 100)}%` }}
+              style={{ width: `${Math.min((totalSpent / (totalCostToMax() * 6)) * 100, 100)}%` }}
             />
           </div>
         </div>
@@ -533,12 +563,12 @@ export function SkillsView() {
       </div>
 
       {/* How it works */}
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 text-xs text-gray-500 font-mono space-y-1">
-        <div className="text-gray-400 font-bold uppercase tracking-wider mb-2">How Progression Works</div>
-        <div>· Advance to each <span className="text-white">Monday</span> to collect {POINTS_PER_WEEK} skill points</div>
-        <div>· Points accumulate — spend them any time, in any order</div>
+      <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4 text-xs text-slate-400 font-mono space-y-1">
+        <div className="text-slate-300 font-bold mb-2">How Progression Works</div>
+        <div>· Earn XP by trading, completing challenges, and unlocking achievements</div>
+        <div>· XP thresholds award skill points — they accumulate, spend any time in any order</div>
         <div>· Upgrade costs: L1={UPGRADE_COSTS[0]} · L2={UPGRADE_COSTS[1]} · L3={UPGRADE_COSTS[2]} · L4={UPGRADE_COSTS[3]} · L5={UPGRADE_COSTS[4]} pts</div>
-        <div className="pt-1 text-gray-600">── Organic progression ──</div>
+        <div className="pt-1 text-slate-500">── Organic progression ──</div>
         <div>· <span className="text-cyan-600">Blog Literacy</span> gains XP for verified posts (+1.0) and loses for wrong calls (−0.5)</div>
         <div>· <span className="text-blue-600">Algorithm Mastery</span> gains XP for profitable sells (&gt;5%) and loses for losses (&gt;5%)</div>
         <div>· <span className="text-purple-600">Analyst Acuity</span> gains XP when analyst-informed trades pay off</div>

@@ -14,11 +14,11 @@ const SENTIMENT_BORDER: Record<string, string> = {
 
 function EventCard({ fired, isToday }: { fired: FiredEvent; isToday: boolean }) {
   const borderColor =
-    SENTIMENT_BORDER[fired.event.sentiment] ?? "border-l-gray-500";
+    SENTIMENT_BORDER[fired.event.sentiment] ?? "border-l-slate-400";
 
   return (
     <div
-      className={`border-l-4 ${borderColor} bg-gray-800 rounded-r p-3 mb-2`}
+      className={`border-l-4 ${borderColor} bg-[#151c2f] rounded-r p-3 mb-2`}
     >
       <div className="flex items-start justify-between gap-2 mb-1">
         <div className="flex items-center gap-2">
@@ -29,7 +29,7 @@ function EventCard({ fired, isToday }: { fired: FiredEvent; isToday: boolean }) 
                 TODAY
               </span>
             )}
-            <span className="text-xs text-gray-400">Day {fired.day}</span>
+            <span className="text-xs text-slate-300">Day {fired.day}</span>
           </div>
         </div>
         <SentimentBadge sentiment={fired.event.sentiment} />
@@ -37,7 +37,7 @@ function EventCard({ fired, isToday }: { fired: FiredEvent; isToday: boolean }) 
       <div className="text-sm font-bold text-white mb-1">
         {fired.event.headline}
       </div>
-      <div className="text-xs text-gray-400 mb-2">{fired.event.body}</div>
+      <div className="text-xs text-slate-300 mb-2">{fired.event.body}</div>
       {fired.affectedTickers.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {fired.affectedTickers.slice(0, 6).map((ticker) => {
@@ -58,7 +58,7 @@ function EventCard({ fired, isToday }: { fired: FiredEvent; isToday: boolean }) 
             );
           })}
           {fired.affectedTickers.length > 6 && (
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-slate-400">
               +{fired.affectedTickers.length - 6} more
             </span>
           )}
@@ -82,13 +82,13 @@ export function NewsFeed() {
     .sort((a, b) => b.day - a.day);
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 flex flex-col h-full">
-      <h2 className="text-xs text-gray-400 uppercase tracking-wider mb-3">
+    <div className="bg-[#0f1221] border border-white/[0.07] rounded-xl p-4 flex flex-col h-full">
+      <h2 className="text-sm font-semibold text-slate-300 mb-3">
         Market News
       </h2>
       <div className="overflow-y-auto flex-1 max-h-[500px] pr-1">
         {allEvents.length === 0 ? (
-          <div className="text-center text-gray-600 py-8 text-sm">
+          <div className="text-center text-slate-500 py-8 text-sm">
             No news yet. Advance a day to see what happens.
           </div>
         ) : (

@@ -15,10 +15,10 @@ export function AdvisorSkillBar({ label, value }: Props) {
   return (
     <div>
       <div className="flex justify-between items-center mb-1">
-        <span className="text-xs text-gray-400">{label}</span>
+        <span className="text-xs text-slate-300">{label}</span>
         <span className="text-xs font-mono font-bold text-white">{value}/10</span>
       </div>
-      <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+      <div className="h-1.5 bg-[#1e2a45] rounded-full overflow-hidden">
         <div
           className={`h-full ${color} rounded-full transition-all`}
           style={{ width: `${value * 10}%` }}

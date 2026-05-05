@@ -47,7 +47,7 @@ interface TypeBadgeProps {
 export function TypeBadge({ type }: TypeBadgeProps) {
   const classes =
     type === "stock"
-      ? "bg-gray-800 text-gray-300 border-gray-600"
+      ? "bg-[#151c2f] text-slate-300 border-white/[0.07]"
       : "bg-amber-900 text-amber-300 border-amber-700";
   return (
     <span className={`inline-block text-xs px-2 py-0.5 rounded border ${classes} font-mono`}>
