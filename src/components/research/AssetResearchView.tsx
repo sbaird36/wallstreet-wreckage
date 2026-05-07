@@ -283,6 +283,7 @@ export function AssetResearchView({ ticker }: Props) {
         <div className="flex items-start justify-between flex-wrap gap-4 mb-4">
           <div>
             <div className="flex items-center gap-3 mb-1 flex-wrap">
+              <span className="text-5xl">{asset.emoji}</span>
               <h1 className="text-3xl font-mono font-bold text-white">{ticker}</h1>
               <TypeBadge type={asset.type} />
               {asset.type === "stock" && <SectorBadge sector={asset.sector} />}

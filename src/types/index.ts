@@ -35,6 +35,7 @@ export interface BaseAsset {
   name: string;
   type: AssetType;
   description: string;
+  emoji: string;
   priceHistory: PricePoint[];
   currentPrice: number;
   previousPrice: number;

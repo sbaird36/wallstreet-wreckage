@@ -11,6 +11,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "Goggle dominates search, cloud computing, and advertising. Their AI division, GoggleBrain, recently achieved sentience and is now billing clients emotionally. The CEO drives to work in a self-driving car that occasionally takes scenic detours through other dimensions.",
+    emoji: "🔍",
     volatility: 0.022,
     trend: 0.0008,
     sharesOutstanding: 12_500_000_000,
@@ -25,6 +26,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "Apricot makes phones with slightly rounder corners each year and charges $1,200 more for the privilege. Their latest device, the iSphere, has no buttons, no ports, and no screen — analysts call it a paradigm shift. Customers call it a very expensive ball.",
+    emoji: "🍎",
     volatility: 0.018,
     trend: 0.0006,
     sharesOutstanding: 15_400_000_000,
@@ -39,6 +41,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "Microcoft makes Windows, which occasionally works. Their cloud platform, Azzure, hosts 40% of the world's cat photos. The CEO once accidentally deleted Teams in a live demo and blamed it on a hardware issue. Stock went up 3%.",
+    emoji: "🪟",
     volatility: 0.016,
     trend: 0.0007,
     sharesOutstanding: 7_400_000_000,
@@ -53,6 +56,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "E-Commerce",
     description:
       "Amazoon delivers everything everywhere in two days, including things you didn't know you needed. Their drone delivery service recently achieved sapience and is unionizing. AWS powers 33% of the internet and 100% of the arguments about cloud costs.",
+    emoji: "📦",
     volatility: 0.024,
     trend: 0.0009,
     sharesOutstanding: 10_200_000_000,
@@ -67,6 +71,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Social Media",
     description:
       "Faceborg spent $80 billion building a metaverse that has roughly 12 active users, two of whom are the CEO's mom. Their algorithm is so good at reading emotions it filed for a restraining order against its own users. The company officially changed its name to Meta so people would stop saying 'Faceborg'.",
+    emoji: "👍",
     volatility: 0.031,
     trend: 0.0005,
     sharesOutstanding: 2_750_000_000,
@@ -81,6 +86,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Electric Vehicles",
     description:
       "Teslah makes electric cars that occasionally catch fire but do so in a very innovative way. The CEO tweets stock-moving statements at 3am and once offered to buy a small country on a dare. Their Autopilot feature is described as 'mostly harmless' by regulators.",
+    emoji: "⚡",
     volatility: 0.058,
     trend: 0.001,
     sharesOutstanding: 3_200_000_000,
@@ -95,6 +101,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Streaming",
     description:
       "Netflux has 300 million subscribers and releases 400 original shows per month, of which 3 are good. They recently hired an actual navy to defend against streaming competitors. Password sharing is now punishable by a strongly worded email.",
+    emoji: "🎬",
     volatility: 0.034,
     trend: 0.0004,
     sharesOutstanding: 432_000_000,
@@ -109,6 +116,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "Nviduh makes graphics chips that are mostly used for training AIs to generate pictures of astronauts riding horses. Their chips are so powerful that running one in your basement legally makes you a data center. Demand has outpaced supply since 2020; analysts project this will continue until the heat death of the universe.",
+    emoji: "🖥️",
     volatility: 0.049,
     trend: 0.0015,
     sharesOutstanding: 2_460_000_000,
@@ -123,6 +131,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Space",
     description:
       "SpaceTwo is humanity's best hope for becoming a multi-planetary species, assuming they stop landing on the wrong planets. Their reusable rockets have cut launch costs by 90%, which mostly benefits other rocket companies. The CEO claims to own Mars; Mars has not responded to the claim.",
+    emoji: "🚀",
     volatility: 0.062,
     trend: 0.0012,
     sharesOutstanding: 1_840_000_000,
@@ -137,6 +146,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Fast Food",
     description:
       "McDunks serves 70 million customers daily, most of whom are eating their feelings. Their McFish sandwich recently received a Michelin star, which the Michelin Guide immediately revoked after tasting it sober. The secret sauce is legally classified as a controlled substance in four states.",
+    emoji: "🍔",
     volatility: 0.014,
     trend: 0.0003,
     sharesOutstanding: 750_000_000,
@@ -151,6 +161,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Banking",
     description:
       "JP Morgatron manages $3 trillion in assets and has been fined $40 billion for various infractions, which they consider a rounding error. Their investment banking division helped finance both sides of several conflicts, for efficiency. The CEO's bonus is larger than the GDP of Luxembourg.",
+    emoji: "🏦",
     volatility: 0.020,
     trend: 0.0004,
     sharesOutstanding: 2_940_000_000,
@@ -165,6 +176,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "E-Commerce",
     description:
       "FurnishCo sells home furniture exclusively online, delivering sofas, bed frames, and accent chairs in an average of 14 boxes with instructions translated from a language that may not exist. Their return policy is technically 'hassle-free' if you can figure out how to repackage a sectional. Free shipping applies to everything except the things you actually want shipped.",
+    emoji: "💰",
     volatility: 0.032,
     trend: 0.0003,
     sharesOutstanding: 132_000_000,
@@ -179,6 +191,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "E-Commerce",
     description:
       "Shopifry powers 4 million online stores, including 3.8 million that sell artisanal candles. Their payment platform processes $200 billion per year, taking a small cut that adds up to a large mansion. The CEO runs the company entirely from a skateboard.",
+    emoji: "🛍️",
     volatility: 0.043,
     trend: 0.0006,
     sharesOutstanding: 1_270_000_000,
@@ -193,6 +206,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Social Media",
     description:
       "Twatter is a social media platform where world leaders announce policy changes and people argue about sandwiches. The current owner changed the name, logo, and 80% of the staff, while keeping all the problems. The verification system now costs $8/month and confers the social status of a parking ticket.",
+    emoji: "🐦",
     volatility: 0.071,
     trend: -0.0005,
     sharesOutstanding: 800_000_000,
@@ -207,6 +221,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "Uburr connects people who need rides with drivers who need money, taking 30% of the transaction and calling it a platform fee. Their food delivery arm, Uburr Eats, delivers food that was hot 45 minutes ago. Driver satisfaction is measured in negative Yelp reviews.",
+    emoji: "🚗",
     volatility: 0.038,
     trend: 0.0003,
     sharesOutstanding: 2_070_000_000,
@@ -222,6 +237,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "Intelll makes the chips inside most computers, which is either impressive or terrifying depending on how you feel about Intelll. Their flagship processor, the Corum i9, runs so hot it has been approved as a space heater in 14 states. A marketing campaign to rename themselves 'OuttelL' was abandoned after the design team quit.",
+    emoji: "💾",
     volatility: 0.028,
     trend: 0.0002,
     sharesOutstanding: 4_260_000_000,
@@ -236,6 +252,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "Oractle makes enterprise database software that companies buy because a consultant told them to in 1997 and nobody has dared to remove it since. Their sales team has been described as 'technically legal.' The founder owns an island, a yacht, and a basketball team, though not necessarily in that order of priority.",
+    emoji: "🗄️",
     volatility: 0.021,
     trend: 0.0005,
     sharesOutstanding: 2_740_000_000,
@@ -250,6 +267,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "Saleforce makes CRM software that promises to organize your customer relationships. After implementation, your customer relationships are still chaotic but now they're chaotic inside a cloud dashboard that costs $150 per user per month. The CEO once wore a Hawaiian shirt to a Senate hearing and called it 'disruption.'",
+    emoji: "☁️",
     volatility: 0.033,
     trend: 0.0006,
     sharesOutstanding: 970_000_000,
@@ -264,6 +282,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Social Media",
     description:
       "Snappy is a social media app where photos disappear after 10 seconds, which was considered a privacy feature until people started screenshotting everything. Their augmented reality filters have been blamed for an 18% increase in people who think they look like a dog. Revenue is described as 'present but elusive, like the content itself.'",
+    emoji: "👻",
     volatility: 0.052,
     trend: -0.0003,
     sharesOutstanding: 1_620_000_000,
@@ -278,6 +297,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Social Media",
     description:
       "TokTik serves 30-second videos of people dancing, cooking, and explaining conspiracy theories. Its algorithm is so effective at predicting what you want to watch that several governments have classified it as a national security concern. The average user spends 4.2 hours per day on the app and can no longer read long-form text.",
+    emoji: "🎵",
     volatility: 0.059,
     trend: 0.0008,
     sharesOutstanding: 2_280_000_000,
@@ -292,6 +312,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Social Media",
     description:
       "Pintrest lets users collect images of things they intend to make, buy, or become. Studies show 94% of pinned recipes are never cooked and 99% of pinned home renovations are never attempted. The company describes this as 'aspirational commerce.' Revenue comes from ads for more things people will aspire to and not do.",
+    emoji: "📌",
     volatility: 0.041,
     trend: 0.0002,
     sharesOutstanding: 680_000_000,
@@ -306,6 +327,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Entertainment",
     description:
       "Disnee owns every intellectual property from your childhood and is currently charging you $14.99/month to access them. Their theme parks cost $200 per person to enter, where you wait 3 hours to ride a 90-second attraction themed around a movie from 1994. The CEO is technically a warlock but it has never been confirmed in a press release.",
+    emoji: "🏰",
     volatility: 0.025,
     trend: 0.0004,
     sharesOutstanding: 1_830_000_000,
@@ -320,6 +342,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Entertainment",
     description:
       "Comcrast provides internet and cable service in regions where they are the only provider, which they call a 'monopoly' and regulators call 'a coincidence.' Customer service wait times average 4.5 hours, during which you will hear the same hold music 37 times. Their internet speeds are 'theoretically possible under laboratory conditions.'",
+    emoji: "📡",
     volatility: 0.018,
     trend: 0.0003,
     sharesOutstanding: 4_120_000_000,
@@ -334,6 +357,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Streaming",
     description:
       "Spottify pays musicians $0.003 per stream, which means a song needs to be played 333 times to buy a coffee. They have 600 million users and still lose money, which mathematicians describe as 'an achievement.' Their Discover Weekly playlist knows you better than your therapist and charges significantly less.",
+    emoji: "🎧",
     volatility: 0.042,
     trend: 0.0004,
     sharesOutstanding: 196_000_000,
@@ -348,6 +372,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Retail",
     description:
       "Wal*Mart is the world's largest retailer, a fact that makes local businesses cry. They sell everything from groceries to firearms under one roof, which is either convenient or deeply symbolic. Their employee wages are low enough that many staff qualify for the government assistance programs Wal*Mart's lobby opposes. Investors love the margins.",
+    emoji: "🛒",
     volatility: 0.014,
     trend: 0.0004,
     sharesOutstanding: 2_690_000_000,
@@ -362,6 +387,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Retail",
     description:
       "Targett is the upscale Wal*Mart where you go in for paper towels and leave 45 minutes later having spent $240 on things that weren't on your list but were displayed very attractively near the entrance. Their store layout is engineered by psychologists. The shopping cart has been described as 'a financial trap on wheels.'",
+    emoji: "🎯",
     volatility: 0.019,
     trend: 0.0003,
     sharesOutstanding: 460_000_000,
@@ -376,6 +402,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Retail",
     description:
       "Costcoo sells goods in quantities that require a forklift to transport home. Members pay $65/year for the privilege of buying 96-roll packs of toilet paper. Their hot dog combo has been $1.50 since 1985 as a matter of corporate philosophy, and anyone who tries to raise the price is immediately fired. Analysts call this 'the Costcoo Paradox.'",
+    emoji: "🏪",
     volatility: 0.016,
     trend: 0.0006,
     sharesOutstanding: 444_000_000,
@@ -390,6 +417,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Fintech",
     description:
       "PayPigeon moves money from one person to another digitally, taking a fee both ways and an additional fee for the privilege of withdrawing your own money. Their Venmo subsidiary is used primarily to split dinner tabs and passive-aggressively charge ex-partners $7 for a Spotify account. The CFO describes their fee structure as 'elegant.'",
+    emoji: "💳",
     volatility: 0.035,
     trend: 0.0002,
     sharesOutstanding: 1_080_000_000,
@@ -404,6 +432,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Fintech",
     description:
       "Blokk started as a payments company, accidentally became a crypto company, and is now unclear about what it is. Their CEO changed the company name twice in one year, once to a single letter he later admitted was a typo. The stock correlates 87% with the price of Bytecoin, which the company denies.",
+    emoji: "🔗",
     volatility: 0.055,
     trend: 0.0007,
     sharesOutstanding: 590_000_000,
@@ -418,6 +447,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Fast Food",
     description:
       "Starbuckets charges $9 for a coffee drink with more syllables than ingredients. Their cup sizes are named Small, Medium, Large in Italian, which means 'Tall, Grande, Venti' — none of which mean what they sound like. Baristas misspell your name by law. The company has more loyalty program data than the CIA.",
+    emoji: "☕",
     volatility: 0.020,
     trend: 0.0004,
     sharesOutstanding: 1_140_000_000,
@@ -432,6 +462,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Fast Food",
     description:
       "Chipottle serves burritos the size of your forearm, assembled via a choreographed line that penalizes indecision. Their portion sizes are controlled by the employee's mood, meaning the same item can weigh anywhere between 8 and 32 ounces depending on who scoops the rice. Guacamole is extra. It is always extra.",
+    emoji: "🌯",
     volatility: 0.028,
     trend: 0.0007,
     sharesOutstanding: 286_000_000,
@@ -446,6 +477,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Healthcare",
     description:
       "Johnson & Johnson Jr. makes band-aids, shampoo, and pharmaceutical products with varying degrees of documented safety. Their legal department has been described as 'a country unto itself.' They recently settled a lawsuit for $8.9 billion, which they paid from what the CFO called 'the usual budget line.' Baby powder sold separately.",
+    emoji: "💊",
     volatility: 0.015,
     trend: 0.0003,
     sharesOutstanding: 2_410_000_000,
@@ -460,6 +492,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Healthcare",
     description:
       "Phizer makes medications that cost $800 in America and $12 in Canada, a pricing difference the company attributes to 'research costs' and regulators attribute to 'audacity.' Their drug pipeline is enormous and 94% of it will fail, but the 6% that succeed generate enough revenue to fund the other 94% and a very large yacht.",
+    emoji: "💉",
     volatility: 0.022,
     trend: 0.0004,
     sharesOutstanding: 5_670_000_000,
@@ -474,6 +507,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Automotive",
     description:
       "Fordd makes trucks that are larger than most apartments in major cities. Their F-150 is the best-selling vehicle in America, which says more about American roads than American taste. Their electric vehicle division, Fordd Lightning, was unveiled to great fanfare and is currently on a production pause due to 'reasons.'",
+    emoji: "🚙",
     volatility: 0.030,
     trend: 0.0002,
     sharesOutstanding: 4_010_000_000,
@@ -488,6 +522,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Automotive",
     description:
       "Toyto makes cars that run for 300,000 miles, which is their business problem because you never need to buy a new one. Their Camry is so reliable it has been declared a geological feature in parts of Ohio. Their hybrid technology was invented in 1997 and competitors are still catching up, a fact Toyto mentions at every earnings call.",
+    emoji: "🚘",
     volatility: 0.018,
     trend: 0.0004,
     sharesOutstanding: 6_480_000_000,
@@ -505,6 +540,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "Panther Analytics provides AI-powered data intelligence to government agencies and corporations who need to find patterns in things they probably shouldn't be looking at. Their flagship platform, Seer, processes 40 trillion data points daily and once flagged a national security threat that turned out to be a sourdough bread recipe going viral. Most of their revenue is classified.",
+    emoji: "🐆",
     volatility: 0.055,
     trend: 0.0001,
     sharesOutstanding: 214_000_000,
@@ -519,6 +555,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "Tellio provides the invisible API plumbing behind every unsolicited marketing text you have ever received. Their platform sends 12 billion messages per day on behalf of companies that describe their texts as 'important updates you won't want to miss.' Tellio's terms of service strictly prohibit spam, enforced by an algorithm that has never once flagged a paying customer.",
+    emoji: "📶",
     volatility: 0.048,
     trend: 0.0002,
     sharesOutstanding: 158_000_000,
@@ -533,6 +570,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "DataHound monitors your servers, your applications, and the emotional wellbeing of your engineering team simultaneously. Their dashboard displays 400 metrics, 14 of which are actually useful; engineers know which ones but refuse to tell management. The CEO calls the product 'a window into your infrastructure,' which is accurate if your window shows only red.",
+    emoji: "🏗️",
     volatility: 0.052,
     trend: 0.0002,
     sharesOutstanding: 321_000_000,
@@ -547,6 +585,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "AutoPath builds software robots that automate the repetitive tasks of office workers, who are invited to document those tasks in detail before being reassigned to 'automation oversight roles.' Their bots click through spreadsheets at inhuman speed and crash at roughly human frequency. The ROI calculator on their website always rounds generously upward.",
+    emoji: "🤖",
     volatility: 0.058,
     trend: 0.0001,
     sharesOutstanding: 543_000_000,
@@ -561,6 +600,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Technology",
     description:
       "LearnLoop teaches language, coding, and financial literacy through an app that guilt-trips users with an increasingly distressed cartoon owl for missing a single day. They have 80 million monthly active users, 70 million of whom qualify because the owl emailed them a push notification. The owl now has a verified social media presence and 4 million followers that management counts toward DAUs.",
+    emoji: "📚",
     volatility: 0.045,
     trend: 0.0003,
     sharesOutstanding: 129_000_000,
@@ -575,6 +615,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "E-Commerce",
     description:
       "Cratsy is a marketplace for handmade, vintage, and items described as 'cottagecore aesthetic' that are handmade in the sense that someone applied a decal. Their 14 million sellers list everything from hand-poured candles to algorithmically generated wall art sold as 'limited prints.' The platform's top-selling item three years running is a candle that smells like old books. Shipping costs are added at checkout and are always a surprise.",
+    emoji: "🎀",
     volatility: 0.042,
     trend: 0.0001,
     sharesOutstanding: 127_000_000,
@@ -589,6 +630,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "E-Commerce",
     description:
       "PawShop delivers pet food, supplements, and anxiety medication (for the pet) in boxes that arrive before your pet notices and are immediately sat on. Their autoship subscription model relies on the actuarial certainty that no one knows how to cancel it. When a customer's pet dies, PawShop sends a handwritten sympathy card, which is either remarkably thoughtful or the best retention tactic in retail.",
+    emoji: "🐾",
     volatility: 0.048,
     trend: 0.0001,
     sharesOutstanding: 432_000_000,
@@ -603,6 +645,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Retail",
     description:
       "ReSell Hub is a secondhand clothing marketplace where sellers photograph items in 'golden hour natural light' and describe significant wear as 'vintage character.' Their algorithm suggests a $14 listing for a shirt that cost $11 new. The platform takes 20% of each sale, which sellers accept because they have already listed 400 items and feel emotionally committed to the process.",
+    emoji: "🔄",
     volatility: 0.055,
     trend: -0.0001,
     sharesOutstanding: 118_000_000,
@@ -617,6 +660,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Retail",
     description:
       "FiveSeasons operates large-format home décor stores where every item looks like it belongs in a beach house you saw on Instagram. Their product line refreshes each quarter including 'Transition Fall,' a proprietary season they invented that is essentially regular Fall but with more candles. Inventory turns slowly, clearance markdowns are permanent, and the parking lot is always 60% full in a way that is impossible to interpret.",
+    emoji: "📊",
     volatility: 0.042,
     trend: -0.0001,
     sharesOutstanding: 87_000_000,
@@ -631,6 +675,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Fintech",
     description:
       "NovaFi is a digital bank offering checking, savings, and investment accounts through an app that is extremely smooth to sign up for and increasingly confusing afterward. Their student loan refinancing product is aggressively marketed to people who still do not fully understand compound interest. The CEO describes every product launch as 'democratizing finance,' which he appears to genuinely believe.",
+    emoji: "🏛️",
     volatility: 0.062,
     trend: 0.0002,
     sharesOutstanding: 896_000_000,
@@ -645,6 +690,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Fintech",
     description:
       "PayLater lets you split any purchase into equal installments, making a $280 standing desk feel like a $46 decision until four months later. Their approval process takes 11 seconds, requires no hard credit check, and is described as 'inclusive.' Delinquency rates are 'within expectations,' which is not the same as low but sounds similar if you say it with confidence.",
+    emoji: "💸",
     volatility: 0.058,
     trend: 0.0001,
     sharesOutstanding: 302_000_000,
@@ -659,6 +705,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Fintech",
     description:
       "TradeEasy built a commission-free brokerage app with confetti animations that fire every time you execute a trade, including the losing ones. Their interface makes options trading feel like a mobile game, which regulators have noted in writing on three separate occasions. The app is funded by payment for order flow, which is disclosed in the terms of service in the legally required but least prominent location.",
+    emoji: "📈",
     volatility: 0.065,
     trend: 0.0001,
     sharesOutstanding: 865_000_000,
@@ -673,6 +720,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Healthcare",
     description:
       "MediLink connects patients with licensed physicians via video in under 10 minutes, dramatically shortening the gap between 'I should get this checked' and being told to drink more water. Their platform covers 30 specialties including mental health, which became the fastest-growing segment during a period the company describes only as 'elevated demand.' Average appointment duration: 8 minutes.",
+    emoji: "🏥",
     volatility: 0.055,
     trend: -0.0001,
     sharesOutstanding: 445_000_000,
@@ -687,6 +735,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Healthcare",
     description:
       "WellVia ships prescription medications for hair loss, erectile dysfunction, and anxiety in discreet packaging described as 'thoughtfully minimal.' Their telehealth intake questionnaire takes 4 minutes and asks questions marginally more rigorous than a WebMD symptom checker. They spend 42% of revenue on advertising, which the CFO calls 'brand investment' and the auditors call 'a line item.'",
+    emoji: "🧬",
     volatility: 0.058,
     trend: 0.0002,
     sharesOutstanding: 176_000_000,
@@ -701,6 +750,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Healthcare",
     description:
       "BioTrace develops at-home cancer screening tests that are either going to save millions of lives or generate millions of follow-up appointments that insurance will partially cover. Their flagship test, TraceMax, processes a sample from 'any biological fluid,' a phrase on their homepage that remains unexplained. Clinical sensitivity: 94.2%. Specificity: described in press releases as 'high.'",
+    emoji: "🔬",
     volatility: 0.052,
     trend: 0.0001,
     sharesOutstanding: 161_000_000,
@@ -715,6 +765,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Entertainment",
     description:
       "Blocktopia is a gaming platform where users build, share, and monetize experiences using virtual currency called BlokBucks, which cost real money to acquire and approximately nothing to lose. Their 65 million monthly players are 80% under the age of 16, a demographic their advertisers describe as 'highly engaged.' The platform's top developer earned $4 million last year. Blocktopia earned considerably more.",
+    emoji: "🎭",
     volatility: 0.048,
     trend: 0.0002,
     sharesOutstanding: 625_000_000,
@@ -729,6 +780,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Entertainment",
     description:
       "BuildEngine powers 60% of all mobile games through a development platform that is free until you start making money, at which point the pricing has been restructured three times in 18 months, each time accompanied by a blog post titled 'Listening to Our Community.' Developers say the pricing is confusing. BuildEngine says it is simpler. Both cannot be correct.",
+    emoji: "🏢",
     volatility: 0.055,
     trend: -0.0001,
     sharesOutstanding: 387_000_000,
@@ -743,6 +795,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Streaming",
     description:
       "StreamBox runs the operating system on 80 million smart TVs and streaming sticks, giving them precise knowledge of what you are watching, when you paused it, and what you switched to when you got bored. Their advertising platform sells this intelligence to brands in what they call an 'audience insights ecosystem.' Device margin: 3%. Data margin: not disclosed.",
+    emoji: "📺",
     volatility: 0.042,
     trend: 0.0001,
     sharesOutstanding: 142_000_000,
@@ -757,6 +810,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Social Media",
     description:
       "ConnectApp owns four dating apps targeting four demographics who are all looking for the same things but prefer different UIs and price points. Their subscription tiers — Bronze, Gold, and Platinum — gate basic features behind paywalls, with Platinum unlocking the ability to see who liked you, information that is free on every competitor. Monthly active users are up. Meaningful connections are described as 'a lagging indicator.'",
+    emoji: "📱",
     volatility: 0.048,
     trend: 0.0001,
     sharesOutstanding: 235_000_000,
@@ -771,6 +825,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Fast Food",
     description:
       "LeafEats sells build-your-own salads at prices that make a burger feel like financial responsibility. Each location uses compostable packaging that cannot be composted by any municipal facility within 300 miles, which the company offsets with carbon credits described in press releases as 'certified.' They are profitable in 34% of their locations and describe this as 'the path to unit economics.'",
+    emoji: "👜",
     volatility: 0.045,
     trend: 0.0002,
     sharesOutstanding: 98_000_000,
@@ -785,6 +840,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Fast Food",
     description:
       "BrewBros operates drive-through coffee stands staffed by employees who are trained to compliment your car and memorize your name, which customers find either charming or unsettling depending on the visit. Their menu offers 14,000 possible drink combinations, of which most customers order the same 8. Each new market opening involves a line of cars that blocks the nearest intersection for several hours, which local news covers as a traffic story.",
+    emoji: "🍺",
     volatility: 0.042,
     trend: 0.0003,
     sharesOutstanding: 167_000_000,
@@ -799,6 +855,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Electric Vehicles",
     description:
       "TerraRide builds electric pickup trucks and commercial vans for customers who want to haul things sustainably. Their rated range of 350 miles drops to 180 miles when you actually use the truck to haul things, which TerraRide attributes to 'payload conditions.' Annual production has reached 16,000 units, a figure they call 'ramping' and analysts call 'a concern.' The reservation waitlist is two years. The stock is down 65% from IPO.",
+    emoji: "🌿",
     volatility: 0.068,
     trend: -0.0001,
     sharesOutstanding: 912_000_000,
@@ -813,6 +870,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Electric Vehicles",
     description:
       "LucentEV makes luxury electric sedans with a 516-mile range, the longest in the industry, which is primarily of interest to people who commute 19 miles. Their factory can produce 90,000 vehicles annually, which would be useful if they could sell 90,000 vehicles annually. Current run rate: 6,800. The CEO describes this as 'the early innings of a multi-decade opportunity,' which is technically unfalsifiable.",
+    emoji: "💡",
     volatility: 0.072,
     trend: -0.0002,
     sharesOutstanding: 2_260_000_000,
@@ -827,6 +885,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Banking",
     description:
       "Cascade Bank is a regional commercial lender serving real estate developers and small businesses across the Mountain West, which means they have a lot of feelings about the Federal Reserve. Their loan portfolio is 'conservatively positioned by historical standards,' a phrase that appears in every quarterly letter regardless of actual conditions. They have paid a dividend without interruption since 1997 and mention this every quarter.",
+    emoji: "🏦",
     volatility: 0.042,
     trend: 0.0001,
     sharesOutstanding: 112_000_000,
@@ -841,6 +900,7 @@ export const INITIAL_STOCKS: Omit<
     sector: "Space",
     description:
       "OrbitalSync launches small satellites for government agencies, universities, and companies that want to observe specific parts of the Earth for reasons they prefer not to specify. Their Relay-9 rocket puts 300kg into low orbit for roughly the cost of a Manhattan studio apartment. They have completed 36 launches, of which 33 were fully successful and 3 are officially designated 'partial mission completion events.'",
+    emoji: "🛸",
     volatility: 0.062,
     trend: 0.0001,
     sharesOutstanding: 244_000_000,
@@ -864,6 +924,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "MemeCo monetizes internet humor through an NFT marketplace where digital pictures of cats in astronaut suits sell for $12,000. Their valuation assumes each meme has a 0.3% chance of becoming 'culturally significant,' a metric they invented. The CEO was previously banned from three crypto exchanges for reasons he describes as 'vibes-related.'",
+    emoji: "🔩",
     volatility: 0.105,
     trend: -0.002,
     sharesOutstanding: 48_000_000,
@@ -878,6 +939,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "YOLO Financial offers investment accounts with 'maximum risk settings' that the company describes as features, not warnings. Their flagship product, the YOLO Portfolio, is 100% invested in whatever their 23-year-old community manager is feeling excited about that morning. The terms of service include the phrase 'past performance was terrible.'",
+    emoji: "🎲",
     volatility: 0.12,
     trend: -0.002,
     sharesOutstanding: 62_000_000,
@@ -892,6 +954,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "Rektd Capital provides peer-to-peer loans to people who have been declined by every other financial institution, which they market as 'democratizing access to credit.' Default rates are 'healthy' by their own definition of the word. The CFO has a recurring calendar event titled 'Accept Reality' every first Monday of the month.",
+    emoji: "💀",
     volatility: 0.135,
     trend: -0.002,
     sharesOutstanding: 35_000_000,
@@ -906,6 +969,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "Lunara Mining claims to own mineral rights on 30% of the Moon's surface based on a legal interpretation reviewed by an AI lawyer in 2024. Their actual operations consist of two telescopes, a PowerPoint deck, and a geologist named Gerald who is 'technically up there in spirit.' First extraction expected Q4 of whatever year seems most convincing at investor meetings.",
+    emoji: "🌙",
     volatility: 0.095,
     trend: -0.002,
     sharesOutstanding: 55_000_000,
@@ -920,6 +984,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "ShroomCorp is developing psilocybin-based pharmaceuticals for anxiety, depression, and 'the general feeling that things are fine but also somehow not fine.' Their Phase 2 trials were reportedly very interesting. The research team is described as 'enthusiastic' and 'chronically late to meetings.' FDA review pending, possibly for years.",
+    emoji: "🍄",
     volatility: 0.11,
     trend: -0.002,
     sharesOutstanding: 40_000_000,
@@ -934,6 +999,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "GreenBud operates cannabis dispensaries in states where it is legal and cannabis companies in states where the law is 'ambiguous.' Their wellness line includes CBD-infused everything and a topical that customers describe as 'probably working.' Revenue is real but audited with 'significant judgment.'",
+    emoji: "🌿",
     volatility: 0.115,
     trend: -0.002,
     sharesOutstanding: 72_000_000,
@@ -948,6 +1014,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "BuzzFuel sells energy drinks made from ingredients that are 'natural' in the way crude oil is technically organic. Their flagship drink, BuzzMax, contains 480mg of caffeine and is legally required to include a physician waiver in seven states. A Reddit post described it as 'drinking anxiety in liquid form,' which the company used as an ad tagline.",
+    emoji: "🐝",
     volatility: 0.10,
     trend: -0.002,
     sharesOutstanding: 58_000_000,
@@ -962,6 +1029,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "Vibology is a social media platform where users share nothing except their 'vibe' — a proprietary emotional score between 1 and 10. There is no text, no images, and no monetization strategy. The app has 2 million daily users who describe it as 'therapeutic.' Revenue is 'forthcoming,' according to a blog post from 2023.",
+    emoji: "✨",
     volatility: 0.13,
     trend: -0.002,
     sharesOutstanding: 44_000_000,
@@ -976,6 +1044,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "Squirrel Analytics offers AI-powered business intelligence described as 'seeing around corners.' Their models were trained on publicly available data plus 'some stuff we found.' Product demos are impressive; reproducibility in client environments is inconsistent. The CTO insists this is a 'calibration issue' and not a 'fundamental problem.'",
+    emoji: "🐿️",
     volatility: 0.115,
     trend: -0.002,
     sharesOutstanding: 31_000_000,
@@ -990,6 +1059,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "Noot is a streaming platform exclusively for content about seals, sea lions, and related pinnipeds. They have 200,000 subscribers, none of whom can fully explain why they subscribed. A Noot original documentary about a walrus named Glenn received 40 million views and briefly caused Noot stock to jump 180%. They have not been able to find another Glenn.",
+    emoji: "🦦",
     volatility: 0.095,
     trend: -0.002,
     sharesOutstanding: 28_000_000,
@@ -1004,6 +1074,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "PloppBio makes homeopathic remedies so diluted that, per their own literature, 'no original molecules may remain.' Their flagship product, PloppWater, is certified organic and double-blind tested, with results the company describes as 'directionally positive.' The FDA has sent 14 letters; PloppBio describes these as 'ongoing dialogue.'",
+    emoji: "💧",
     volatility: 0.14,
     trend: -0.002,
     sharesOutstanding: 22_000_000,
@@ -1018,6 +1089,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "Chad Premium sells luxury goods marketed exclusively to people who need others to know they spent more than necessary. Their flagship product, the Chad Watch, costs $4,800 and tells time exactly as well as a $15 Casio. The brand's motto is 'You've Earned This.' Return rate: 2%. Regret rate: untracked.",
+    emoji: "💪",
     volatility: 0.09,
     trend: -0.002,
     sharesOutstanding: 18_000_000,
@@ -1032,6 +1104,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "BobaCoin operates bubble tea kiosks that accept only their proprietary BobaCoin cryptocurrency as payment. Regular money is available via an in-app converter for a 6% fee. The company raised $40M in a token sale the CEO called 'the future of tea.' Three locations are profitable. Seventeen are not. Management calls this 'the scaling phase.'",
+    emoji: "🧋",
     volatility: 0.12,
     trend: -0.002,
     sharesOutstanding: 51_000_000,
@@ -1046,6 +1119,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "GroundFloor has been 'pre-IPO' since 2018, which is either a strategic long game or a sign of something else. Their product is a platform for organizing other platforms, which their website calls 'meta-infrastructure.' The CEO's LinkedIn bio says he 'builds things that build things.' Investors are described as 'getting in early,' which is technically true.",
+    emoji: "☕",
     volatility: 0.13,
     trend: -0.002,
     sharesOutstanding: 39_000_000,
@@ -1060,6 +1134,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "Smokescreen Labs describes itself as 'an AI-first, full-stack, Web3-enabled, quantum-adjacent technology company.' Their actual product is unclear even after reading the website three times. Revenue comes from consulting engagements with companies that also aren't sure what they're buying. The VP of Product has a whiteboard in every photo.",
+    emoji: "💨",
     volatility: 0.105,
     trend: -0.002,
     sharesOutstanding: 45_000_000,
@@ -1074,6 +1149,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "ZappScoot deploys electric scooters that work 60% of the time and are located within a half-mile of your destination 40% of the time. Their 'Last Mile' solution has been cited in 14 municipal lawsuits, which Zapp calls 'engagement.' The scooters are technically allowed on bike lanes, sidewalks, and the median, depending on the jurisdiction and how fast you're going.",
+    emoji: "⚡",
     volatility: 0.11,
     trend: -0.002,
     sharesOutstanding: 66_000_000,
@@ -1088,6 +1164,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "FOMO Holdings buys into trending assets at their peak and holds until the narrative changes, which they call 'momentum investing.' Their portfolio has included NFTs, SPAC shares, meme stocks, and at one point a significant position in decorative gourds. Annualized return since inception: -22%. The CEO calls it 'finding the floor.'",
+    emoji: "😱",
     volatility: 0.12,
     trend: -0.002,
     sharesOutstanding: 53_000_000,
@@ -1102,6 +1179,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "PumpUp makes fitness wearables that track 47 biometric data points, of which 43 are of unclear medical relevance. Their AI coach, GRIT, delivers motivational messages every 20 minutes and cannot be turned off. The band's battery lasts 9 hours, which the company calls 'all-day' if your day starts at noon.",
+    emoji: "🚀",
     volatility: 0.10,
     trend: -0.002,
     sharesOutstanding: 37_000_000,
@@ -1116,6 +1194,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "Dunk makes a sports analytics platform for amateur bettors described as 'professional-grade' despite being sold to non-professionals. Their win-rate algorithm guarantees 'above-average accuracy,' which their data shows is correct roughly 51% of the time. The app has a terms section titled 'Please Read This — We Mean It,' which no one has read.",
+    emoji: "🏀",
     volatility: 0.115,
     trend: -0.002,
     sharesOutstanding: 29_000_000,
@@ -1130,6 +1209,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "HypeCycle uses AI to predict which products, ideas, and trends will be popular before they are popular — a capability they call 'temporal alpha.' Their top 2025 prediction was 'AI will be big,' which was correct. Their other 11 predictions are still 'pending confirmation.' The company has been in stealth mode for 4 years and is now in 'loud whisper mode.'",
+    emoji: "📣",
     volatility: 0.095,
     trend: -0.002,
     sharesOutstanding: 41_000_000,
@@ -1144,6 +1224,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "Gurt delivers probiotic yogurt via subscription with flavors including 'Kale-Berry Redemption,' 'Oat Milk Apology,' and 'Plain (for people who gave up).' Their gut health app integrates with your calendar to ensure you eat at optimal intestinal timing. Customer acquisition cost: $240. Customer lifetime value: $85. Management is aware.",
+    emoji: "🥛",
     volatility: 0.125,
     trend: -0.002,
     sharesOutstanding: 24_000_000,
@@ -1158,6 +1239,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "PonkChain is building blockchain infrastructure for an industry they have not yet identified. Current use cases include 'supply chain transparency for artisanal goods' and 'decentralized dog breeding records.' Their token, $PONK, has been listed and delisted from three exchanges. The whitepaper is 140 pages long and uses the word 'revolutionary' 34 times.",
+    emoji: "🎪",
     volatility: 0.14,
     trend: -0.002,
     sharesOutstanding: 88_000_000,
@@ -1172,6 +1254,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "Blink Diagnostics markets a wearable that detects early signs of stress by analyzing blink rate, pupil dilation, and how you type text messages. Clinical validation is 'ongoing.' The device costs $399, requires a $29/month subscription, and sends notifications like 'Your cortisol pattern suggests mild existential concern.' Audited accuracy: 52%.",
+    emoji: "👁️",
     volatility: 0.10,
     trend: -0.002,
     sharesOutstanding: 33_000_000,
@@ -1186,6 +1269,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "MoonShot Resources holds mining rights to 'significant asteroid mineral deposits,' which is either the investment opportunity of the century or science fiction with investor relations branding. Their technology roadmap begins with 'secure launch contract' in a slide deck from 2021 that has not been updated. The CEO uses 'trillion-dollar upside' in all public communications.",
+    emoji: "🧠",
     volatility: 0.11,
     trend: -0.002,
     sharesOutstanding: 47_000_000,
@@ -1200,6 +1284,7 @@ export const PENNY_STOCKS: Omit<
     sector: "Speculative",
     description:
       "DeepCore builds underground data centers cooled by geothermal energy, a genuinely interesting concept undermined by the fact that they have dug in the wrong place three times. Current operational depth: 40 meters. Target depth: 800 meters. Timeline to profitability: 'soon.' Regulatory status: 'under review in two states.'",
+    emoji: "⛏️",
     volatility: 0.105,
     trend: -0.002,
     sharesOutstanding: 26_000_000,

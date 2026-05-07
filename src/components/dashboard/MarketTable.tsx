@@ -8,6 +8,7 @@ import { SectorBadge, TypeBadge } from "@/components/ui/Badge";
 import { AssetSignals } from "@/components/dashboard/AssetSignals";
 import { getPriceChangePercent } from "@/utils/calculations";
 import { formatPrice } from "@/utils/formatting";
+import { getSignals, SIGNAL_FILTERS } from "@/utils/signals";
 import type { Asset, Sector } from "@/types";
 
 type Tab = "stocks" | "crypto";
@@ -21,10 +22,12 @@ export function MarketTable() {
   const [sort, setSort] = useState<SortKey>("change");
   const [sortDir, setSortDir] = useState<1 | -1>(-1);
   const [sectorFilter, setSectorFilter] = useState<Sector | null>(null);
+  const [signalFilter, setSignalFilter] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
   const allAssets = Object.values(state.assets);
+  const { activeEvents, currentDay, blogFeed } = state;
 
   const availableSectors = useMemo(() => {
     const sectors = new Set<Sector>();
@@ -44,7 +47,11 @@ export function MarketTable() {
         if (a.type !== "crypto") return false;
       }
       if (q) {
-        return a.ticker.toLowerCase().includes(q) || a.name.toLowerCase().includes(q);
+        if (!a.ticker.toLowerCase().includes(q) && !a.name.toLowerCase().includes(q)) return false;
+      }
+      if (signalFilter) {
+        const sigs = getSignals(a, activeEvents, currentDay, blogFeed);
+        if (!sigs.some((s) => s.key === signalFilter)) return false;
       }
       return true;
     });
@@ -54,7 +61,7 @@ export function MarketTable() {
       if (sort === "price") return (a.currentPrice - b.currentPrice) * sortDir;
       return (getPriceChangePercent(a) - getPriceChangePercent(b)) * sortDir;
     });
-  }, [allAssets, tab, sectorFilter, sort, sortDir, search]);
+  }, [allAssets, tab, sectorFilter, signalFilter, sort, sortDir, search, activeEvents, currentDay, blogFeed]);
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -73,6 +80,7 @@ export function MarketTable() {
   function handleTabChange(t: Tab) {
     setTab(t);
     setSectorFilter(null);
+    setSignalFilter(null);
     setSearch("");
     setPage(1);
   }
@@ -81,6 +89,24 @@ export function MarketTable() {
     setSectorFilter(sector);
     setPage(1);
   }
+
+  function handleSignalFilter(key: string | null) {
+    setSignalFilter((prev) => (prev === key ? null : key));
+    setPage(1);
+  }
+
+  // Compute which signal keys have at least one matching asset (for current tab)
+  const activeSignalKeys = useMemo(() => {
+    const tabAssets = allAssets.filter((a) =>
+      tab === "stocks" ? a.type === "stock" : a.type === "crypto"
+    );
+    const keys = new Set<string>();
+    for (const a of tabAssets) {
+      const sigs = getSignals(a, activeEvents, currentDay, blogFeed);
+      for (const s of sigs) keys.add(s.key);
+    }
+    return keys;
+  }, [allAssets, tab, activeEvents, currentDay, blogFeed]);
 
   function handleQuickBuy(asset: Asset) {
     dispatch({
@@ -176,6 +202,35 @@ export function MarketTable() {
         </div>
       )}
 
+      {/* Signal filter pills — only show signals that have at least one matching asset */}
+      {activeSignalKeys.size > 0 && (
+        <div className="flex flex-wrap gap-1 mb-3">
+          {SIGNAL_FILTERS.filter((f) => activeSignalKeys.has(f.key)).map((f) => (
+            <button
+              key={f.key}
+              onClick={() => handleSignalFilter(f.key)}
+              title={f.label}
+              className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border transition-colors ${
+                signalFilter === f.key
+                  ? "bg-[#151c2f] border-white/20 text-white"
+                  : "border-white/[0.07] text-slate-500 hover:border-white/20 hover:text-slate-300"
+              }`}
+            >
+              <span>{f.icon}</span>
+              <span className="hidden sm:inline">{f.label}</span>
+            </button>
+          ))}
+          {signalFilter && (
+            <button
+              onClick={() => handleSignalFilter(null)}
+              className="text-xs px-2.5 py-1 rounded-full border border-white/[0.07] text-slate-500 hover:text-slate-300 hover:border-white/20 transition-colors"
+            >
+              ✕ Clear
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
@@ -206,12 +261,15 @@ export function MarketTable() {
                   className="hover:bg-[#151c2f]/50 transition-colors"
                 >
                   <td className="py-3">
-                    <Link href={href} className="group">
-                      <div className="font-mono font-bold text-white text-sm group-hover:text-blue-400 transition-colors">
-                        {asset.ticker}
-                      </div>
-                      <div className="text-slate-400 text-xs truncate max-w-[120px]">
-                        {asset.name}
+                    <Link href={href} className="group flex items-center gap-2.5">
+                      <span className="text-2xl">{asset.emoji}</span>
+                      <div>
+                        <div className="font-mono font-bold text-white text-sm group-hover:text-blue-400 transition-colors">
+                          {asset.ticker}
+                        </div>
+                        <div className="text-slate-400 text-xs truncate max-w-[120px]">
+                          {asset.name}
+                        </div>
                       </div>
                     </Link>
                     <AssetSignals asset={asset} />
